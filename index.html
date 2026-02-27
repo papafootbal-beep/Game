@@ -225,14 +225,13 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
   overflow: hidden; position: relative;
 }
 .rarity-seg-label {
-  font-family: 'Rajdhani', sans-serif; font-size: 9.5px; font-weight: 700;
-  color: rgba(255,255,255,0.92); white-space: nowrap; pointer-events: none;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  line-height: 1;
+  font-family: 'Rajdhani', sans-serif; font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.95); white-space: nowrap; pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7); line-height: 1;
+  position: absolute; left: 50%; transform: translateX(-50%);
 }
-.rarity-seg-label .pity-plus {
-  color: #86efac; font-size: 8px;
-}
+.rarity-seg { position: relative; overflow: hidden; }
+.rarity-seg-label .pity-plus { display: none; }
 .open-case-btn {
   width: calc(100% - 36px); margin: 0 18px 16px;
   padding: 12px; border-radius: 10px; border: none;
@@ -1199,16 +1198,24 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 
 <!-- ===== CLICKER SCREEN ===== -->
 <div class="screen active" id="screen-clicker">
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="s-label">Зароблено всього</div>
-      <div class="s-val" id="totalEarned">0€</div>
+  <!-- П.11: Capital mini-banner -->
+  <div style="background:linear-gradient(135deg,#1a1209,#2d1f0e);border:1px solid rgba(245,200,66,.25);border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(circle at 70% 50%,rgba(245,200,66,.05),transparent);pointer-events:none;"></div>
+    <div>
+      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Капітал</div>
+      <div style="font-size:17px;font-weight:800;color:var(--gold);font-family:'Orbitron',sans-serif;" id="clickerCapTotal">0€</div>
     </div>
-    <div class="stat-card">
-      <div class="s-label">Дохід за клік</div>
-      <div class="s-val"><span id="perClickDisplay">1</span>€</div>
+    <div style="text-align:center;">
+      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Баланс</div>
+      <div style="font-size:14px;font-weight:700;color:var(--green);" id="clickerBalance">0€</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Forbes</div>
+      <div style="font-size:14px;font-weight:800;color:var(--gold);font-family:'Orbitron',sans-serif;" id="clickerForbes">#—</div>
     </div>
   </div>
+  <!-- hidden spans for totalEarned and perClickDisplay used elsewhere -->
+  <div style="display:none;"><span id="totalEarned">0€</span><span id="perClickDisplay">1</span></div>
 
   <div class="click-area">
     <button class="click-btn" id="clickBtn" onclick="handleClick(event)">💰</button>
@@ -1240,11 +1247,8 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 
 <!-- ===== INVENTORY SCREEN ===== -->
 <div class="screen" id="screen-inventory">
-  <div class="inv-header" style="margin-bottom:0">
-    <div class="section-title" style="margin:0">🎒 Склад</div>
-    <div class="inv-count" id="invCount">0 предметів</div>
-  </div>
-  <div class="shop-tabs">
+  <div style="display:none;"><span id="invCount"></span></div>
+  <div class="shop-tabs" style="margin-top:6px;">
     <button class="shop-tab active" id="invTab-items" onclick="switchInvTab('items')">📦 Предмети</button>
     <button class="shop-tab" id="invTab-upgrades" onclick="switchInvTab('upgrades')">⬆️ Покращення</button>
     <button class="shop-tab" id="invTab-collections" onclick="switchInvTab('collections')">🏅 Колекції</button>
@@ -1282,11 +1286,7 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
     </div>
   </div>
   <div id="shopUnlocked" style="display:none">
-    <div class="inv-header" style="margin-bottom:0">
-      <div class="section-title" style="margin:0">🏪 Онлайн-Магазин</div>
-      <div class="inv-count" id="shopCount"></div>
-    </div>
-
+    <div style="display:none;"><span id="shopCount"></span></div>
     <!-- Tabs -->
     <div class="shop-tabs">
       <button class="shop-tab active" id="shopTab-listings" onclick="switchShopTab('listings')">📋 Лістинги</button>
@@ -1310,6 +1310,11 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
       <div id="multUpgradeCard"></div>
       <div id="shopLimitUpgradeCard"></div>
       <div id="listAllMaxCard"></div>
+      <!-- Колекційні покращення -->
+      <div style="margin-top:6px;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;padding:0 2px;">🏆 Покращення колекцій</div>
+        <div id="collShopUpgradesContainer"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1465,8 +1470,8 @@ const UPGRADES = [
   // ── Ранній етап ───────────────────────────────────────────
   { id:'glove',   name:'Рукавичка',        icon:'🧤', price:50,          clickBonus:2,     passiveBonus:0,    desc:'+2€ за клік' },
   { id:'fast',    name:'Швидкий палець',   icon:'⚡', price:500,         clickBonus:5,     passiveBonus:0,    desc:'+5€ за клік' },
-  { id:'auto1',   name:'Авто-клікер v1',  icon:'🤖', price:2_000,       clickBonus:0,     passiveBonus:15,   desc:'+15€/сек пасивно' },
-  { id:'energy',  name:'Енергетик',        icon:'🥤', price:10_000,      clickBonus:50,    passiveBonus:0,    desc:'+50€ за клік' },
+  { id:'energy',  name:'Енергетик',        icon:'🥤', price:2_000,       clickBonus:50,    passiveBonus:0,    desc:'+50€ за клік' },
+  { id:'auto1',   name:'Авто-клікер v1',  icon:'🤖', price:10_000,      clickBonus:0,     passiveBonus:15,   desc:'+15€/сек пасивно' },
   { id:'golden',  name:'Золотий тач',      icon:'✨', price:50_000,      clickBonus:200,   passiveBonus:0,    desc:'+200€ за клік' },
   // ── Середній етап ─────────────────────────────────────────
   { id:'cyber',   name:'Кібер-рукавиця',   icon:'🦾', price:250_000,     clickBonus:800,   passiveBonus:0,    desc:'+800€ за клік' },
@@ -1505,484 +1510,484 @@ const CASES = [
   { id:'street', name:'Street Stuff', icon:'__ELEC_CASE__', price:15,
     desc:'Вуличний набір на кожен день', color:'#64748b',
     items:[
-      {name:'Спіннер',          emoji:'🌀', rarity:'common',    value:2},
-      {name:'Кабель USB',       emoji:'🔋', rarity:'common',    value:3},
-      {name:'Брелок',           emoji:'🗝️', rarity:'common',    value:1},
-      {name:'Попсокет',         emoji:'🔵', rarity:'common',    value:2},
-      {name:'Шкарпетки',        emoji:'🧦', rarity:'common',    value:5},
-      {name:'Чохол',            emoji:'📱', rarity:'common',    value:4},
-      {name:'Флешка 128GB',     emoji:'💾', rarity:'rare',      value:8},
-      {name:'Запальничка Zippo',emoji:'🔥', rarity:'rare',      value:15},
-      {name:'Кепка',            emoji:'🧢', rarity:'rare',      value:22},
-      {name:'Гаманець',         emoji:'👛', rarity:'rare',      value:30},
-      {name:'Навушники Skullcandy',emoji:'🎧',rarity:'epic',    value:45},
-      {name:'Термос Stanley',   emoji:'🧴', rarity:'epic',      value:40},
-      {name:'Парасолька Xiaomi',emoji:'☂️', rarity:'epic',      value:35},
-      {name:'JBL Flip 6',       emoji:'🔊', rarity:'legendary', value:110},
-      {name:'Powerbank 30000mAh',emoji:'⚡',rarity:'legendary', value:85},
+      {name:'Брелок',              emoji:'🗝️', rarity:'common',    value:1},
+      {name:'Попсокет',            emoji:'🔵', rarity:'common',    value:2},
+      {name:'Чохол',               emoji:'📱', rarity:'common',    value:3},
+      {name:'Шкарпетки',           emoji:'🧦', rarity:'common',    value:2},
+      {name:'Кабель USB',          emoji:'🔋', rarity:'common',    value:4},
+      {name:'Спіннер',             emoji:'🌀', rarity:'common',    value:3},
+      {name:'Флешка 128GB',        emoji:'💾', rarity:'rare',      value:8},
+      {name:'Запальничка Zippo',   emoji:'🔥', rarity:'rare',      value:10},
+      {name:'Кепка',               emoji:'🧢', rarity:'rare',      value:11},
+      {name:'Гаманець',            emoji:'👛', rarity:'rare',      value:12},
+      {name:'Навушники Skullcandy',emoji:'🎧', rarity:'epic',      value:30},
+      {name:'Термос Stanley',      emoji:'🧴', rarity:'epic',      value:45},
+      {name:'JBL Flip 6',          emoji:'🔊', rarity:'epic',      value:55},
+      {name:'Powerbank 30000mAh',  emoji:'⚡', rarity:'legendary', value:120},
+      {name:'Parасолька Xiaomi',   emoji:'☂️', rarity:'legendary', value:180},
     ]},
 
   // ── 2. Office Hero ───────────────────────────────────────────────
   { id:'office', name:'Office Hero', icon:'🗂️', price:50,
     desc:'Все для продуктивного офісу', color:'#3b82f6',
     items:[
-      {name:'Підставка для ручок',emoji:'✏️', rarity:'common',  value:10},
-      {name:'USB-вентилятор',   emoji:'💨', rarity:'common',    value:15},
-      {name:'Чашка',            emoji:'☕', rarity:'common',    value:12},
-      {name:'Стікери',          emoji:'📌', rarity:'common',    value:5},
-      {name:'Килимок',          emoji:'🟫', rarity:'common',    value:20},
-      {name:'Антисептик',       emoji:'🧴', rarity:'common',    value:8},
-      {name:'Вертикальна миша', emoji:'🖱️', rarity:'rare',      value:25},
-      {name:'Органайзер',       emoji:'🗂️', rarity:'rare',      value:50},
-      {name:'Килимок з підігрівом',emoji:'🔥',rarity:'rare',    value:75},
-      {name:'Щоденник Moleskine',emoji:'📓',rarity:'rare',      value:100},
-      {name:'Клавіатура Keychron',emoji:'⌨️',rarity:'epic',     value:130},
-      {name:'Рюкзак Bobby',     emoji:'🎒', rarity:'epic',      value:110},
-      {name:'Кавоварка',        emoji:'☕', rarity:'epic',      value:95},
-      {name:'Крісло Ergo',      emoji:'🪑', rarity:'legendary', value:350},
-      {name:'Лампа Dyson Morph',emoji:'💡', rarity:'legendary', value:280},
+      {name:'Стікери',             emoji:'📌', rarity:'common',    value:5},
+      {name:'Чашка',               emoji:'☕', rarity:'common',    value:8},
+      {name:'USB-вентилятор',      emoji:'💨', rarity:'common',    value:10},
+      {name:'Підставка для ручок', emoji:'✏️', rarity:'common',    value:12},
+      {name:'Антисептик',          emoji:'🧴', rarity:'common',    value:9},
+      {name:'Килимок',             emoji:'🟫', rarity:'common',    value:13},
+      {name:'Вертикальна миша',    emoji:'🖱️', rarity:'rare',      value:25},
+      {name:'Органайзер',          emoji:'🗂️', rarity:'rare',      value:30},
+      {name:'Щоденник Moleskine',  emoji:'📓', rarity:'rare',      value:35},
+      {name:'Килимок з підігрівом',emoji:'🔥', rarity:'rare',      value:40},
+      {name:'Рюкзак Bobby',        emoji:'🎒', rarity:'epic',      value:100},
+      {name:'Кавоварка',           emoji:'☕', rarity:'epic',      value:150},
+      {name:'Клавіатура Keychron', emoji:'⌨️', rarity:'epic',      value:200},
+      {name:'Крісло Ergo',         emoji:'🪑', rarity:'legendary', value:400},
+      {name:'Лампа Dyson Morph',   emoji:'💡', rarity:'legendary', value:700},
     ]},
 
   // ── 3. Home Chef ─────────────────────────────────────────────────
-  { id:'chef', name:'Home Chef', icon:'👨‍🍳', price:120,
+  { id:'chef', name:'Home Chef', icon:'👨‍🍳', price:150,
     desc:'Для справжнього шеф-кухаря', color:'#f97316',
     items:[
-      {name:'Дошка',            emoji:'🪵', rarity:'common',    value:25},
-      {name:'Форма для випічки',emoji:'🧁', rarity:'common',    value:30},
-      {name:'Фартух',           emoji:'👕', rarity:'common',    value:20},
-      {name:'Спеції',           emoji:'🌶️', rarity:'common',    value:15},
-      {name:'Лопатки',          emoji:'🥄', rarity:'common',    value:10},
-      {name:'Шпажки',           emoji:'🍢', rarity:'common',    value:5},
-      {name:'Тостер',           emoji:'🍞', rarity:'rare',      value:60},
-      {name:'Блендер',          emoji:'🥤', rarity:'rare',      value:120},
-      {name:'Електрочайник',    emoji:'☕', rarity:'rare',      value:180},
-      {name:'Ваги кухонні',     emoji:'⚖️', rarity:'rare',      value:240},
-      {name:'Набір ножів',      emoji:'🔪', rarity:'epic',      value:180},
-      {name:'Аерофритюрниця',   emoji:'🍳', rarity:'epic',      value:160},
-      {name:'Вакууматор',       emoji:'📦', rarity:'epic',      value:140},
-      {name:'Гриль Tefal',      emoji:'🔥', rarity:'legendary', value:320},
-      {name:'Кухонний комбайн', emoji:'🤖', rarity:'legendary', value:280},
+      {name:'Шпажки',              emoji:'🍢', rarity:'common',    value:15},
+      {name:'Лопатки',             emoji:'🥄', rarity:'common',    value:18},
+      {name:'Спеції',              emoji:'🌶️', rarity:'common',    value:20},
+      {name:'Фартух',              emoji:'👕', rarity:'common',    value:22},
+      {name:'Форма для випічки',   emoji:'🧁', rarity:'common',    value:24},
+      {name:'Дошка',               emoji:'🪵', rarity:'common',    value:25},
+      {name:'Тостер',              emoji:'🍞', rarity:'rare',      value:75},
+      {name:'Блендер',             emoji:'🥤', rarity:'rare',      value:90},
+      {name:'Ваги кухонні',        emoji:'⚖️', rarity:'rare',      value:105},
+      {name:'Електрочайник',       emoji:'☕', rarity:'rare',      value:120},
+      {name:'Вакууматор',          emoji:'📦', rarity:'epic',      value:300},
+      {name:'Аерофритюрниця',      emoji:'🍳', rarity:'epic',      value:450},
+      {name:'Набір ножів',         emoji:'🔪', rarity:'epic',      value:600},
+      {name:'Кухонний комбайн',    emoji:'🤖', rarity:'legendary', value:1200},
+      {name:'Гриль Tefal',         emoji:'🔥', rarity:'legendary', value:2000},
     ]},
 
   // ── 4. Gamer's Den ───────────────────────────────────────────────
-  { id:'gamer', name:"Gamer's Den", icon:'🎮', price:300,
+  { id:'gamer', name:"Gamer's Den", icon:'🎮', price:450,
     desc:'Топове гарнірування для геймера', color:'#8b5cf6',
     items:[
-      {name:'Килимок великий',  emoji:'🟫', rarity:'common',    value:35},
-      {name:'Кріплення монітора',emoji:'🖥️',rarity:'common',    value:50},
-      {name:'Кейкапи',          emoji:'⌨️', rarity:'common',    value:40},
-      {name:'Окуляри для ПК',   emoji:'👓', rarity:'common',    value:30},
-      {name:'Кабель-менеджмент',emoji:'🔌', rarity:'common',    value:15},
-      {name:'Стікерпак',        emoji:'🎨', rarity:'common',    value:10},
-      {name:'Миша Logitech G',  emoji:'🖱️', rarity:'rare',      value:150},
-      {name:'RGB стрічка',      emoji:'🌈', rarity:'rare',      value:300},
-      {name:'Веб-камера',       emoji:'📷', rarity:'rare',      value:450},
-      {name:'Мікрофон',         emoji:'🎤', rarity:'rare',      value:600},
-      {name:'Гарнітура Razer',  emoji:'🎧', rarity:'epic',      value:900},
-      {name:'Стрім-дека Elgato',emoji:'🎛️', rarity:'epic',      value:1500},
-      {name:'Крісло геймерське',emoji:'🪑', rarity:'epic',      value:2200},
-      {name:'Монітор LG Ultra', emoji:'🖥️', rarity:'legendary', value:3500},
-      {name:'Відеокарта RTX 4060',emoji:'💻',rarity:'legendary',value:5500},
+      {name:'Стікерпак',           emoji:'🎨', rarity:'common',    value:45},
+      {name:'Кабель-менеджмент',   emoji:'🔌', rarity:'common',    value:50},
+      {name:'Окуляри для ПК',      emoji:'👓', rarity:'common',    value:55},
+      {name:'Кейкапи',             emoji:'⌨️', rarity:'common',    value:55},
+      {name:'Кріплення монітора',  emoji:'🖥️', rarity:'common',    value:60},
+      {name:'Килимок великий',     emoji:'🟫', rarity:'common',    value:65},
+      {name:'Миша Logitech G',     emoji:'🖱️', rarity:'rare',      value:225},
+      {name:'RGB стрічка',         emoji:'🌈', rarity:'rare',      value:270},
+      {name:'Веб-камера',          emoji:'📷', rarity:'rare',      value:310},
+      {name:'Мікрофон',            emoji:'🎤', rarity:'rare',      value:350},
+      {name:'Гарнітура Razer',     emoji:'🎧', rarity:'epic',      value:900},
+      {name:'Стрім-дека Elgato',   emoji:'🎛️', rarity:'epic',      value:1400},
+      {name:'Крісло геймерське',   emoji:'🪑', rarity:'epic',      value:1800},
+      {name:'Монітор LG Ultra',    emoji:'🖥️', rarity:'legendary', value:3500},
+      {name:'Відеокарта RTX 4060', emoji:'💻', rarity:'legendary', value:6000},
     ]},
 
   // ── 5. Fitness Pro ───────────────────────────────────────────────
-  { id:'fitness', name:'Fitness Pro', icon:'🏋️', price:650,
+  { id:'fitness', name:'Fitness Pro', icon:'🏋️', price:1000,
     desc:'Все для тренувань і здоровʼя', color:'#22c55e',
     items:[
-      {name:'Скакалка',         emoji:'〰️', rarity:'common',    value:25},
-      {name:'Еспандер',         emoji:'💪', rarity:'common',    value:35},
-      {name:'Рушник',           emoji:'🏳️', rarity:'common',    value:20},
-      {name:'Напульсники',      emoji:'🧤', rarity:'common',    value:15},
-      {name:'Магнезія',         emoji:'🤍', rarity:'common',    value:10},
-      {name:'Гетри',            emoji:'🧦', rarity:'common',    value:30},
-      {name:'Спортивна сумка',  emoji:'👜', rarity:'rare',      value:320},
-      {name:'Йога-мат',         emoji:'🧘', rarity:'rare',      value:650},
-      {name:'Шейкер брендовий', emoji:'🥤', rarity:'rare',      value:1000},
-      {name:'Навушники спорт',  emoji:'🎧', rarity:'rare',      value:1600},
-      {name:'Масажний пістолет',emoji:'🔫', rarity:'epic',      value:2000},
-      {name:'Гантелі набірні',  emoji:'🏋️', rarity:'epic',      value:3500},
-      {name:'Garmin Watch',     emoji:'⌚', rarity:'epic',      value:5000},
-      {name:'Велотренажер',     emoji:'🚴', rarity:'legendary', value:1800},
-      {name:'Бігова доріжка',   emoji:'🏃', rarity:'legendary', value:1400},
+      {name:'Магнезія',            emoji:'🤍', rarity:'common',    value:100},
+      {name:'Напульсники',         emoji:'🧤', rarity:'common',    value:110},
+      {name:'Рушник',              emoji:'🏳️', rarity:'common',    value:115},
+      {name:'Скакалка',            emoji:'〰️', rarity:'common',    value:125},
+      {name:'Еспандер',            emoji:'💪', rarity:'common',    value:135},
+      {name:'Гетри',               emoji:'🧦', rarity:'common',    value:150},
+      {name:'Спортивна сумка',     emoji:'👜', rarity:'rare',      value:500},
+      {name:'Йога-мат',            emoji:'🧘', rarity:'rare',      value:600},
+      {name:'Шейкер брендовий',    emoji:'🥤', rarity:'rare',      value:700},
+      {name:'Навушники спорт',     emoji:'🎧', rarity:'rare',      value:800},
+      {name:'Масажний пістолет',   emoji:'🔫', rarity:'epic',      value:2000},
+      {name:'Garmin Watch',        emoji:'⌚', rarity:'epic',      value:3000},
+      {name:'Гантелі набірні',     emoji:'🏋️', rarity:'epic',      value:4000},
+      {name:'Велотренажер',        emoji:'🚴', rarity:'legendary', value:8000},
+      {name:'Бігова доріжка',      emoji:'🏃', rarity:'legendary', value:14000},
     ]},
 
   // ── 6. Apple Garden ──────────────────────────────────────────────
-  { id:'apple', name:'Apple Garden', icon:'🍎', price:1200,
+  { id:'apple', name:'Apple Garden', icon:'🍎', price:2500,
     desc:'Преміум Apple-екосистема', color:'#94a3b8',
     items:[
-      {name:'Силіконовий чохол',emoji:'📱', rarity:'common',    value:60},
-      {name:'Кабель Lightning', emoji:'🔋', rarity:'common',    value:35},
-      {name:'Ремінець Solo Loop',emoji:'⌚',rarity:'common',    value:55},
-      {name:'Перехідник',       emoji:'🔌', rarity:'common',    value:25},
-      {name:'Серветка полірувальна',emoji:'🧹',rarity:'common', value:20},
-      {name:'Зарядка 20W',      emoji:'⚡', rarity:'common',    value:40},
-      {name:'AirPods Pro 2',    emoji:'🎧', rarity:'rare',      value:600},
-      {name:'Apple Pencil',     emoji:'✏️', rarity:'rare',      value:1200},
-      {name:'MagSafe Battery',  emoji:'🔋', rarity:'rare',      value:1800},
-      {name:'AirTag 4-pack',    emoji:'🏷️', rarity:'rare',      value:2800},
-      {name:'Apple Watch S9',   emoji:'⌚', rarity:'epic',      value:3500},
-      {name:'AirPods Max',      emoji:'🎧', rarity:'epic',      value:6000},
-      {name:'iPad Air',         emoji:'📟', rarity:'epic',      value:9000},
-      {name:'iPhone 15 Pro Max',emoji:'📱', rarity:'legendary', value:14000},
-      {name:'MacBook Air M2',   emoji:'💻', rarity:'legendary', value:20000},
+      {name:'Серветка полірувальна',emoji:'🧹', rarity:'common',   value:250},
+      {name:'Перехідник',          emoji:'🔌', rarity:'common',    value:275},
+      {name:'Кабель Lightning',    emoji:'🔋', rarity:'common',    value:290},
+      {name:'Зарядка 20W',         emoji:'⚡', rarity:'common',    value:310},
+      {name:'Ремінець Solo Loop',  emoji:'⌚', rarity:'common',    value:340},
+      {name:'Силіконовий чохол',   emoji:'📱', rarity:'common',    value:370},
+      {name:'AirPods Pro 2',       emoji:'🎧', rarity:'rare',      value:1200},
+      {name:'Apple Pencil',        emoji:'✏️', rarity:'rare',      value:1500},
+      {name:'MagSafe Battery',     emoji:'🔋', rarity:'rare',      value:1700},
+      {name:'AirTag 4-pack',       emoji:'🏷️', rarity:'rare',      value:2000},
+      {name:'Apple Watch S9',      emoji:'⌚', rarity:'epic',      value:5000},
+      {name:'iPad Air',            emoji:'📟', rarity:'epic',      value:7500},
+      {name:'AirPods Max',         emoji:'🎧', rarity:'epic',      value:10000},
+      {name:'MacBook Air M3',      emoji:'💻', rarity:'legendary', value:20000},
+      {name:'Mac Pro',             emoji:'🖥️', rarity:'legendary', value:35000},
     ]},
 
   // ── 7. Photo Studio ──────────────────────────────────────────────
-  { id:'photo', name:'Photo Studio', icon:'📸', price:2800,
-    desc:'Профі-обладнання для фотографа', color:'#ec4899',
+  { id:'photo', name:'Photo Studio', icon:'📷', price:5500,
+    desc:'Для справжніх майстрів фото', color:'#ec4899',
     items:[
-      {name:'Фільтр для лінзи', emoji:'🔭', rarity:'common',    value:80},
-      {name:'Набір для чистки', emoji:'🧹', rarity:'common',    value:40},
-      {name:'Акумулятор',       emoji:'🔋', rarity:'common',    value:110},
-      {name:'Ремінь камери',    emoji:'🪢', rarity:'common',    value:65},
-      {name:'Картрідер',        emoji:'💾', rarity:'common',    value:50},
-      {name:'Чохол',            emoji:'🎒', rarity:'common',    value:90},
-      {name:'Штатив Manfrotto', emoji:'📷', rarity:'rare',      value:1400},
-      {name:'Карта памʼяті 512GB',emoji:'💾',rarity:'rare',   value:2800},
-      {name:'Мікрофон Rode',    emoji:'🎤', rarity:'rare',      value:4500},
-      {name:'Сумка Peak Design',emoji:'👜', rarity:'rare',      value:7000},
-      {name:'Дрон DJI Mini 4',  emoji:'🚁', rarity:'epic',      value:8500},
-      {name:'Стабілізатор Ronin',emoji:'🎬',rarity:'epic',      value:14000},
-      {name:'Світло Aputure',   emoji:'💡', rarity:'epic',      value:20000},
-      {name:'Sony A7 IV',       emoji:'📸', rarity:'legendary', value:32000},
-      {name:'Обʼєктив 24-70mm',emoji:'🔭', rarity:'legendary', value:50000},
+      {name:'Чистячий набір',      emoji:'🧹', rarity:'common',    value:550},
+      {name:'Бленда',              emoji:'🔭', rarity:'common',    value:600},
+      {name:'Ремінь для камери',   emoji:'🎗️', rarity:'common',    value:650},
+      {name:'Карта памʼяті 256GB',emoji:'💾', rarity:'common',    value:700},
+      {name:'Штативна голівка',    emoji:'🔩', rarity:'common',    value:750},
+      {name:'Фільтри UV',          emoji:'🔮', rarity:'common',    value:820},
+      {name:'Кільцева лампа',      emoji:'💡', rarity:'rare',      value:2700},
+      {name:'Штатив Manfrotto',    emoji:'📷', rarity:'rare',      value:3200},
+      {name:'Спалах Godox',        emoji:'⚡', rarity:'rare',      value:3800},
+      {name:'Обʼєктив 50mm f/1.8',emoji:'🔍', rarity:'rare',      value:4400},
+      {name:'Обʼєктив 70-200mm',  emoji:'🔭', rarity:'epic',      value:11000},
+      {name:'Sony A7 IV Body',     emoji:'📸', rarity:'epic',      value:17000},
+      {name:'Canon EOS R5',        emoji:'📷', rarity:'epic',      value:22000},
+      {name:'Hasselblad X2D',      emoji:'🏆', rarity:'legendary', value:44000},
+      {name:'Phase One IQ4',       emoji:'👑', rarity:'legendary', value:75000},
     ]},
 
   // ── 8. Hobbyist Workshop ─────────────────────────────────────────
-  { id:'workshop', name:'Hobbyist Workshop', icon:'🔧', price:6000,
-    desc:'Майстерня для справжнього майстра', color:'#f59e0b',
+  { id:'workshop', name:'Hobbyist Workshop', icon:'🔧', price:10000,
+    desc:'Майстерня для справжніх ентузіастів', color:'#f59e0b',
     items:[
-      {name:'Захисні окуляри',  emoji:'🥽', rarity:'common',    value:40},
-      {name:'Рулетка',          emoji:'📏', rarity:'common',    value:25},
-      {name:'Набір ключів',     emoji:'🔑', rarity:'common',    value:120},
-      {name:'Ліхтар',           emoji:'🔦', rarity:'common',    value:80},
-      {name:'Маска',            emoji:'😷', rarity:'common',    value:50},
-      {name:'Органайзер болтів',emoji:'🗂️', rarity:'common',    value:70},
-      {name:'Перфоратор',       emoji:'🔨', rarity:'rare',      value:3500},
-      {name:'Шліфувальна машина',emoji:'⚙️',rarity:'rare',      value:6000},
-      {name:'Набір свердел',    emoji:'🪛', rarity:'rare',      value:9000},
-      {name:'Будівельний пилосос',emoji:'🌀',rarity:'rare',     value:12000},
-      {name:'Набір інструментів DeWalt',emoji:'🧰',rarity:'epic',value:9500},
-      {name:'Зварювальний апарат',emoji:'⚡',rarity:'epic',     value:13000},
-      {name:'Верстак',          emoji:'🪚', rarity:'epic',      value:18000},
-      {name:'3D Принтер Bambu', emoji:'🖨️', rarity:'legendary', value:28000},
-      {name:'Гравірувальний верстат',emoji:'⚙️',rarity:'legendary',value:45000},
+      {name:'Захисні окуляри',     emoji:'🥽', rarity:'common',    value:1000},
+      {name:'Маска',               emoji:'😷', rarity:'common',    value:1100},
+      {name:'Рулетка',             emoji:'📏', rarity:'common',    value:1150},
+      {name:'Ліхтар',              emoji:'🔦', rarity:'common',    value:1200},
+      {name:'Органайзер болтів',   emoji:'🗂️', rarity:'common',    value:1300},
+      {name:'Набір ключів',        emoji:'🔑', rarity:'common',    value:1500},
+      {name:'Перфоратор',          emoji:'🔨', rarity:'rare',      value:5000},
+      {name:'Шліфувальна машина',  emoji:'⚙️', rarity:'rare',      value:6000},
+      {name:'Набір свердел',       emoji:'🪛', rarity:'rare',      value:7000},
+      {name:'Будівельний пилосос', emoji:'🌀', rarity:'rare',      value:8000},
+      {name:'Набір інструментів DeWalt',emoji:'🧰',rarity:'epic',  value:20000},
+      {name:'Зварювальний апарат', emoji:'⚡', rarity:'epic',      value:30000},
+      {name:'Верстак',             emoji:'🪚', rarity:'epic',      value:40000},
+      {name:'3D Принтер Bambu',    emoji:'🖨️', rarity:'legendary', value:80000},
+      {name:'Гравірувальний верстат',emoji:'⚙️',rarity:'legendary',value:140000},
     ]},
 
   // ── 9. Smart Comfort ─────────────────────────────────────────────
-  { id:'smart', name:'Smart Comfort', icon:'🏠', price:12000,
+  { id:'smart', name:'Smart Comfort', icon:'🏠', price:16000,
     desc:'Розумний дім преміум-класу', color:'#06b6d4',
     items:[
-      {name:'Смарт-лампочка',   emoji:'💡', rarity:'common',    value:45},
-      {name:'Датчик затоплення',emoji:'💧', rarity:'common',    value:60},
-      {name:'Розумна розетка',  emoji:'🔌', rarity:'common',    value:40},
-      {name:'Термостат',        emoji:'🌡️', rarity:'common',    value:180},
-      {name:'Пульт Harmony',    emoji:'📡', rarity:'common',    value:250},
-      {name:'Відеодзвінок',     emoji:'📷', rarity:'common',    value:220},
-      {name:'Розумні штори',    emoji:'🪟', rarity:'rare',      value:6000},
-      {name:'Колонка Sonos',    emoji:'🔊', rarity:'rare',      value:12000},
-      {name:'Очисник Dyson',    emoji:'💨', rarity:'rare',      value:18000},
-      {name:'Смарт-дзеркало',   emoji:'🪞', rarity:'rare',      value:26000},
-      {name:'Робот-пилосос+база',emoji:'🤖',rarity:'epic',      value:18000},
-      {name:'Система розумного дому',emoji:'🏠',rarity:'epic',  value:28000},
-      {name:'Проектор Freestyle',emoji:'📽️',rarity:'epic',      value:38000},
-      {name:'Samsung TV 85"',   emoji:'📺', rarity:'legendary', value:55000},
-      {name:'Розумне ліжко',    emoji:'🛏️', rarity:'legendary', value:85000},
+      {name:'Смарт-лампочка',      emoji:'💡', rarity:'common',    value:1600},
+      {name:'Розумна розетка',     emoji:'🔌', rarity:'common',    value:1800},
+      {name:'Датчик затоплення',   emoji:'💧', rarity:'common',    value:2000},
+      {name:'Пульт Harmony',       emoji:'📡', rarity:'common',    value:2100},
+      {name:'Відеодзвінок',        emoji:'📷', rarity:'common',    value:2200},
+      {name:'Термостат',           emoji:'🌡️', rarity:'common',    value:2400},
+      {name:'Розумні штори',       emoji:'🪟', rarity:'rare',      value:8000},
+      {name:'Колонка Sonos',       emoji:'🔊', rarity:'rare',      value:9500},
+      {name:'Очисник Dyson',       emoji:'💨', rarity:'rare',      value:11000},
+      {name:'Смарт-дзеркало',      emoji:'🪞', rarity:'rare',      value:12000},
+      {name:'Робот-пилосос+база',  emoji:'🤖', rarity:'epic',      value:32000},
+      {name:'Проектор Freestyle',  emoji:'📽️', rarity:'epic',      value:48000},
+      {name:'Система розумного дому',emoji:'🏠',rarity:'epic',     value:64000},
+      {name:'Samsung TV 85"',      emoji:'📺', rarity:'legendary', value:120000},
+      {name:'Розумне ліжко',       emoji:'🛏️', rarity:'legendary', value:220000},
     ]},
 
   // ── 10. Elite Collector ──────────────────────────────────────────
   { id:'elite', name:'Elite Collector', icon:'👑', price:22000,
     desc:'Колекція для обраних', color:'#f5c842',
     items:[
-      {name:'Гаманець брендовий',emoji:'👛',rarity:'common',    value:450},
-      {name:'Краватка',         emoji:'👔', rarity:'common',    value:280},
-      {name:'Окуляри сонцезахисні',emoji:'🕶️',rarity:'common', value:550},
-      {name:'Книга колекційна', emoji:'📚', rarity:'common',    value:350},
-      {name:'Картхолдер',       emoji:'💳', rarity:'common',    value:220},
-      {name:'Парасолька елітна',emoji:'☂️', rarity:'common',    value:600},
-      {name:'Ручка Montblanc',  emoji:'🖊️', rarity:'rare',      value:11000},
-      {name:'Запонки Cartier',  emoji:'💎', rarity:'rare',      value:22000},
-      {name:'Ремінь Gucci',     emoji:'👔', rarity:'rare',      value:35000},
-      {name:'Шарф Hermès',      emoji:'🧣', rarity:'rare',      value:50000},
-      {name:'Костюм Tom Ford',  emoji:'🤵', rarity:'epic',      value:38000},
-      {name:'Сумка Louis Vuitton',emoji:'👜',rarity:'epic',     value:60000},
-      {name:'Винна шафа',       emoji:'🍷', rarity:'epic',      value:85000},
-      {name:'Omega Seamaster',  emoji:'⌚', rarity:'legendary', value:120000},
-      {name:'Золота монета',    emoji:'🪙', rarity:'legendary', value:180000},
+      {name:'Картхолдер',          emoji:'💳', rarity:'common',    value:2200},
+      {name:'Краватка',            emoji:'👔', rarity:'common',    value:2500},
+      {name:'Книга колекційна',    emoji:'📚', rarity:'common',    value:2700},
+      {name:'Гаманець брендовий',  emoji:'👛', rarity:'common',    value:2900},
+      {name:'Окуляри сонцезахисні',emoji:'🕶️', rarity:'common',   value:3100},
+      {name:'Парасолька елітна',   emoji:'☂️', rarity:'common',    value:3300},
+      {name:'Ручка Montblanc',     emoji:'🖊️', rarity:'rare',      value:11000},
+      {name:'Запонки Cartier',     emoji:'💎', rarity:'rare',      value:13000},
+      {name:'Ремінь Gucci',        emoji:'👔', rarity:'rare',      value:15000},
+      {name:'Шарф Hermès',         emoji:'🧣', rarity:'rare',      value:17000},
+      {name:'Костюм Tom Ford',     emoji:'🤵', rarity:'epic',      value:44000},
+      {name:'Сумка Louis Vuitton', emoji:'👜', rarity:'epic',      value:66000},
+      {name:'Винна шафа',          emoji:'🍷', rarity:'epic',      value:88000},
+      {name:'Omega Seamaster',     emoji:'⌚', rarity:'legendary', value:170000},
+      {name:'Золота монета',       emoji:'🪙', rarity:'legendary', value:300000},
     ]},
 ];
 
 
 // =================== MYSTERY BOXES DATA ===================
 const MYSTERY_BOXES = [
-  { id:'mbox1', name:"Traveler's Dream", icon:'✈️', price:15000,
+  { id:'mbox1', name:"Traveler's Dream", icon:'✈️', price:50000,
     desc:'Незабутні пригоди з усього світу', color:'#0ea5e9',
     items:[
       // Common (20)
-      {name:'Надувна подушка для шиї',      emoji:'💺', rarity:'common', value:80},
-      {name:'Маска для сну',                emoji:'😴', rarity:'common', value:40},
-      {name:'Набір перехідників',           emoji:'🔌', rarity:'common', value:60},
-      {name:'Термос Stanley Classic',       emoji:'🧴', rarity:'common', value:110},
-      {name:'Павербанк Solar 10000mAh',     emoji:'⚡', rarity:'common', value:130},
-      {name:'Окуляри Ray-Ban Aviator',      emoji:'🕶️', rarity:'common', value:180},
-      {name:'Скретч-карта світу XL',        emoji:'🗺️', rarity:'common', value:90},
-      {name:'Швидкосохнучий рушник',        emoji:'🏳️', rarity:'common', value:45},
-      {name:'Чохол для валізи',             emoji:'🧳', rarity:'common', value:35},
-      {name:'Органайзер для дротів',        emoji:'🔀', rarity:'common', value:55},
-      {name:'Набір міні-косметики',         emoji:'💄', rarity:'common', value:120},
-      {name:'Пляшка з фільтром',            emoji:'🚰', rarity:'common', value:75},
-      {name:'Компресійні шкарпетки',        emoji:'🧦', rarity:'common', value:30},
-      {name:'Сонцезахисний крем Luxury',    emoji:'🌞', rarity:'common', value:65},
-      {name:'Книга "Топ 100 місць"',        emoji:'📖', rarity:'common', value:40},
-      {name:'Парасолька-тростина',          emoji:'☂️', rarity:'common', value:115},
-      {name:'Гаманець з RFID захистом',     emoji:'👛', rarity:'common', value:150},
-      {name:'Водонепроникний чохол',        emoji:'📱', rarity:'common', value:25},
-      {name:'Дорожня аптечка',              emoji:'🩹', rarity:'common', value:95},
-      {name:'Магніт "I was there"',         emoji:'🧲', rarity:'common', value:10},
+      {name:'Надувна подушка для шиї',      emoji:'💺', rarity:'common', value:4000},
+      {name:'Маска для сну',                emoji:'😴', rarity:'common', value:4300},
+      {name:'Набір перехідників',           emoji:'🔌', rarity:'common', value:4600},
+      {name:'Термос Stanley Classic',       emoji:'🧴', rarity:'common', value:4800},
+      {name:'Павербанк Solar 10000mAh',     emoji:'⚡', rarity:'common', value:5000},
+      {name:'Окуляри Ray-Ban Aviator',      emoji:'🕶️', rarity:'common', value:5200},
+      {name:'Скретч-карта світу XL',        emoji:'🗺️', rarity:'common', value:5500},
+      {name:'Швидкосохнучий рушник',        emoji:'🏳️', rarity:'common', value:5700},
+      {name:'Чохол для валізи',             emoji:'🧳', rarity:'common', value:5900},
+      {name:'Органайзер для дротів',        emoji:'🔀', rarity:'common', value:6000},
+      {name:'Набір міні-косметики',         emoji:'💄', rarity:'common', value:6100},
+      {name:'Пляшка з фільтром',            emoji:'🚰', rarity:'common', value:6200},
+      {name:'Компресійні шкарпетки',        emoji:'🧦', rarity:'common', value:6300},
+      {name:'Сонцезахисний крем Luxury',    emoji:'🌞', rarity:'common', value:6400},
+      {name:'Книга "Топ 100 місць"',        emoji:'📖', rarity:'common', value:6500},
+      {name:'Парасолька-тростина',          emoji:'☂️', rarity:'common', value:6600},
+      {name:'Гаманець з RFID захистом',     emoji:'👛', rarity:'common', value:6700},
+      {name:'Водонепроникний чохол',        emoji:'📱', rarity:'common', value:6800},
+      {name:'Дорожня аптечка',              emoji:'🩹', rarity:'common', value:6900},
+      {name:'Магніт "I was there"',         emoji:'🧲', rarity:'common', value:7000},
       // Rare (15)
-      {name:'Валіза Louis Vuitton Horizon', emoji:'🧳', rarity:'rare',   value:4200},
-      {name:'Намет для сходження',          emoji:'⛺', rarity:'rare',   value:3500},
-      {name:'Гірськолижний комплект',       emoji:'🎿', rarity:'rare',   value:2800},
-      {name:'GoPro Hero 12 Bundle',         emoji:'📷', rarity:'rare',   value:1500},
-      {name:'Рюкзак Peak Design 45L',       emoji:'🎒', rarity:'rare',   value:1200},
-      {name:'Сонячна панель 200W',          emoji:'☀️', rarity:'rare',   value:900},
-      {name:'Колекційні путівники',         emoji:'📚', rarity:'rare',   value:850},
-      {name:'Дрон для подорожей',           emoji:'🚁', rarity:'rare',   value:1800},
-      {name:'Спальний мішок Extreme',       emoji:'🛌', rarity:'rare',   value:1100},
-      {name:'Навігатор Garmin',             emoji:'🗺️', rarity:'rare',   value:950},
-      {name:'Портативний фільтр води',      emoji:'💧', rarity:'rare',   value:600},
-      {name:'Бінокль Nikon',               emoji:'🔭', rarity:'rare',   value:1300},
-      {name:'Окуляри для плавання+дисплей',emoji:'🥽', rarity:'rare',   value:800},
-      {name:'Шкіряні аксесуари паспорта',  emoji:'📋', rarity:'rare',   value:700},
-      {name:'Дорожня праска преміум',       emoji:'🔧', rarity:'rare',   value:400},
+      {name:'Валіза Louis Vuitton Horizon', emoji:'🧳', rarity:'rare',   value:10000},
+      {name:'Намет для сходження',          emoji:'⛺', rarity:'rare',   value:11000},
+      {name:'Гірськолижний комплект',       emoji:'🎿', rarity:'rare',   value:12000},
+      {name:'GoPro Hero 12 Bundle',         emoji:'📷', rarity:'rare',   value:12500},
+      {name:'Рюкзак Peak Design 45L',       emoji:'🎒', rarity:'rare',   value:13000},
+      {name:'Сонячна панель 200W',          emoji:'☀️', rarity:'rare',   value:13500},
+      {name:'Колекційні путівники',         emoji:'📚', rarity:'rare',   value:14000},
+      {name:'Дрон для подорожей',           emoji:'🚁', rarity:'rare',   value:14500},
+      {name:'Спальний мішок Extreme',       emoji:'🛌', rarity:'rare',   value:15500},
+      {name:'Навігатор Garmin',             emoji:'🗺️', rarity:'rare',   value:16000},
+      {name:'Портативний фільтр води',      emoji:'💧', rarity:'rare',   value:16500},
+      {name:'Бінокль Nikon',               emoji:'🔭', rarity:'rare',   value:17000},
+      {name:'Окуляри для плавання+дисплей',emoji:'🥽', rarity:'rare',   value:17500},
+      {name:'Шкіряні аксесуари паспорта',  emoji:'📋', rarity:'rare',   value:17800},
+      {name:'Дорожня праска преміум',       emoji:'🔧', rarity:'rare',   value:18000},
       // Epic (7)
-      {name:'Тиждень у Burj Al Arab',       emoji:'🏨', rarity:'epic',   value:14500},
-      {name:'Тур на вертольоті над Альпами',emoji:'🚁', rarity:'epic',   value:12000},
-      {name:'Набір для дайвінгу Scubapro',  emoji:'🤿', rarity:'epic',   value:11000},
-      {name:'Квиток в перший клас Emirates',emoji:'✈️', rarity:'epic',   value:9500},
-      {name:'Експедиція в Антарктиду',      emoji:'🧊', rarity:'epic',   value:13000},
-      {name:'Сафарі-тур у Кенії',          emoji:'🦁', rarity:'epic',   value:10500},
-      {name:'Повітряна куля в Каппадокії',  emoji:'🎈', rarity:'epic',   value:8800},
+      {name:'Тиждень у Burj Al Arab',       emoji:'🏨', rarity:'epic',   value:60000},
+      {name:'Тур на вертольоті над Альпами',emoji:'🚁', rarity:'epic',   value:65000},
+      {name:'Набір для дайвінгу Scubapro',  emoji:'🤿', rarity:'epic',   value:72000},
+      {name:'Квиток в перший клас Emirates',emoji:'✈️', rarity:'epic',   value:78000},
+      {name:'Експедиція в Антарктиду',      emoji:'🧊', rarity:'epic',   value:85000},
+      {name:'Сафарі-тур у Кенії',          emoji:'🦁', rarity:'epic',   value:88000},
+      {name:'Повітряна куля в Каппадокії',  emoji:'🎈', rarity:'epic',   value:90000},
       // Legendary (3)
-      {name:'Круїз "Навколо світу"',        emoji:'🚢', rarity:'legendary', value:45000},
-      {name:'Політ у невагомості Zero-G',   emoji:'🛸', rarity:'legendary', value:38000},
-      {name:'Приватний переліт бізнес-джет',emoji:'🛩️', rarity:'legendary', value:32000},
+      {name:'Круїз "Навколо світу"',        emoji:'🚢', rarity:'legendary', value:250000},
+      {name:'Політ у невагомості Zero-G',   emoji:'🛸', rarity:'legendary', value:275000},
+      {name:'Приватний переліт бізнес-джет',emoji:'🛩️', rarity:'legendary', value:300000},
     ]},
 
-  { id:'mbox2', name:'Secret Tech Lab', icon:'🔬', price:30000,
+  { id:'mbox2', name:'Secret Tech Lab', icon:'🔬', price:100000,
     desc:'Технології майбутнього вже сьогодні', color:'#8b5cf6',
     items:[
       // Common (20)
-      {name:'Смарт-кільце Oura Ring',       emoji:'💍', rarity:'common', value:1300},
-      {name:'Левітаційна лампа Flyte',      emoji:'💡', rarity:'common', value:1100},
-      {name:'Смарт-ручка Moleskine Set',    emoji:'✏️', rarity:'common', value:900},
-      {name:'Навушники Dyson Zone',         emoji:'🎧', rarity:'common', value:1200},
-      {name:'Чохол з E-Ink екраном',        emoji:'📱', rarity:'common', value:750},
-      {name:'USB-холодильник косметики',    emoji:'🧊', rarity:'common', value:450},
-      {name:'Розумна скарбничка-сейф',      emoji:'🔒', rarity:'common', value:350},
-      {name:'Клавіатура Apple Magic',       emoji:'⌨️', rarity:'common', value:400},
-      {name:'Смарт-пляшка HidrateSpark',    emoji:'💧', rarity:'common', value:280},
-      {name:'Тестер якості повітря',        emoji:'💨', rarity:'common', value:550},
-      {name:'Зарядка Nomad Base Station',   emoji:'🔋', rarity:'common', value:220},
-      {name:'Лазерна віртуальна клавіатура',emoji:'🖥️', rarity:'common', value:480},
-      {name:'AirTag Gold Edition',          emoji:'🏷️', rarity:'common', value:300},
-      {name:'Анти-стрес куб OLED',          emoji:'🎮', rarity:'common', value:380},
-      {name:'Розумна скакалка Tangram',     emoji:'⚡', rarity:'common', value:180},
-      {name:'Фотопринтер Fujifilm Pocket',  emoji:'📸', rarity:'common', value:320},
-      {name:'Електронна маска для сну',     emoji:'😴', rarity:'common', value:420},
-      {name:'Підставка з відстеженням',     emoji:'📡', rarity:'common', value:200},
-      {name:'USB-грілка для рук',           emoji:'🤲', rarity:'common', value:100},
-      {name:'Нагрівач для чашки App',       emoji:'☕', rarity:'common', value:120},
+      {name:'Смарт-кільце Oura Ring',       emoji:'💍', rarity:'common', value:8000},
+      {name:'Левітаційна лампа Flyte',      emoji:'💡', rarity:'common', value:8500},
+      {name:'Смарт-ручка Moleskine Set',    emoji:'✏️', rarity:'common', value:9000},
+      {name:'Навушники Dyson Zone',         emoji:'🎧', rarity:'common', value:9500},
+      {name:'Чохол з E-Ink екраном',        emoji:'📱', rarity:'common', value:10000},
+      {name:'USB-холодильник косметики',    emoji:'🧊', rarity:'common', value:10500},
+      {name:'Розумна скарбничка-сейф',      emoji:'🔒', rarity:'common', value:11000},
+      {name:'Клавіатура Apple Magic',       emoji:'⌨️', rarity:'common', value:11500},
+      {name:'Смарт-пляшка HidrateSpark',    emoji:'💧', rarity:'common', value:12000},
+      {name:'Тестер якості повітря',        emoji:'💨', rarity:'common', value:12500},
+      {name:'Зарядка Nomad Base Station',   emoji:'🔋', rarity:'common', value:12800},
+      {name:'Лазерна віртуальна клавіатура',emoji:'🖥️', rarity:'common', value:13000},
+      {name:'AirTag Gold Edition',          emoji:'🏷️', rarity:'common', value:13500},
+      {name:'Анти-стрес куб OLED',          emoji:'🎮', rarity:'common', value:14000},
+      {name:'Розумна скакалка Tangram',     emoji:'⚡', rarity:'common', value:14500},
+      {name:'Фотопринтер Fujifilm Pocket',  emoji:'📸', rarity:'common', value:14800},
+      {name:'Електронна маска для сну',     emoji:'😴', rarity:'common', value:15000},
+      {name:'Підставка з відстеженням',     emoji:'📡', rarity:'common', value:15000},
+      {name:'USB-грілка для рук',           emoji:'🤲', rarity:'common', value:15000},
+      {name:'Нагрівач для чашки App',       emoji:'☕', rarity:'common', value:15000},
       // Rare (15)
-      {name:'Дрон DJI Inspire 3',           emoji:'🚁', rarity:'rare',   value:9000},
-      {name:'Смарт-дзеркало Hi-Tech',       emoji:'🪞', rarity:'rare',   value:8200},
-      {name:'Смартфон з гнучким екраном',   emoji:'📱', rarity:'rare',   value:7000},
-      {name:'Голографічний вентилятор 3D',  emoji:'🌀', rarity:'rare',   value:6200},
-      {name:'Гідропонна ферма Click&Grow',  emoji:'🌱', rarity:'rare',   value:5500},
-      {name:'Замок з венним сканером',      emoji:'🔐', rarity:'rare',   value:4800},
-      {name:'Шолом Quest Pro MR',           emoji:'🥽', rarity:'rare',   value:4200},
-      {name:'Біометричний сейф',            emoji:'🔒', rarity:'rare',   value:3800},
-      {name:'Матрац з контролем клімату',   emoji:'🛏️', rarity:'rare',   value:3500},
-      {name:'Робо-мийник вікон Winbot',     emoji:'🤖', rarity:'rare',   value:2900},
-      {name:'Розумний акваріум авто',       emoji:'🐟', rarity:'rare',   value:2600},
-      {name:'Електро-скейтборд Carbon',     emoji:'🛹', rarity:'rare',   value:2200},
-      {name:'Bose QuietComfort Special',    emoji:'🎧', rarity:'rare',   value:1900},
-      {name:'Garmin Marq смарт-годинник',   emoji:'⌚', rarity:'rare',   value:2400},
-      {name:'Очищувач Dyson Big+Quiet',     emoji:'💨', rarity:'rare',   value:1700},
+      {name:'Дрон DJI Inspire 3',           emoji:'🚁', rarity:'rare',   value:25000},
+      {name:'Смарт-дзеркало Hi-Tech',       emoji:'🪞', rarity:'rare',   value:27000},
+      {name:'Смартфон з гнучким екраном',   emoji:'📱', rarity:'rare',   value:28000},
+      {name:'Голографічний вентилятор 3D',  emoji:'🌀', rarity:'rare',   value:29000},
+      {name:'Гідропонна ферма Click&Grow',  emoji:'🌱', rarity:'rare',   value:30000},
+      {name:'Замок з венним сканером',      emoji:'🔐', rarity:'rare',   value:31000},
+      {name:'Шолом Quest Pro MR',           emoji:'🥽', rarity:'rare',   value:32000},
+      {name:'Біометричний сейф',            emoji:'🔒', rarity:'rare',   value:33000},
+      {name:'Матрац з контролем клімату',   emoji:'🛏️', rarity:'rare',   value:34000},
+      {name:'Робо-мийник вікон Winbot',     emoji:'🤖', rarity:'rare',   value:35000},
+      {name:'Розумний акваріум авто',       emoji:'🐟', rarity:'rare',   value:36000},
+      {name:'Електро-скейтборд Carbon',     emoji:'🛹', rarity:'rare',   value:37000},
+      {name:'Bose QuietComfort Special',    emoji:'🎧', rarity:'rare',   value:38000},
+      {name:'Garmin Marq смарт-годинник',   emoji:'⌚', rarity:'rare',   value:39000},
+      {name:'Очищувач Dyson Big+Quiet',     emoji:'💨', rarity:'rare',   value:40000},
       // Epic (7)
-      {name:'Apple Vision Pro 2',           emoji:'🥽', rarity:'epic',   value:28500},
-      {name:'Крісло-станція Acer Predator', emoji:'🪑', rarity:'epic',   value:25000},
-      {name:'Tesla Powerwall Home Battery', emoji:'⚡', rarity:'epic',   value:23000},
-      {name:'Прозорий Micro-LED дисплей',   emoji:'📺', rarity:'epic',   value:21000},
-      {name:'Розумна кухня-робот',          emoji:'🤖', rarity:'epic',   value:19000},
-      {name:'Екзоскелет для спини',         emoji:'🦾', rarity:'epic',   value:17000},
-      {name:'Розумне дзеркало+тренер',      emoji:'🪞', rarity:'epic',   value:14500},
+      {name:'Apple Vision Pro 2',           emoji:'🥽', rarity:'epic',   value:120000},
+      {name:'Крісло-станція Acer Predator', emoji:'🪑', rarity:'epic',   value:130000},
+      {name:'Tesla Powerwall Home Battery', emoji:'⚡', rarity:'epic',   value:140000},
+      {name:'Прозорий Micro-LED дисплей',   emoji:'📺', rarity:'epic',   value:155000},
+      {name:'Розумна кухня-робот',          emoji:'🤖', rarity:'epic',   value:165000},
+      {name:'Екзоскелет для спини',         emoji:'🦾', rarity:'epic',   value:175000},
+      {name:'Розумне дзеркало+тренер',      emoji:'🪞', rarity:'epic',   value:180000},
       // Legendary (3)
-      {name:'Лазерний ТВ Hisense 150"',     emoji:'📺', rarity:'legendary', value:85000},
-      {name:'Робопес Unitree Go2 Pro',      emoji:'🐕', rarity:'legendary', value:70000},
-      {name:'Капсула для відновлення сил',  emoji:'🛸', rarity:'legendary', value:60000},
+      {name:'Лазерний ТВ Hisense 150"',     emoji:'📺', rarity:'legendary', value:500000},
+      {name:'Робопес Unitree Go2 Pro',      emoji:'🐕', rarity:'legendary', value:550000},
+      {name:'Капсула для відновлення сил',  emoji:'🛸', rarity:'legendary', value:600000},
     ]},
 
-  { id:'mbox3', name:'History Keeper', icon:'🏛️', price:60000,
+  { id:'mbox3', name:'History Keeper', icon:'🏛️', price:150000,
     desc:'Артефакти та скарби цивілізацій', color:'#d97706',
     items:[
       // Common (20)
-      {name:'Стара газета 1920-х',          emoji:'📰', rarity:'common', value:2500},
-      {name:'Срібний свічник',              emoji:'🕯️', rarity:'common', value:3200},
-      {name:'Набір для листів Vintage',     emoji:'✉️', rarity:'common', value:1800},
-      {name:'Марка "Blue Mauritius"',       emoji:'📮', rarity:'common', value:4500},
-      {name:'Старовинний ключ від замку',   emoji:'🗝️', rarity:'common', value:1200},
-      {name:'Глиняна трубка',               emoji:'🪈', rarity:'common', value:1500},
-      {name:'Перо з золотим наконечником',  emoji:'🖊️', rarity:'common', value:2100},
-      {name:'Скляна чорнильниця',           emoji:'🫙', rarity:'common', value:1400},
-      {name:'Череп з гірського кришталю',   emoji:'💀', rarity:'common', value:5200},
-      {name:'Картина невідомого майстра',   emoji:'🖼️', rarity:'common', value:6000},
-      {name:'Фарфорова лялька',             emoji:'🪆', rarity:'common', value:4800},
-      {name:'Старий кишеньковий годинник',  emoji:'⏱️', rarity:'common', value:7500},
-      {name:'Латунний калейдоскоп',         emoji:'🔮', rarity:'common', value:2300},
-      {name:'Камінь з петрогліфами',        emoji:'🪨', rarity:'common', value:3800},
-      {name:'Старовинна скриня',            emoji:'📦', rarity:'common', value:8000},
-      {name:'Колекція засушених метеликів', emoji:'🦋', rarity:'common', value:5500},
-      {name:'Монокль у золотій оправі',     emoji:'🧐', rarity:'common', value:4200},
-      {name:'Шкіряна папка',               emoji:'📁', rarity:'common', value:2800},
-      {name:'Гіпсова маска',               emoji:'🎭', rarity:'common', value:1100},
-      {name:'Медальйон під фото',           emoji:'📿', rarity:'common', value:3100},
+      {name:'Стара газета 1920-х',          emoji:'📰', rarity:'common', value:12000},
+      {name:'Срібний свічник',              emoji:'🕯️', rarity:'common', value:12500},
+      {name:'Набір для листів Vintage',     emoji:'✉️', rarity:'common', value:13000},
+      {name:'Марка "Blue Mauritius"',       emoji:'📮', rarity:'common', value:14000},
+      {name:'Старовинний ключ від замку',   emoji:'🗝️', rarity:'common', value:14500},
+      {name:'Глиняна трубка',               emoji:'🪈', rarity:'common', value:15000},
+      {name:'Перо з золотим наконечником',  emoji:'🖊️', rarity:'common', value:15500},
+      {name:'Скляна чорнильниця',           emoji:'🫙', rarity:'common', value:16000},
+      {name:'Череп з гірського кришталю',   emoji:'💀', rarity:'common', value:17000},
+      {name:'Картина невідомого майстра',   emoji:'🖼️', rarity:'common', value:17500},
+      {name:'Фарфорова лялька',             emoji:'🪆', rarity:'common', value:18000},
+      {name:'Старий кишеньковий годинник',  emoji:'⏱️', rarity:'common', value:19000},
+      {name:'Латунний калейдоскоп',         emoji:'🔮', rarity:'common', value:20000},
+      {name:'Камінь з петрогліфами',        emoji:'🪨', rarity:'common', value:21000},
+      {name:'Старовинна скриня',            emoji:'📦', rarity:'common', value:21500},
+      {name:'Колекція засушених метеликів', emoji:'🦋', rarity:'common', value:22000},
+      {name:'Монокль у золотій оправі',     emoji:'🧐', rarity:'common', value:22000},
+      {name:'Шкіряна папка',               emoji:'📁', rarity:'common', value:22000},
+      {name:'Гіпсова маска',               emoji:'🎭', rarity:'common', value:22000},
+      {name:'Медальйон під фото',           emoji:'📿', rarity:'common', value:22000},
       // Rare (15)
-      {name:'Катана періоду Едо',           emoji:'⚔️', rarity:'rare',   value:18000},
-      {name:'Карта світу на пергаменті',    emoji:'🗺️', rarity:'rare',   value:15500},
-      {name:'Beatles First Press вініл',    emoji:'🎵', rarity:'rare',   value:13000},
-      {name:'Набір воскових печаток',       emoji:'💌', rarity:'rare',   value:11000},
-      {name:'Срібна чаша Вікторіанська',   emoji:'🏆', rarity:'rare',   value:9500},
-      {name:'Старовинний мікроскоп латунь',emoji:'🔬', rarity:'rare',   value:8200},
-      {name:'Набір каліграфії XIX ст',      emoji:'✍️', rarity:'rare',   value:7800},
-      {name:'Ваза династії Мін',           emoji:'🏺', rarity:'rare',   value:12000},
-      {name:'Бронзова статуетка Будди',     emoji:'🙏', rarity:'rare',   value:10500},
-      {name:'Перша камера Leica',           emoji:'📷', rarity:'rare',   value:9000},
-      {name:'Компас капітана',              emoji:'🧭', rarity:'rare',   value:6500},
-      {name:'Книга з автографом',           emoji:'📕', rarity:'rare',   value:14000},
-      {name:'Грамофон початку XX ст',       emoji:'📻', rarity:'rare',   value:11500},
-      {name:'Скринька з інкрустацією',      emoji:'💎', rarity:'rare',   value:8800},
-      {name:'Срібні столові прилади',       emoji:'🍴', rarity:'rare',   value:10000},
+      {name:'Катана періоду Едо',           emoji:'⚔️', rarity:'rare',   value:40000},
+      {name:'Карта світу на пергаменті',    emoji:'🗺️', rarity:'rare',   value:42000},
+      {name:'Beatles First Press вініл',    emoji:'🎵', rarity:'rare',   value:44000},
+      {name:'Набір воскових печаток',       emoji:'💌', rarity:'rare',   value:46000},
+      {name:'Срібна чаша Вікторіанська',   emoji:'🏆', rarity:'rare',   value:48000},
+      {name:'Старовинний мікроскоп латунь',emoji:'🔬', rarity:'rare',   value:50000},
+      {name:'Набір каліграфії XIX ст',      emoji:'✍️', rarity:'rare',   value:52000},
+      {name:'Ваза династії Мін',           emoji:'🏺', rarity:'rare',   value:54000},
+      {name:'Бронзова статуетка Будди',     emoji:'🙏', rarity:'rare',   value:55000},
+      {name:'Перша камера Leica',           emoji:'📷', rarity:'rare',   value:56000},
+      {name:'Компас капітана',              emoji:'🧭', rarity:'rare',   value:57000},
+      {name:'Книга з автографом',           emoji:'📕', rarity:'rare',   value:58000},
+      {name:'Грамофон початку XX ст',       emoji:'📻', rarity:'rare',   value:59000},
+      {name:'Скринька з інкрустацією',      emoji:'💎', rarity:'rare',   value:60000},
+      {name:'Срібні столові прилади',       emoji:'🍴', rarity:'rare',   value:60000},
       // Epic (7)
-      {name:'Лицарський обладунок XVI ст',  emoji:'🛡️', rarity:'epic',   value:55000},
-      {name:'Антикварний підлоговий годин', emoji:'🕰️', rarity:'epic',   value:48000},
-      {name:'Давньоримська фібула з золота',emoji:'🏅', rarity:'epic',   value:42000},
-      {name:'Перські килими ручної роботи', emoji:'🪞', rarity:'epic',   value:38000},
-      {name:'Перша машинка Remington',      emoji:'⌨️', rarity:'epic',   value:35000},
-      {name:'Колекційне вино 1945 року',    emoji:'🍷', rarity:'epic',   value:32000},
-      {name:'Морський хронометр',           emoji:'⏱️', rarity:'epic',   value:29000},
+      {name:'Лицарський обладунок XVI ст',  emoji:'🛡️', rarity:'epic',   value:200000},
+      {name:'Антикварний підлоговий годин', emoji:'🕰️', rarity:'epic',   value:220000},
+      {name:'Давньоримська фібула з золота',emoji:'🏅', rarity:'epic',   value:240000},
+      {name:'Перські килими ручної роботи', emoji:'🪞', rarity:'epic',   value:260000},
+      {name:'Перша машинка Remington',      emoji:'⌨️', rarity:'epic',   value:280000},
+      {name:'Колекційне вино 1945 року',    emoji:'🍷', rarity:'epic',   value:290000},
+      {name:'Морський хронометр',           emoji:'⏱️', rarity:'epic',   value:300000},
       // Legendary (3)
-      {name:'Золотий статер Македонського', emoji:'🪙', rarity:'legendary', value:140000},
-      {name:'Фрагмент справжнього метеорита',emoji:'☄️',rarity:'legendary', value:115000},
-      {name:'Оригінальне "Математичні начала"',emoji:'📜',rarity:'legendary',value:95000},
+      {name:'Золотий статер Македонського', emoji:'🪙', rarity:'legendary', value:750000},
+      {name:'Фрагмент справжнього метеорита',emoji:'☄️',rarity:'legendary', value:825000},
+      {name:'Оригінальне "Математичні начала"',emoji:'📜',rarity:'legendary', value:900000},
     ]},
 
-  { id:'mbox4', name:'Cyberpunk Vibe', icon:'🤖', price:90000,
+  { id:'mbox4', name:'Cyberpunk Vibe', icon:'🤖', price:200000,
     desc:'Нео-майбутнє вже тут', color:'#ec4899',
     items:[
       // Common (20)
-      {name:'Неонова маска для вечірок',    emoji:'🎭', rarity:'common', value:6000},
-      {name:'Плакат зі світлодіодами',      emoji:'💡', rarity:'common', value:5200},
-      {name:'Скляна флешка неон',           emoji:'💾', rarity:'common', value:2500},
-      {name:'Кабель у сталевій оплітці',    emoji:'🔌', rarity:'common', value:1800},
-      {name:'Навушники Cat-ear RGB',        emoji:'🎧', rarity:'common', value:4500},
-      {name:'Рукавичка з датчиками',        emoji:'🧤', rarity:'common', value:7000},
-      {name:'Браслет E-ink екран',          emoji:'⌚', rarity:'common', value:3800},
-      {name:'Стікерпак "Glitch art"',       emoji:'🎨', rarity:'common', value:500},
-      {name:'Cyber-Fuel кейс напоїв',       emoji:'🥤', rarity:'common', value:1200},
-      {name:'Килимок бездротова зарядка',   emoji:'🖥️', rarity:'common', value:4000},
-      {name:'Вентилятор ПК з голограмою',   emoji:'🌀', rarity:'common', value:3200},
-      {name:'Підставка гарнітури "Hand"',   emoji:'🖐️', rarity:'common', value:2800},
-      {name:'USB-хаб у формі ядра',         emoji:'⚛️', rarity:'common', value:3500},
-      {name:'Паспорт "Netrunner"',          emoji:'📋', rarity:'common', value:800},
-      {name:'Запальничка плазмова',         emoji:'🔥', rarity:'common', value:1500},
-      {name:'Окуляри "Cyclops"',            emoji:'🕶️', rarity:'common', value:2200},
-      {name:'Брелок-токен',                 emoji:'🔑', rarity:'common', value:900},
-      {name:'Ліхтарик 5000Lm',             emoji:'🔦', rarity:'common', value:3100},
-      {name:'Значок "High Tech Low Life"',  emoji:'📌', rarity:'common', value:400},
-      {name:'Чохол з мікросхемами',         emoji:'📱', rarity:'common', value:2000},
+      {name:'Неонова маска для вечірок',    emoji:'🎭', rarity:'common', value:18000},
+      {name:'Плакат зі світлодіодами',      emoji:'💡', rarity:'common', value:19000},
+      {name:'Скляна флешка неон',           emoji:'💾', rarity:'common', value:20000},
+      {name:'Кабель у сталевій оплітці',    emoji:'🔌', rarity:'common', value:21000},
+      {name:'Навушники Cat-ear RGB',        emoji:'🎧', rarity:'common', value:22000},
+      {name:'Рукавичка з датчиками',        emoji:'🧤', rarity:'common', value:23000},
+      {name:'Браслет E-ink екран',          emoji:'⌚', rarity:'common', value:24000},
+      {name:'Стікерпак "Glitch art"',       emoji:'🎨', rarity:'common', value:25000},
+      {name:'Cyber-Fuel кейс напоїв',       emoji:'🥤', rarity:'common', value:26000},
+      {name:'Килимок бездротова зарядка',   emoji:'🖥️', rarity:'common', value:27000},
+      {name:'Вентилятор ПК з голограмою',   emoji:'🌀', rarity:'common', value:27500},
+      {name:'Підставка гарнітури "Hand"',   emoji:'🖐️', rarity:'common', value:28000},
+      {name:'USB-хаб у формі ядра',         emoji:'⚛️', rarity:'common', value:28500},
+      {name:'Паспорт "Netrunner"',          emoji:'📋', rarity:'common', value:29000},
+      {name:'Запальничка плазмова',         emoji:'🔥', rarity:'common', value:29500},
+      {name:'Окуляри "Cyclops"',            emoji:'🕶️', rarity:'common', value:30000},
+      {name:'Брелок-токен',                 emoji:'🔑', rarity:'common', value:30000},
+      {name:'Ліхтарик 5000Lm',             emoji:'🔦', rarity:'common', value:30000},
+      {name:'Значок "High Tech Low Life"',  emoji:'📌', rarity:'common', value:30000},
+      {name:'Чохол з мікросхемами',         emoji:'📱', rarity:'common', value:30000},
       // Rare (15)
-      {name:'AR-окуляри Nreal Air 2 Ultra', emoji:'🥽', rarity:'rare',   value:28000},
-      {name:'Клавіатура рідкий метал',      emoji:'⌨️', rarity:'rare',   value:22000},
-      {name:'Смарт-дзеркало з мережею',    emoji:'🪞', rarity:'rare',   value:20000},
-      {name:'Тепловізор-монокль преміум',   emoji:'👁️', rarity:'rare',   value:24000},
-      {name:'Неонові вивіски кастомні',     emoji:'💡', rarity:'rare',   value:18000},
-      {name:'Steam Deck 3 (репліка)',        emoji:'🎮', rarity:'rare',   value:15000},
-      {name:'Катана з лазерним лезом',      emoji:'⚔️', rarity:'rare',   value:19000},
-      {name:'Кибер-дека компʼютер',         emoji:'💻', rarity:'rare',   value:17500},
-      {name:'Маска самурая-кіборга',        emoji:'🎭', rarity:'rare',   value:14000},
-      {name:'Навушники кісткова провідність',emoji:'🎧',rarity:'rare',   value:12500},
-      {name:'Рюкзак LED-панель 4K',         emoji:'🎒', rarity:'rare',   value:11000},
-      {name:'Кросівки авто-шнурівка',       emoji:'👟', rarity:'rare',   value:16000},
-      {name:'Розумний респіратор',          emoji:'😷', rarity:'rare',   value:10500},
-      {name:'Плазмова лампа гігант',        emoji:'⚡', rarity:'rare',   value:9500},
-      {name:'Годинник газорозрядні індик',  emoji:'⏰', rarity:'rare',   value:13000},
+      {name:'AR-окуляри Nreal Air 2 Ultra', emoji:'🥽', rarity:'rare',   value:55000},
+      {name:'Клавіатура рідкий метал',      emoji:'⌨️', rarity:'rare',   value:58000},
+      {name:'Смарт-дзеркало з мережею',    emoji:'🪞', rarity:'rare',   value:62000},
+      {name:'Тепловізор-монокль преміум',   emoji:'👁️', rarity:'rare',   value:65000},
+      {name:'Неонові вивіски кастомні',     emoji:'💡', rarity:'rare',   value:68000},
+      {name:'Steam Deck 3 (репліка)',        emoji:'🎮', rarity:'rare',   value:71000},
+      {name:'Катана з лазерним лезом',      emoji:'⚔️', rarity:'rare',   value:74000},
+      {name:'Кибер-дека компʼютер',         emoji:'💻', rarity:'rare',   value:76000},
+      {name:'Маска самурая-кіборга',        emoji:'🎭', rarity:'rare',   value:78000},
+      {name:'Навушники кісткова провідність',emoji:'🎧',rarity:'rare',   value:80000},
+      {name:'Рюкзак LED-панель 4K',         emoji:'🎒', rarity:'rare',   value:81000},
+      {name:'Кросівки авто-шнурівка',       emoji:'👟', rarity:'rare',   value:82000},
+      {name:'Розумний респіратор',          emoji:'😷', rarity:'rare',   value:83000},
+      {name:'Плазмова лампа гігант',        emoji:'⚡', rarity:'rare',   value:84000},
+      {name:'Годинник газорозрядні індик',  emoji:'⏰', rarity:'rare',   value:85000},
       // Epic (7)
-      {name:'Cyber-PC Super-Nova водяне охол',emoji:'💻',rarity:'epic',  value:85000},
-      {name:'Куртка смарт-тканина екрани',  emoji:'🧥', rarity:'epic',   value:75000},
-      {name:'Nanoleaf Limited Edition',     emoji:'💡', rarity:'epic',   value:68000},
-      {name:'Турель-охоронець (муляж)',      emoji:'🔫', rarity:'epic',   value:62000},
-      {name:'Розумна тату-машина ШІ',       emoji:'🎨', rarity:'epic',   value:55000},
-      {name:'Шолом пілота AR-інтерфейс',    emoji:'🪖', rarity:'epic',   value:50000},
-      {name:'Біо-реактор для моху',         emoji:'🌿', rarity:'epic',   value:45000},
+      {name:'Cyber-PC Super-Nova водяне охол',emoji:'💻',rarity:'epic',  value:350000},
+      {name:'Куртка смарт-тканина екрани',  emoji:'🧥', rarity:'epic',   value:400000},
+      {name:'Nanoleaf Limited Edition',     emoji:'💡', rarity:'epic',   value:440000},
+      {name:'Турель-охоронець (муляж)',      emoji:'🔫', rarity:'epic',   value:480000},
+      {name:'Розумна тату-машина ШІ',       emoji:'🎨', rarity:'epic',   value:510000},
+      {name:'Шолом пілота AR-інтерфейс',    emoji:'🪖', rarity:'epic',   value:540000},
+      {name:'Біо-реактор для моху',         emoji:'🌿', rarity:'epic',   value:550000},
       // Legendary (3)
-      {name:'Електробайк "Neo-Tokyo"',      emoji:'🏍️', rarity:'legendary', value:250000},
-      {name:'Біонічний протез руки (декор)',emoji:'🦾', rarity:'legendary', value:210000},
-      {name:'Система VR повного занурення', emoji:'🥽', rarity:'legendary', value:180000},
+      {name:'Електробайк "Neo-Tokyo"',      emoji:'🏍️', rarity:'legendary', value:1000000},
+      {name:'Біонічний протез руки (декор)',emoji:'🦾', rarity:'legendary', value:1100000},
+      {name:'Система VR повного занурення', emoji:'🥽', rarity:'legendary', value:1200000},
     ]},
 
-  { id:'mbox5', name:'Fortune Teller', icon:'🔮', price:150000,
+  { id:'mbox5', name:'Fortune Teller', icon:'🔮', price:250000,
     desc:'Доля, удача і золото на кожному кроці', color:'#f5c842',
     items:[
       // Common (20)
-      {name:'Золота підкова на удачу',      emoji:'🪄', rarity:'common', value:9000},
-      {name:'Книга заклять преміум',        emoji:'📖', rarity:'common', value:11000},
-      {name:'Амулет "Око"',                emoji:'👁️', rarity:'common', value:8000},
-      {name:'Монета з гравіюванням',        emoji:'🪙', rarity:'common', value:6000},
-      {name:'Ароматичні свічки Luxury',     emoji:'🕯️', rarity:'common', value:4000},
-      {name:'Гральні кості з позолотою',    emoji:'🎲', rarity:'common', value:5500},
-      {name:'Маятник для лозоходства',      emoji:'⚖️', rarity:'common', value:3200},
-      {name:'Шкіряний мішечок для монет',   emoji:'👛', rarity:'common', value:2800},
-      {name:'Рунічні камені з агату',       emoji:'🔮', rarity:'common', value:7500},
-      {name:'Сіль для ванн "Magic Relax"',  emoji:'🛁', rarity:'common', value:1500},
-      {name:'Чорне перо ворона (декор)',    emoji:'🪶', rarity:'common', value:2100},
-      {name:'Підставка під кулю',           emoji:'🔮', rarity:'common', value:5000},
-      {name:'Набір ефірних масел',          emoji:'🌿', rarity:'common', value:4200},
-      {name:'Металева картка VIP',          emoji:'💳', rarity:'common', value:9500},
-      {name:'Кришталева піраміда',          emoji:'🔺', rarity:'common', value:8500},
-      {name:'Браслет червона нитка+золото', emoji:'📿', rarity:'common', value:7000},
-      {name:'Подушка для медитації',        emoji:'🧘', rarity:'common', value:3500},
-      {name:'Курильниця для пахощів',       emoji:'🫧', rarity:'common', value:6500},
-      {name:'Магічний пісок у колбі',       emoji:'⏳', rarity:'common', value:1200},
-      {name:'Ловець снів екзотичний',       emoji:'🌙', rarity:'common', value:4800},
+      {name:'Золота підкова на удачу',      emoji:'🪄', rarity:'common', value:25000},
+      {name:'Книга заклять преміум',        emoji:'📖', rarity:'common', value:26000},
+      {name:'Амулет "Око"',                emoji:'👁️', rarity:'common', value:27000},
+      {name:'Монета з гравіюванням',        emoji:'🪙', rarity:'common', value:28000},
+      {name:'Ароматичні свічки Luxury',     emoji:'🕯️', rarity:'common', value:29000},
+      {name:'Гральні кості з позолотою',    emoji:'🎲', rarity:'common', value:30000},
+      {name:'Маятник для лозоходства',      emoji:'⚖️', rarity:'common', value:31000},
+      {name:'Шкіряний мішечок для монет',   emoji:'👛', rarity:'common', value:32000},
+      {name:'Рунічні камені з агату',       emoji:'🔮', rarity:'common', value:33000},
+      {name:'Сіль для ванн "Magic Relax"',  emoji:'🛁', rarity:'common', value:34000},
+      {name:'Чорне перо ворона (декор)',    emoji:'🪶', rarity:'common', value:35000},
+      {name:'Підставка під кулю',           emoji:'🔮', rarity:'common', value:36000},
+      {name:'Набір ефірних масел',          emoji:'🌿', rarity:'common', value:37000},
+      {name:'Металева картка VIP',          emoji:'💳', rarity:'common', value:38000},
+      {name:'Кришталева піраміда',          emoji:'🔺', rarity:'common', value:39000},
+      {name:'Браслет червона нитка+золото', emoji:'📿', rarity:'common', value:39500},
+      {name:'Подушка для медитації',        emoji:'🧘', rarity:'common', value:40000},
+      {name:'Курильниця для пахощів',       emoji:'🫧', rarity:'common', value:40000},
+      {name:'Магічний пісок у колбі',       emoji:'⏳', rarity:'common', value:40000},
+      {name:'Ловець снів екзотичний',       emoji:'🌙', rarity:'common', value:40000},
       // Rare (15)
-      {name:'Срібний кубок переможця',      emoji:'🏆', rarity:'rare',   value:45000},
-      {name:'Шахи нефрит та мармур',        emoji:'♟️', rarity:'rare',   value:40000},
-      {name:'Карти Таро золоте тиснення',   emoji:'🃏', rarity:'rare',   value:32000},
-      {name:'Статуетка богині Фортуни',     emoji:'🏛️', rarity:'rare',   value:35000},
-      {name:'Монета "Double Eagle"',        emoji:'🪙', rarity:'rare',   value:38000},
-      {name:'Кубики з кістки мамонта',      emoji:'🎲', rarity:'rare',   value:28000},
-      {name:'Книга пророцтв антикварна',    emoji:'📜', rarity:'rare',   value:25000},
-      {name:'Магічний амулет з рубіном',    emoji:'💎', rarity:'rare',   value:30000},
-      {name:'Срібне дзеркало ворожіння',    emoji:'🪞', rarity:'rare',   value:22000},
-      {name:'Шафка магічних артефактів',    emoji:'🗄️', rarity:'rare',   value:27000},
-      {name:'Підкова 24-каратне покриття',  emoji:'🐴', rarity:'rare',   value:20000},
-      {name:'Кільце з таємним знаком',      emoji:'💍', rarity:'rare',   value:18000},
-      {name:'Чорна перлина в раковині',     emoji:'🦪', rarity:'rare',   value:24000},
-      {name:'Лампа Аладдіна позолота',      emoji:'🪔', rarity:'rare',   value:21000},
-      {name:'Карта скарбів на шкірі',       emoji:'🗺️', rarity:'rare',   value:19000},
+      {name:'Срібний кубок переможця',      emoji:'🏆', rarity:'rare',   value:70000},
+      {name:'Шахи нефрит та мармур',        emoji:'♟️', rarity:'rare',   value:73000},
+      {name:'Карти Таро золоте тиснення',   emoji:'🃏', rarity:'rare',   value:76000},
+      {name:'Статуетка богині Фортуни',     emoji:'🏛️', rarity:'rare',   value:79000},
+      {name:'Монета "Double Eagle"',        emoji:'🪙', rarity:'rare',   value:82000},
+      {name:'Кубики з кістки мамонта',      emoji:'🎲', rarity:'rare',   value:84000},
+      {name:'Книга пророцтв антикварна',    emoji:'📜', rarity:'rare',   value:86000},
+      {name:'Магічний амулет з рубіном',    emoji:'💎', rarity:'rare',   value:88000},
+      {name:'Срібне дзеркало ворожіння',    emoji:'🪞', rarity:'rare',   value:90000},
+      {name:'Шафка магічних артефактів',    emoji:'🗄️', rarity:'rare',   value:92000},
+      {name:'Підкова 24-каратне покриття',  emoji:'🐴', rarity:'rare',   value:93000},
+      {name:'Кільце з таємним знаком',      emoji:'💍', rarity:'rare',   value:95000},
+      {name:'Чорна перлина в раковині',     emoji:'🦪', rarity:'rare',   value:97000},
+      {name:'Лампа Аладдіна позолота',      emoji:'🪔', rarity:'rare',   value:98000},
+      {name:'Карта скарбів на шкірі',       emoji:'🗺️', rarity:'rare',   value:100000},
       // Epic (7)
-      {name:'Карта "Золотий Джокер"',       emoji:'🃏', rarity:'epic',   value:120000},
-      {name:'Кришталева куля кварц',        emoji:'🔮', rarity:'epic',   value:100000},
-      {name:'Фішки казино Лас-Вегас 1950х', emoji:'🎰', rarity:'epic',   value:90000},
-      {name:'Картина "Фортуна" золота рама',emoji:'🖼️', rarity:'epic',   value:85000},
-      {name:'Набір для покеру крокодил',    emoji:'🎴', rarity:'epic',   value:78000},
-      {name:'Скульптура "Золотий Телець"',  emoji:'🐂', rarity:'epic',   value:72000},
-      {name:'Годинник-скелетон ручна робота',emoji:'⌚',rarity:'epic',   value:95000},
+      {name:'Карта "Золотий Джокер"',       emoji:'🃏', rarity:'epic',   value:500000},
+      {name:'Кришталева куля кварц',        emoji:'🔮', rarity:'epic',   value:570000},
+      {name:'Фішки казино Лас-Вегас 1950х', emoji:'🎰', rarity:'epic',   value:640000},
+      {name:'Картина "Фортуна" золота рама',emoji:'🖼️', rarity:'epic',   value:700000},
+      {name:'Набір для покеру крокодил',    emoji:'🎴', rarity:'epic',   value:740000},
+      {name:'Скульптура "Золотий Телець"',  emoji:'🐂', rarity:'epic',   value:770000},
+      {name:'Годинник-скелетон ручна робота',emoji:'⌚',rarity:'epic',   value:800000},
       // Legendary (3)
-      {name:'Золотий злиток 2.5кг',         emoji:'🥇', rarity:'legendary', value:380000},
-      {name:'Блакитний діамант 3 карати',   emoji:'💎', rarity:'legendary', value:340000},
-      {name:'Ключ VIP-ложі казино назавжди',emoji:'🗝️', rarity:'legendary', value:310000},
+      {name:'Золотий злиток 2.5кг',         emoji:'🥇', rarity:'legendary', value:1250000},
+      {name:'Блакитний діамант 3 карати',   emoji:'💎', rarity:'legendary', value:1375000},
+      {name:'Ключ VIP-ложі казино назавжди',emoji:'🗝️', rarity:'legendary', value:1500000},
     ]},
 ];
 
@@ -2521,7 +2526,8 @@ let state = {
   capitalAchievements: {}, // { id: true } — one-time flags
   collections: {},         // { caseId: { itemName: {name,emoji,rarity,value} } }
   collectionBonuses: {},   // { caseId: { multiOpen:true, discount:true } }
-  rivalNets: null          // { name: currentNet } — live Forbes wealth tracking
+  rivalNets: null,          // { name: currentNet } — live Forbes wealth tracking
+  collUpgLevels: {}          // { caseId: currentLevel } — collection shop upgrade levels
 };
 
 function saveState() {
@@ -2563,8 +2569,38 @@ function loadState() {
       // Re-apply collection bonuses immediately after load
       // (called inline so bonuses are ready before any render)
       if (!state.capitalAchievements) state.capitalAchievements = {};
+      if (!state.collUpgLevels) state.collUpgLevels = {};
       // Remove stuck sold items from previous sessions
       state.shop = state.shop.filter(x => !x.sold);
+
+      // ── П.8: Offline sales processing ──
+      if (!state.pendingOfflineSales) state.pendingOfflineSales = null;
+      const now = Date.now();
+      let offlineSoldCount = 0;
+      let offlineEarned    = 0;
+      const offlineSoldNames = [];
+
+      state.shop = state.shop.filter(entry => {
+        if (entry.timerActive && entry.endTime && entry.endTime <= now) {
+          // This item sold while player was away
+          offlineSoldCount++;
+          offlineEarned += (entry.listPrice || entry.value || 0);
+          offlineSoldNames.push(entry.name);
+          return false; // remove from shop
+        }
+        return true;
+      });
+
+      if (offlineSoldCount > 0) {
+        state.pendingOfflineSales = {
+          count:   offlineSoldCount,
+          earned:  offlineEarned,
+          names:   offlineSoldNames,
+        };
+        // stats update
+        if (!state.stats) state.stats = { casesOpened:0, itemsSold:0 };
+        state.stats.itemsSold = (state.stats.itemsSold || 0) + offlineSoldCount;
+      }
     }
   } catch(e) {}
 }
@@ -2691,11 +2727,28 @@ function handleClick(e) {
 }
 
 // Passive income
+function getDynamicPassiveBonus() {
+  // Elite Collector: Динамічний пасив — % залежить від капіталу
+  if (!state._collBonus_dynamicPassive) return 0;
+  const cap = calcCapital().total;
+  if      (cap < 10000)       return 0.005;   // 0.5%
+  else if (cap < 50000)       return 0.01;    // 1%
+  else if (cap < 200000)      return 0.02;    // 2%
+  else if (cap < 1000000)     return 0.05;    // 5%
+  else if (cap < 10000000)    return 0.10;    // 10%
+  else if (cap < 100000000)   return 0.25;    // 25%
+  else if (cap < 1000000000)  return 0.50;    // 50%
+  else                        return 1.00;    // 100%
+}
+
 setInterval(() => {
   if (state.passivePerSec > 0) {
     const passiveMult  = state._collBonus_passiveMult  || 1;
     const passiveSpeed = state._collBonus_passiveSpeed || 1;
-    const earned = Math.round(state.passivePerSec * passiveMult * passiveSpeed);
+    const passiveFlat  = state._collBonus_passiveFlat  || 0;
+    const dynBonus     = getDynamicPassiveBonus();
+    const base = state.passivePerSec * passiveMult * passiveSpeed + passiveFlat;
+    const earned = Math.round(base * (1 + dynBonus));
     state.balance     += earned;
     state.totalEarned += earned;
     updateHUD();
@@ -2713,12 +2766,26 @@ function updateHUD() {
   setTimeout(() => el.classList.remove('pop'), 100);
 
   document.getElementById('totalEarned').textContent = fmt(state.totalEarned);
-  document.getElementById('perClickDisplay').textContent = state.clickValue;
-  document.getElementById('clickValHint').textContent = state.clickValue;
-  const pm = state._collBonus_passiveMult  || 1;
-  const ps = state._collBonus_passiveSpeed || 1;
-  const actualPassive = state.passivePerSec > 0 ? Math.round(state.passivePerSec * pm * ps) : 0;
-  document.getElementById('passiveDisplay').textContent =
+  const _clickMultHUD = state._collBonus_clickMult || 1;
+  const _totalClick = Math.round((state.clickValue + (state._collBonus_clickFlat || 0)) * _clickMultHUD);
+  document.getElementById('perClickDisplay').textContent = _totalClick;
+  document.getElementById('clickValHint').textContent = _totalClick;
+  const pm  = state._collBonus_passiveMult  || 1;
+  const ps  = state._collBonus_passiveSpeed || 1;
+  const pfl = state._collBonus_passiveFlat  || 0;
+  const dyn = getDynamicPassiveBonus ? getDynamicPassiveBonus() : 0;
+  const actualPassive = state.passivePerSec > 0
+    ? Math.round((state.passivePerSec * pm * ps + pfl) * (1 + dyn)) : 0;
+  // П.11: Update clicker capital banner
+  const _cc = calcCapital();
+  const _cr = getForbesRank(_cc.total);
+  const _ect = document.getElementById('clickerCapTotal');
+  const _ecb = document.getElementById('clickerBalance');
+  const _ecf = document.getElementById('clickerForbes');
+  if (_ect) _ect.textContent = fmtCapital(_cc.total);
+  if (_ecb) _ecb.textContent = fmtCapital(state.balance);
+  if (_ecf) _ecf.textContent = '#' + _cr;
+    document.getElementById('passiveDisplay').textContent =
     actualPassive > 0
       ? '+' + actualPassive + '€/сек' + (pm > 1 || ps > 1 ? ' ✨' : '')
       : '';
@@ -2754,6 +2821,8 @@ function updateHUD() {
   if (invBulkCard && invBulkCard.innerHTML) renderInvUpgrades();
   const shopLimCard = document.getElementById('shopLimitUpgradeCard');
   if (shopLimCard && shopLimCard.innerHTML) renderShopUpgrades();
+  const collUpgCont = document.getElementById('collShopUpgradesContainer');
+  if (collUpgCont) renderCollShopUpgrades();
   const listAllCard = document.getElementById('listAllMaxCard');
   if (listAllCard && listAllCard.innerHTML) renderListAllMaxCard();
   updateCapitalUI();
@@ -2786,7 +2855,7 @@ function renderUpgrades() {
     nameEl.textContent = u.name;
     const descEl = document.createElement('div');
     descEl.className = 'upg-desc';
-    descEl.textContent = u.desc + (owned ? '' : ' · Ціна: ' + fmt(u.price));
+    descEl.textContent = u.desc;
     infoEl.appendChild(nameEl);
     infoEl.appendChild(descEl);
 
@@ -2879,7 +2948,9 @@ function bulkMoveToShop() {
       listPrice: baseVal,      // default listing = boosted base price
       listedAt:  Date.now(),
       timerSec:  0,
-      sold:      false
+      sold:      false,
+      fromCase:      item.fromCase || null,
+      fromContainer: item.fromContainer || null,
     };
     state.shop.push(shopEntry);
     state.inventory = state.inventory.filter(x => x.id !== item.id);
@@ -2925,6 +2996,9 @@ function updateRarityBar(caseId) {
 function updateAllRarityBars() {
   CASES.forEach(c => updateRarityBar(c.id));
   MYSTERY_BOXES.forEach(mb => updateRarityBar(mb.id));
+  // Re-render containers if visible (pity bars update)
+  const cPane = document.getElementById('casesPane-containers');
+  if (cPane && cPane.style.display !== 'none') renderContainers();
 }
 
 
@@ -2992,8 +3066,8 @@ function renderCases() {
     if (collBonus.multiOpen) {
       const x5Btn = document.createElement('button');
       x5Btn.className = 'open-case-btn can';
-      x5Btn.style.cssText = 'flex:none;padding:7px 10px;font-size:10px;font-weight:800;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.35);color:var(--gold);margin:0;letter-spacing:.5px;line-height:1.2;text-align:center;min-width:44px;';
-      x5Btn.innerHTML = '⚡<br>×5';
+      x5Btn.style.cssText = 'flex:none;padding:4px 6px;font-size:11px;font-weight:800;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.35);color:var(--gold);margin:0;line-height:1.1;text-align:center;width:34px;min-width:34px;max-width:34px;box-sizing:border-box;border-radius:8px;';
+      x5Btn.innerHTML = '⚡×5';
       const cost5 = effectivePrice * 5;
       if (state.balance < cost5) { x5Btn.disabled = true; x5Btn.style.opacity = '.4'; }
       x5Btn.addEventListener('click', () => openCaseMulti(c.id, 5));
@@ -3188,6 +3262,9 @@ function getPityForCase(caseId) {
   return state.pity[caseId];
 }
 
+// IDs що належать кейсам (не mbox/containers)
+const CASE_IDS = new Set(['street','office','chef','gamer','fitness','apple','photo','workshop','smart','elite']);
+
 function getCurrentWeights(caseId) {
   const base = { ...RARITY_WEIGHTS };
   const id = caseId || (currentCase ? currentCase.id : '_');
@@ -3195,8 +3272,19 @@ function getCurrentWeights(caseId) {
   let rareBonus      = p.rare;
   let epicBonus      = p.epic;
   let legendaryBonus = p.legendary;
-  // Fitness Pro collection bonus: +12% rare chance for fitness case
-  if (id === 'fitness' && state._collBonus_fitnessRare) rareBonus += 12;
+
+  // Rarity bonuses лише для кейсів — НЕ для Mystery Boxes і Containers
+  if (CASE_IDS.has(id)) {
+    // Fitness Pro collection bonus: +12% rare chance for fitness case
+    if (id === 'fitness' && state._collBonus_fitnessRare) rareBonus += 12;
+    // Office Hero cert: +5% Rare global (only cases)
+    if (state._collBonus_officeRare) rareBonus += 5;
+    // Global rarity bonuses from shop upgrades (only cases)
+    rareBonus      += (state._collBonus_globalRareChance || 0);
+    epicBonus      += (state._collBonus_globalEpicChance || 0);
+    legendaryBonus += (state._collBonus_globalLegChance  || 0);
+  }
+
   const totalBonus = rareBonus + epicBonus + legendaryBonus;
   return {
     common:    Math.max(1, base.common - totalBonus),
@@ -3433,13 +3521,18 @@ function keepResult() {
 
 function closeModal() {
   if (spinning) return;
-  // Auto-keep if there's a pending result when closing
   if (currentResult && hasSpunOnce) {
     autoKeepResult(currentResult);
     currentResult = null;
   }
   document.getElementById('caseModal').classList.remove('show');
   hasSpunOnce = false;
+  // П.2: Restore carousel-wrap so next open doesn't throw null error
+  const wrap = document.querySelector('#caseModal .carousel-wrap');
+  if (wrap && !document.getElementById('carouselTrack')) {
+    wrap.innerHTML = '<div class="carousel-track" id="carouselTrack"></div>';
+    wrap.style.cssText = '';
+  }
 }
 
 document.getElementById('caseModal').addEventListener('click', function(e) {
@@ -3455,7 +3548,14 @@ function renderInventory() {
     return;
   }
   grid.innerHTML = '';
-  state.inventory.forEach(item => {
+  const _sorted = [...state.inventory].sort((a, b) => {
+    const aC = CASES.find(c => c.name === a.fromCase);
+    const bC = CASES.find(c => c.name === b.fromCase);
+    const aE = aC && !getColl(aC.id)[a.name] ? 1 : 0;
+    const bE = bC && !getColl(bC.id)[b.name] ? 1 : 0;
+    return bE - aE;
+  });
+  _sorted.forEach(item => {
     const div = document.createElement('div');
     div.className = 'inv-item';
 
@@ -3519,12 +3619,26 @@ function renderInventory() {
   });
 }
 
+function isItemFromCase(item) {
+  // Перевіряємо чи предмет з основного кейса (не mbox/container)
+  if (!item.fromCase) return false;
+  return CASES.some(c => c.name === item.fromCase);
+}
+
 function getSellValue(item) {
   let val = item.value;
-  if (item.rarity === 'common' && state._collBonus_commonSellMult > 1)
-    val = Math.round(val * state._collBonus_commonSellMult);
-  if (item.rarity === 'epic' && state._collBonus_epicSellMult > 1)
-    val = Math.round(val * state._collBonus_epicSellMult);
+  const r = item.rarity;
+  // Sell multipliers тільки для предметів з кейсів
+  if (isItemFromCase(item)) {
+    if (r === 'common'    && (state._collBonus_commonSellMult||1) > 1)
+      val = Math.round(val * state._collBonus_commonSellMult);
+    if (r === 'rare'      && (state._collBonus_rareSellMult||1)   > 1)
+      val = Math.round(val * state._collBonus_rareSellMult);
+    if (r === 'epic'      && (state._collBonus_epicSellMult||1)   > 1)
+      val = Math.round(val * state._collBonus_epicSellMult);
+    if (r === 'legendary' && (state._collBonus_legSellMult||1)    > 1)
+      val = Math.round(val * state._collBonus_legSellMult);
+  }
   return val;
 }
 
@@ -3567,7 +3681,9 @@ function listInShop(invId) {
     listPrice: baseVal,  // default listing = boosted base
     listedAt: Date.now(),
     timerSec: 20,
-    sold: false
+    sold: false,
+    fromCase: item.fromCase || null,       // track source for bonus eligibility
+    fromContainer: item.fromContainer || null,
   };
   state.inventory.splice(idx, 1);
   state.shop.push(shopEntry);
@@ -3816,7 +3932,7 @@ function switchShopTab(tab) {
   document.getElementById('shopTab-' + tab).classList.add('active');
   document.getElementById('shopPane-listings').style.display  = tab === 'listings'  ? 'block' : 'none';
   document.getElementById('shopPane-upgrades').style.display  = tab === 'upgrades'  ? 'block' : 'none';
-  if (tab === 'upgrades') { renderMultUpgrade(); renderShopUpgrades(); renderListAllMaxCard(); }
+  if (tab === 'upgrades') { renderMultUpgrade(); renderShopUpgrades(); renderListAllMaxCard(); renderCollShopUpgrades(); }
 }
 
 function unlockShop() {
@@ -3848,6 +3964,7 @@ function renderShop() {
     grid.innerHTML = '<div class="empty-state"><div class="e-icon">🏪</div><div>Магазин порожній.<br>Перенеси предмети зі складу!</div></div>';
     return;
   }
+  grid.innerHTML = ''; // clear before rendering items
 
   // Sort: items without active timer (new/unlisted) first, active timers below
   const sortedShop = [...state.shop].sort((a, b) => {
@@ -3937,6 +4054,23 @@ function renderShop() {
       div.appendChild(priceWrap);
       div.appendChild(listBtn);
       div.appendChild(timerWrap);
+
+      // П.4: If this entry has an active timer (restored from save), show timer-wrap immediately
+      if (entry.timerActive && entry.endTime && entry.endTime > Date.now()) {
+        priceWrap.style.display = 'none';
+        listBtn.style.display = 'none';
+        timerWrap.style.display = 'block';
+        // Show remaining time immediately
+        const rem = entry.endTime - Date.now();
+        const sec = Math.ceil(rem / 1000);
+        const pct = Math.max(0, Math.min(100, (rem / (entry.timerSec * 1000)) * 100));
+        const barEl = timerWrap.querySelector('.timer-bar');
+        const lblEl = timerWrap.querySelector('.timer-label');
+        if (barEl) barEl.style.width = pct + '%';
+        if (lblEl) lblEl.textContent = sec >= 60
+          ? 'Продається... ' + Math.floor(sec/60) + 'хв ' + (sec%60) + 'с'
+          : 'Продається... ' + sec + 'с';
+      }
     }
 
     grid.appendChild(div);
@@ -3950,13 +4084,14 @@ function renderShop() {
   });
 }
 
-function calcSellTimer(listPrice, marketPrice, maxPrice) {
+function calcSellTimer(listPrice, marketPrice, maxPrice, fromCaseName) {
   // At market price → instant (0s)
   if (listPrice <= marketPrice) return 0;
   // Square-root scale: 1M€ = 3600s (60min), 4€ = 7s, 1200€ = 2min
   const base = Math.min(Math.round(3600 * Math.sqrt(Math.max(listPrice, 0) / 1_000_000)), 3600);
-  // Apply Hobbyist Workshop collection bonus (−10% sell time)
-  const mult = state._collBonus_shopTimerMult || 1.0;
+  // shopTimerMult (Hobbyist Workshop bonus) — тільки для предметів з кейсів
+  const isCaseItem = fromCaseName && CASES.some(c => c.name === fromCaseName);
+  const mult = isCaseItem ? (state._collBonus_shopTimerMult || 1.0) : 1.0;
   return Math.max(1, Math.round(base * mult));
 }
 
@@ -3989,6 +4124,8 @@ function completeSale(entry, listPrice) {
     clearInterval(activeTimers[entry.id].interval);
   }
   entry.sold = true;
+  entry.timerActive = false;
+  entry.endTime = null;
   state.balance += listPrice;
   state.totalEarned += listPrice;
   state.stats.itemsSold++;
@@ -4025,8 +4162,8 @@ function startSellTimer(entryId) {
   const listPrice = Math.min(Math.max(rawPrice, 1), entry.maxPrice);
   entry.listPrice = listPrice;
 
-  const timerSec = calcSellTimer(listPrice, entry.value, entry.maxPrice);
-  entry.timerSec = timerSec;
+  const timerSec = calcSellTimer(listPrice, entry.value, entry.maxPrice, entry.fromCase);
+  entry.timerSec = timerSec; // persisted for offline bar calculation
   entry.listedAt = Date.now();
   saveState();
 
@@ -4044,6 +4181,9 @@ function startSellTimer(entryId) {
   if (timerWrap) timerWrap.style.display = 'block';
 
   const endTime = Date.now() + timerSec * 1000;
+  entry.endTime = endTime; // persist for offline calculation
+  entry.timerActive = true;
+  saveState();
 
   const interval = setInterval(() => {
     const remaining = Math.max(0, endTime - Date.now());
@@ -4225,23 +4365,30 @@ function renderLifeShopPane(tab) {
 
   const items = LIFESHOP_ITEMS[tab] || [];
   items.forEach(item => {
-    const owned = (state.lifeAssets || []).filter(x => x.itemId === item.id).length;
-    const canAfford = state.balance >= item.price;
+    // П.3: один товар — одна покупка (можна знову купити тільки після продажу)
+    const owned = (state.lifeAssets || []).some(x => x.itemId === item.id);
+    const canAfford = !owned && state.balance >= item.price;
+    const cantBuy   = !owned && state.balance < item.price;
     const card = document.createElement('div');
-    card.className = 'ls-item-card' + (owned ? ' owned-card' : '') + (!canAfford ? ' cant-afford' : '');
+    card.className = 'ls-item-card' + (owned ? ' owned-card' : '') + (cantBuy ? ' cant-afford' : '');
+
+    let _btnHtml;
+    if (owned) {
+      _btnHtml = '<span class="ls-owned-badge" style="flex-shrink:0;">✅ В АКТИВІ</span>';
+    } else if (canAfford) {
+      _btnHtml = '<button class="ls-buy-btn" onclick="buyLifeItem(\'' + item.id + '\')">' + '🛒 Купити</button>';
+    } else {
+      _btnHtml = '<button class="ls-buy-btn ls-cant">🔒 ' + fmtCapital(item.price) + '</button>';
+    }
 
     card.innerHTML =
       '<div class="ls-item-emoji">' + item.emoji + '</div>' +
       '<div class="ls-item-info">' +
         '<div class="ls-item-name">' + item.name + '</div>' +
         '<div class="ls-item-price">' + fmtCapital(item.price) + '</div>' +
-        (owned ? '<div class="ls-item-count">У власності: ' + owned + ' шт</div>' : '') +
+        (owned ? '<div class="ls-item-count" style="color:var(--gold);font-size:10px;">Продайте щоб купити знову</div>' : '') +
       '</div>' +
-      (owned ? '<span class="ls-owned-badge">В АКТИВІ</span>' : '') +
-      '<button class="ls-buy-btn' + (!canAfford ? ' ls-cant' : '') + '" ' +
-        (canAfford ? 'onclick="buyLifeItem(\'' + item.id + '\')"' : '') + '>' +
-        (canAfford ? '🛒 Купити' : '🔒 ' + fmtCapital(item.price)) +
-      '</button>';
+      _btnHtml;
 
     pane.appendChild(card);
   });
@@ -4455,17 +4602,113 @@ function renderAchievements() {
 
 
 // Per-case unique mastery bonuses
+// ── Унікальні бонуси сертифікату (активуються одразу при отриманні) ──
 const COLLECTION_UNIQUE_BONUS = {
-  street:   { desc: '📈 Продаж Common +10%',         apply: (state) => { state._collBonus_commonSellMult = 1.10; } },
-  office:   { desc: '⚡ Пасивний дохід +7%',          apply: (state) => { state._collBonus_passiveMult   = (state._collBonus_passiveMult||1) * 1.07; } },
-  chef:     { desc: '🍳 +100€ до кожного кліку',      apply: (state) => { state._collBonus_clickFlat     = (state._collBonus_clickFlat||0) + 100; } },
-  gamer:    { desc: '🎮 Швидкість пасиву +5%',        apply: (state) => { state._collBonus_passiveSpeed  = (state._collBonus_passiveSpeed||1) * 1.05; } },
-  fitness:  { desc: '💪 Шанс Rare у Fitness +12%',    apply: (state) => { state._collBonus_fitnessRare   = true; } },
-  apple:    { desc: '🍎 Продаж Epic +5%',             apply: (state) => { state._collBonus_epicSellMult  = 1.05; } },
-  photo:    { desc: '📸 Клік +15%',                   apply: (state) => { state._collBonus_clickMult     = (state._collBonus_clickMult||1) * 1.15; } },
-  workshop: { desc: '⏱️ Час продажу в магазині −10%',  apply: (state) => { state._collBonus_shopTimerMult  = 0.90; } },
-  smart:    { desc: '🛋️ Штраф LifeShop 20%→15%',     apply: (state) => { state._collBonus_lifeshopFee   = 0.85; } },  // sell = price * 0.85 instead of 0.80
-  elite:    { desc: '⚡ 2% шанс Крит.кліку ×10',      apply: (state) => { state._collBonus_critChance    = (state._collBonus_critChance||0) + 0.02; } },
+  street:   { desc: '+25€ до кожного кліку',
+              apply: s => { s._collBonus_clickFlat = (s._collBonus_clickFlat||0) + 25; } },
+  office:   { desc: '+5% шанс на Rare при відкритті',
+              apply: s => { s._collBonus_officeRare = true; } },
+  chef:     { desc: '+50€ до кожного кліку',
+              apply: s => { s._collBonus_clickFlat = (s._collBonus_clickFlat||0) + 50; } },
+  gamer:    { desc: '+15€/сек пасивно',
+              apply: s => { s._collBonus_passiveFlat = (s._collBonus_passiveFlat||0) + 15; } },
+  fitness:  { desc: '+100€ до кожного кліку',
+              apply: s => { s._collBonus_clickFlat = (s._collBonus_clickFlat||0) + 100; } },
+  apple:    { desc: '+5% до ціни Epic предметів',
+              apply: s => { s._collBonus_epicSellMult = Math.max(s._collBonus_epicSellMult||1, 1.05); } },
+  photo:    { desc: '+100€/сек пасивно',
+              apply: s => { s._collBonus_passiveFlat = (s._collBonus_passiveFlat||0) + 100; } },
+  workshop: { desc: '-5% ціна всіх кейсів',
+              apply: s => { s._collBonus_casePriceMult = (s._collBonus_casePriceMult||1) * 0.95; } },
+  smart:    { desc: '+200€ до кожного кліку',
+              apply: s => { s._collBonus_clickFlat = (s._collBonus_clickFlat||0) + 200; } },
+  elite:    { desc: '✨ Золота Карта — Динамічний пасив',
+              apply: s => { s._collBonus_dynamicPassive = true; } },
+};
+
+// ── Визначення покращень магазину від кожної колекції ──
+// shopUpgrade: { icon, title, steps:10|5, basePrice, priceScale, effect, effectLabel, maxLabel }
+const COLLECTION_SHOP_UPGRADES = {
+  street: {
+    icon: '🏷️', title: 'Ціна Common',
+    subtitle: 'Підвищуй ціну Common предметів у магазині',
+    steps: 10, basePrice: 500, scale: 2.2,
+    getEffect: lvl => 1 + lvl * 0.10,
+    effectLabel: lvl => '+' + (lvl*10) + '% до Common',
+    apply: (s, lvl) => { s._collBonus_commonSellMult = 1 + lvl * 0.10; },
+  },
+  office: {
+    icon: '📊', title: 'Ціна Rare',
+    subtitle: 'Підвищуй ціну Rare предметів у магазині',
+    steps: 10, basePrice: 2000, scale: 2.5,
+    getEffect: lvl => 1 + lvl * 0.05,
+    effectLabel: lvl => '+' + (lvl*5) + '% до Rare',
+    apply: (s, lvl) => { s._collBonus_rareSellMult = 1 + lvl * 0.05; },
+  },
+  chef: {
+    icon: '🍽️', title: 'Шанс Rare',
+    subtitle: 'Збільшуй базовий шанс випадіння Rare',
+    steps: 10, basePrice: 3000, scale: 2.4,
+    getEffect: lvl => lvl * 1,
+    effectLabel: lvl => '+' + lvl + '% шанс Rare',
+    apply: (s, lvl) => { s._collBonus_globalRareChance = lvl; },
+  },
+  gamer: {
+    icon: '⚡', title: 'Енергія кліку',
+    subtitle: 'Множник доходу за клік',
+    steps: 10, basePrice: 5000, scale: 2.6,
+    getEffect: lvl => 1 + lvl * 0.10,
+    effectLabel: lvl => '+' + (lvl*10) + '% до кліку',
+    apply: (s, lvl) => { s._collBonus_clickMult = 1 + lvl * 0.10; },
+  },
+  fitness: {
+    icon: '💥', title: 'Шанс Epic',
+    subtitle: 'Збільшуй базовий шанс випадіння Epic',
+    steps: 5, basePrice: 8000, scale: 3.0,
+    getEffect: lvl => lvl * 1,
+    effectLabel: lvl => '+' + lvl + '% шанс Epic',
+    apply: (s, lvl) => { s._collBonus_globalEpicChance = lvl; },
+  },
+  apple: {
+    icon: '🟣', title: 'Логістика',
+    subtitle: 'Скорочення часу продажу в магазині',
+    steps: 10, basePrice: 15000, scale: 2.8,
+    getEffect: lvl => 1 - lvl * 0.03,
+    effectLabel: lvl => '-' + (lvl*3) + '% час продажу',
+    apply: (s, lvl) => { s._collBonus_shopTimerMult = Math.max(0.1, 1 - lvl * 0.03); },
+  },
+  photo: {
+    icon: '💠', title: 'Ціна Epic',
+    subtitle: 'Підвищуй ціну Epic предметів у магазині',
+    steps: 10, basePrice: 25000, scale: 2.7,
+    getEffect: lvl => 1 + lvl * 0.02,
+    effectLabel: lvl => '+' + (lvl*2) + '% до Epic',
+    apply: (s, lvl) => { s._collBonus_epicSellMult = Math.max(s._collBonus_epicSellMult||1, 1 + lvl * 0.02); },
+  },
+  workshop: {
+    icon: '🌟', title: 'Шанс Legendary',
+    subtitle: 'Збільшуй базовий шанс випадіння Legendary',
+    steps: 5, basePrice: 50000, scale: 4.0,
+    getEffect: lvl => lvl * 0.2,
+    effectLabel: lvl => '+' + (lvl*0.2).toFixed(1) + '% шанс Leg',
+    apply: (s, lvl) => { s._collBonus_globalLegChance = lvl * 0.2; },
+  },
+  smart: {
+    icon: '✖️', title: 'Множник Пасиву',
+    subtitle: 'Збільшуй загальний пасивний дохід',
+    steps: 10, basePrice: 150000, scale: 3.0,
+    getEffect: lvl => 1 + lvl * 0.02,
+    effectLabel: lvl => '+' + (lvl*2) + '% пасивний дохід',
+    apply: (s, lvl) => { s._collBonus_passiveMult = 1 + lvl * 0.02; },
+  },
+  elite: {
+    icon: '👑', title: 'Ціна Legendary',
+    subtitle: 'Підвищуй ціну Legendary предметів у магазині',
+    steps: 5, basePrice: 1000000, scale: 5.0,
+    getEffect: lvl => 1 + lvl * 0.02,
+    effectLabel: lvl => '+' + (lvl*2) + '% до Legendary',
+    apply: (s, lvl) => { s._collBonus_legSellMult = 1 + lvl * 0.02; },
+  },
 };
 
 // =================== COLLECTIONS ===================
@@ -4474,23 +4717,40 @@ const COLLECTION_SIZE = 15; // items per collection
 
 // Re-apply all active collection bonuses (called on load + after new completion)
 function applyAllCollectionBonuses() {
-  // Reset bonus fields
-  state._collBonus_commonSellMult = 1;
-  state._collBonus_epicSellMult   = 1;
-  state._collBonus_passiveMult    = 1;
-  state._collBonus_passiveSpeed   = 1;
-  state._collBonus_clickFlat      = 0;
-  state._collBonus_clickMult      = 1;
-  state._collBonus_shopTimerMult   = 1.0;
-  state._collBonus_lifeshopFee    = 0.80; // default sell penalty
-  state._collBonus_critChance     = 0;
-  state._collBonus_fitnessRare    = false;
+  // Reset all bonus fields
+  state._collBonus_clickFlat         = 0;
+  state._collBonus_clickMult         = 1;
+  state._collBonus_passiveMult       = 1;
+  state._collBonus_passiveSpeed      = 1;
+  state._collBonus_passiveFlat       = 0;
+  state._collBonus_commonSellMult    = 1;
+  state._collBonus_rareSellMult      = 1;
+  state._collBonus_epicSellMult      = 1;
+  state._collBonus_legSellMult       = 1;
+  state._collBonus_shopTimerMult     = 1.0;
+  state._collBonus_lifeshopFee       = 0.80;
+  state._collBonus_critChance        = 0;
+  state._collBonus_fitnessRare       = false;
+  state._collBonus_officeRare        = false;
+  state._collBonus_casePriceMult     = 1;
+  state._collBonus_globalRareChance  = 0;
+  state._collBonus_globalEpicChance  = 0;
+  state._collBonus_globalLegChance   = 0;
+  state._collBonus_dynamicPassive    = false;
 
-  // Apply each mastered case bonus
+  // Apply unique cert bonuses (instant, on collection mastery)
   Object.keys(state.collectionBonuses || {}).forEach(caseId => {
     const b = state.collectionBonuses[caseId];
     if (b?.multiOpen && COLLECTION_UNIQUE_BONUS[caseId]) {
       COLLECTION_UNIQUE_BONUS[caseId].apply(state);
+    }
+  });
+
+  // Apply shop upgrade bonuses (tiered, from collUpgLevels)
+  Object.keys(state.collUpgLevels || {}).forEach(caseId => {
+    const lvl = state.collUpgLevels[caseId] || 0;
+    if (lvl > 0 && COLLECTION_SHOP_UPGRADES[caseId]) {
+      COLLECTION_SHOP_UPGRADES[caseId].apply(state, lvl);
     }
   });
 }
@@ -4552,24 +4812,27 @@ function showCertificate(c) {
   // Full-screen certificate popup
   const div = document.createElement('div');
   div.className = 'cert-popup';
+  const _ub = COLLECTION_UNIQUE_BONUS[c.id];
+  const _su = COLLECTION_SHOP_UPGRADES[c.id];
+  const _shopUpgHtml = _su
+    ? '<div style="margin-top:8px;padding:8px 10px;background:rgba(245,200,66,.08);border-radius:8px;border:1px solid rgba(245,200,66,.25);">'
+      + '<div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:2px;">🏪 Нове покращення в магазині!</div>'
+      + '<div style="font-size:10px;color:var(--muted);">' + _su.icon + ' ' + _su.title + ' · ' + _su.steps + ' рівнів · ' + _su.subtitle + '</div></div>'
+    : '';
   div.innerHTML =
     '<div class="cert-card">' +
       '<div class="cert-title">🏆 КОЛЕКЦІЯ ЗІБРАНА!</div>' +
-      '<div class="cert-case" style="margin:12px 0;display:flex;justify-content:center;align-items:center;">' + itemDisplay(c.icon, 64) + '</div>' +
-      '<div style="font-size:18px;font-weight:800;color:var(--gold);margin-bottom:4px;">' + c.name + '</div>' +
-      '<div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Золотий сертифікат Майстра</div>' +
-      '<div class="cert-bonuses">' +
-        '✅ <b style="color:var(--gold)">Оптовий контракт</b><br>' +
-        'Відкриття ×5 за один клік<br><br>' +
-        '✅ <b style="color:var(--green)">Прямі поставки</b><br>' +
-        'Ціна відкриття −20%' +
-        (COLLECTION_UNIQUE_BONUS[c.id] ?
-          '<br><br>✅ <b style="color:#60a5fa">Унікальний бонус</b><br>' +
-          COLLECTION_UNIQUE_BONUS[c.id].desc
-        : '') +
+      '<div class="cert-case" style="margin:10px 0;display:flex;justify-content:center;align-items:center;">' + itemDisplay(c.icon, 56) + '</div>' +
+      '<div style="font-size:17px;font-weight:800;color:var(--gold);margin-bottom:2px;">' + c.name + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Золотий сертифікат Майстра</div>' +
+      '<div class="cert-bonuses" style="text-align:left;">' +
+        '<div style="margin-bottom:5px;">⚡ <b style="color:var(--gold)">Оптовий контракт</b> — відкриття ×5 за клік</div>' +
+        '<div style="margin-bottom:5px;">💚 <b style="color:#22c55e">Прямі поставки</b> — ціна відкриття −20%</div>' +
+        (_ub ? '<div style="margin-bottom:5px;">✨ <b style="color:#60a5fa">Унікальний бонус</b> — ' + _ub.desc + '</div>' : '') +
+        _shopUpgHtml +
       '</div>' +
       '<button onclick="this.closest(\'.cert-popup\').remove()" ' +
-        'style="margin-top:18px;padding:10px 28px;border-radius:10px;border:none;' +
+        'style="margin-top:14px;padding:10px 28px;border-radius:10px;border:none;' +
         'background:linear-gradient(135deg,var(--gold),#f97316);color:#000;' +
         'font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">🎉 ОТРИМАТИ!</button>' +
     '</div>';
@@ -4609,10 +4872,13 @@ function renderCollections() {
       '<div class="coll-prog-bar"><div class="coll-prog-fill" style="width:' + pct + '%;"></div></div>' +
       (function(){
         const ub = COLLECTION_UNIQUE_BONUS[c.id];
+        const su3 = COLLECTION_SHOP_UPGRADES[c.id];
+        const upLvl3 = state.collUpgLevels[c.id] || 0;
         return '<div class="coll-bonuses">' +
           '<span class="coll-bonus-badge' + (bonus.multiOpen ? '' : ' inactive') + '">⚡ ×5' + (bonus.multiOpen ? '' : ' 🔒') + '</span>' +
           '<span class="coll-bonus-badge' + (bonus.discount  ? '' : ' inactive') + '">💚 −20%' + (bonus.discount  ? '' : ' 🔒') + '</span>' +
-          (ub ? '<span class="coll-bonus-badge' + (bonus.multiOpen ? '' : ' inactive') + '" style="font-size:9px;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + ub.desc + '">' + (bonus.multiOpen ? '' : '🔒 ') + ub.desc + '</span>' : '') +
+          (ub ? '<span class="coll-bonus-badge' + (bonus.multiOpen ? '' : ' inactive') + '" style="font-size:9px;" title="' + ub.desc + '">' + (bonus.multiOpen ? '' : '🔒 ') + ub.desc + '</span>' : '') +
+          (su3 && bonus.multiOpen ? '<span class="coll-bonus-badge" style="font-size:9px;background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);" title="Покращення магазину">🏪 ' + upLvl3 + '/' + su3.steps + '</span>' : '') +
         '</div>';
       })();
 
@@ -4674,7 +4940,12 @@ document.getElementById('collectionModal').addEventListener('click', function(e)
 // Applied in openCaseModal (price discount) and spin x5 button on case card
 function getCaseOpenPrice(c) {
   const bonus = state.collectionBonuses[c.id] || {};
-  return bonus.discount ? Math.round(c.price * 0.8) : c.price;
+  let price = c.price;
+  if (bonus.discount) price = Math.round(price * 0.8);
+  // Hobbyist workshop collection bonus: -5% all cases
+  const caseMult = state._collBonus_casePriceMult || 1;
+  price = Math.round(price * caseMult);
+  return Math.max(1, price);
 }
 
 
@@ -4833,58 +5104,175 @@ function showMultiOpenResults(c, results) {
   const badge = document.getElementById('multiSpinBadge');
   if (badge) badge.remove();
 
-  // Show results inside caseModal (replace carousel area)
-  const modal     = document.querySelector('#caseModal .modal');
-  const wrap      = document.querySelector('#caseModal .carousel-wrap');
-  const resultDiv = document.getElementById('modalResult');
-  const spinBtn   = document.getElementById('spinBtn');
+  // Use a full-screen overlay to show all 5 results without scroll
+  const overlay = document.createElement('div');
+  overlay.id = 'multiResultOverlay';
+  overlay.style.cssText = [
+    'position:fixed;inset:0;z-index:3500;',
+    'background:rgba(0,0,0,0.94);',
+    'display:flex;flex-direction:column;align-items:center;justify-content:center;',
+    'padding:16px;gap:10px;'
+  ].join('');
 
-  // Build result panel
-  wrap.innerHTML = '';
-  wrap.style.cssText = 'overflow-y:auto;max-height:55vh;padding:4px 0 8px;';
+  // Title row
+  const title = document.createElement('div');
+  title.style.cssText = 'font-family:Orbitron,sans-serif;font-size:16px;font-weight:800;color:var(--gold);letter-spacing:2px;';
+  title.textContent = '⚡ ×' + results.length + ' ВІДКРИТТЯ';
+  overlay.appendChild(title);
 
-  // Summary row
+  // Summary badge
   const sumRow = document.createElement('div');
-  sumRow.style.cssText = 'background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:10px 14px;margin:0 4px 10px;font-size:12px;text-align:center;';
+  sumRow.style.cssText = 'background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:8px;padding:6px 14px;font-size:12px;text-align:center;';
   sumRow.innerHTML =
-    '<b style="color:var(--gold);font-family:Orbitron,sans-serif;font-size:14px;">⚡ ×' + results.length + ' ВІДКРИТТЯ</b><br>' +
     '<span style="color:var(--muted);">🎒 На склад: </span><b style="color:var(--green)">' + kept + '</b>' +
-    (sold ? '   <span style="color:var(--muted);">💸 Автопродаж: </span><b style="color:var(--gold)">+' + fmt(soldValue) + '</b>' : '');
-  wrap.appendChild(sumRow);
+    (sold ? '  <span style="color:var(--muted);">💸 Автопродаж: </span><b style="color:var(--gold)">+' + fmt(soldValue) + '</b>' : '');
+  overlay.appendChild(sumRow);
 
-  // 5 result cards in a 2-col grid
+  // Cards grid — 5 cards in one row (or 3+2 for narrow)
   const grid = document.createElement('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 4px;';
+  grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;max-width:400px;';
+
   [...results].sort((a,b) => b.value - a.value).forEach((item, i) => {
     const card = document.createElement('div');
-    card.style.cssText =
-      'background:var(--bg2);border-radius:10px;border:1px solid rgba(255,255,255,.07);' +
-      'padding:10px 8px;text-align:center;animation:prizeSlideIn .4s cubic-bezier(.34,1.56,.64,1) both;' +
-      'animation-delay:' + (i * 0.08) + 's;position:relative;border-color:var(--' + item.rarity + ')33;';
+    // Rarity glow border
+    const rarityColors = {legendary:'#f5c842',epic:'#a855f7',rare:'#3b82f6',common:'#64748b'};
+    const rc = rarityColors[item.rarity] || '#444';
+    card.style.cssText = [
+      'background:var(--bg2);border-radius:12px;',
+      'border:2px solid ' + rc + '55;',
+      'box-shadow:0 0 10px ' + rc + '22;',
+      'padding:10px 8px;text-align:center;',
+      'flex:1;min-width:calc(33% - 8px);max-width:calc(33% - 8px);',
+      'animation:prizeSlideIn .4s cubic-bezier(.34,1.56,.64,1) both;',
+      'animation-delay:' + (i * 0.08) + 's;'
+    ].join('');
     card.innerHTML =
       '<div style="font-size:32px;margin-bottom:4px;">' + item.emoji + '</div>' +
-      '<div class="r-' + item.rarity + '" style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + item.name + '</div>' +
-      '<div style="font-size:10px;color:var(--gold);margin-top:2px;">' + fmt(item.value) + '</div>';
+      '<div class="r-' + item.rarity + '" style="font-size:11px;font-weight:700;line-height:1.3;margin-bottom:3px;">' + item.name + '</div>' +
+      '<div style="font-size:11px;color:var(--gold);font-weight:700;">' + fmt(item.value) + '</div>' +
+      '<div style="font-size:9px;color:var(--' + item.rarity + ');text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">' + item.rarity + '</div>';
     grid.appendChild(card);
   });
-  wrap.appendChild(grid);
+  overlay.appendChild(grid);
 
-  resultDiv.style.display = 'none';
-  spinBtn.textContent = '✕ Закрити';
-  spinBtn.onclick = () => {
-    // Restore normal carousel wrap
-    wrap.innerHTML = '<div class="carousel-track" id="carouselTrack"></div>';
-    wrap.style.cssText = '';
-    spinBtn.onclick = spinCarousel;
-    spinBtn.textContent = '🎲 ВІДКРИТИ';
+  // Close button
+  const closeBtn = document.createElement('button');
+  closeBtn.style.cssText = 'margin-top:6px;padding:13px 40px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold),#f97316);color:#000;font-family:Rajdhani,sans-serif;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:1px;width:100%;max-width:300px;';
+  closeBtn.textContent = '✕ Закрити';
+  closeBtn.onclick = () => {
+    overlay.remove();
     closeModal();
   };
+  overlay.appendChild(closeBtn);
+
+  document.body.appendChild(overlay);
 
   const hasLegendary = results.some(r => r.rarity === 'legendary');
   if (hasLegendary) spawnConfetti();
 }
 
 
+
+// =================== COLLECTION SHOP UPGRADES ===================
+function getCollUpgradePrice(caseId, nextLvl) {
+  const upg = COLLECTION_SHOP_UPGRADES[caseId];
+  if (!upg) return 0;
+  return Math.round(upg.basePrice * Math.pow(upg.scale, nextLvl - 1));
+}
+
+function buyCollUpgrade(caseId) {
+  const upg = COLLECTION_SHOP_UPGRADES[caseId];
+  if (!upg) return;
+  const curLvl  = state.collUpgLevels[caseId] || 0;
+  const maxLvl  = upg.steps;
+  if (curLvl >= maxLvl) return;
+  const nextLvl = curLvl + 1;
+  const price   = getCollUpgradePrice(caseId, nextLvl);
+  if (state.balance < price) { showToast('Недостатньо коштів!'); return; }
+  state.balance -= price;
+  state.collUpgLevels[caseId] = nextLvl;
+  applyAllCollectionBonuses();
+  playSell();
+  showToast('✅ ' + upg.title + ' — рівень ' + nextLvl + '!', 'gold');
+  updateHUD(); saveState();
+  renderCollShopUpgrades();
+}
+
+function renderCollShopUpgrades() {
+  const container = document.getElementById('collShopUpgradesContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const cases = CASES;
+  let anyUnlocked = false;
+
+  cases.forEach(c => {
+    const bonus = state.collectionBonuses[c.id] || {};
+    if (!bonus.multiOpen) return; // not mastered yet
+    const upg = COLLECTION_SHOP_UPGRADES[c.id];
+    if (!upg) return;
+    anyUnlocked = true;
+
+    const curLvl  = state.collUpgLevels[c.id] || 0;
+    const maxLvl  = upg.steps;
+    const isMax   = curLvl >= maxLvl;
+    const nextLvl = curLvl + 1;
+    const price   = isMax ? 0 : getCollUpgradePrice(c.id, nextLvl);
+    const pct     = (curLvl / maxLvl) * 100;
+    const canAfford = !isMax && state.balance >= price;
+
+    // Steps dots
+    const dotsHtml = Array.from({length: maxLvl}, (_, i) => {
+      const cls = i < curLvl ? 'done' : i === curLvl ? 'current' : '';
+      return '<span class="' + cls + '">' + (i+1) + '</span>';
+    }).join('');
+
+    const rarityColors = {legendary:'#f5c842',epic:'#a855f7',rare:'#3b82f6',common:'#64748b'};
+    // Pick accent color by case id pattern
+    const accentMap = {street:'#64748b',office:'#3b82f6',chef:'#3b82f6',gamer:'#f97316',
+      fitness:'#a855f7',apple:'#a855f7',photo:'#a855f7',workshop:'#f5c842',smart:'#22c55e',elite:'#f5c842'};
+    const accent = accentMap[c.id] || 'var(--gold)';
+
+    const card = document.createElement('div');
+    card.className = 'mult-upgrade-card';
+    card.style.cssText = 'margin-bottom:12px;border-left:3px solid ' + accent + ';';
+    card.innerHTML =
+      '<div class="mult-upgrade-header">' +
+        '<div class="mult-upgrade-icon" style="font-size:20px;">' + upg.icon + '</div>' +
+        '<div style="flex:1;">' +
+          '<div class="mult-upgrade-title">' + upg.title +
+            ' <span style="font-size:10px;color:var(--muted);font-weight:400;">(' + c.name + ')</span></div>' +
+          '<div class="mult-upgrade-subtitle">' + upg.subtitle + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="mult-current-badge" style="border-color:' + accent + '44;">' +
+        upg.icon + ' ' + (curLvl > 0 ? upg.effectLabel(curLvl) : 'Рівень 0 — не активовано') +
+        ' <span style="color:var(--muted);font-size:10px;">(' + curLvl + '/' + maxLvl + ')</span>' +
+      '</div>' +
+      '<div class="mult-progress-track"><div class="mult-progress-fill" style="width:' + pct + '%;background:' + accent + ';"></div></div>' +
+      '<div class="mult-steps">' + dotsHtml + '</div>' +
+      (!isMax ?
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">' +
+          '🔓 Наступний рівень ' + nextLvl + ': <b style="color:var(--text)">' + upg.effectLabel(nextLvl) + '</b>' +
+        '</div>' : ''
+      ) +
+      '<button class="mult-upgrade-btn' + (isMax ? ' maxed' : '') + '"' +
+        (!isMax && !canAfford ? ' disabled' : '') +
+        (!isMax ? ' onclick="buyCollUpgrade(\'' + c.id + '\')"' : '') + '>' +
+        (isMax ? '🏆 Максимальний рівень!' : 'Покращити (' + nextLvl + '/' + maxLvl + ') за ' + fmt(price)) +
+      '</button>';
+
+    container.appendChild(card);
+  });
+
+  if (!anyUnlocked) {
+    container.innerHTML =
+      '<div class="empty-state" style="padding:20px 0;">' +
+        '<div class="e-icon">🏆</div>' +
+        '<div>Завершуй колекції, щоб розблокувати покращення!</div>' +
+      '</div>';
+  }
+}
 
 // =================== DEV PANEL ===================
 function toggleDevPanel() {
@@ -4960,26 +5348,42 @@ function tickRivalGrowth() {
   crisisCheckCounter++;
   const doCrisisCheck = (crisisCheckCounter % 2 === 0); // every 2 minutes
 
-  FORBES_RIVALS.filter(r => !r.isPlayer).forEach(r => {
+  // П.13: Pick at most ONE crisis victim per 2-min tick
+  const activeRivals = FORBES_RIVALS.filter(r => !r.isPlayer);
+  let crisisHandledThisTick = false;
+
+  // Pre-select a single random TOP-10 crisis candidate if check is due
+  let crisisVictim = null;
+  if (doCrisisCheck) {
+    const top10 = activeRivals.slice(0, 10).filter(r => {
+      const net = state.rivalNets[r.name];
+      return playerCapital >= net * 0.001; // only active rivals
+    });
+    if (top10.length && Math.random() < 0.15) {
+      crisisVictim = top10[Math.floor(Math.random() * top10.length)];
+    }
+  }
+
+  activeRivals.forEach(r => {
     const currentNet = state.rivalNets[r.name];
 
-    // ── Sleep check: only grow if player capital ≥ 0.1% of rival ──
+    // ── Sleep check ──
     const threshold = currentNet * 0.001;
     if (playerCapital < threshold) {
-      window.rivalLastChange[r.name] = null; // sleeping — no arrow
+      window.rivalLastChange[r.name] = null;
       return;
     }
 
-    // ── Crisis check (every 2 min, 15% chance, only TOP-10) ──
-    const isTop10 = FORBES_RIVALS.filter(x => !x.isPlayer).indexOf(r) < 10;
-    if (doCrisisCheck && isTop10 && Math.random() < 0.15) {
+    // ── Crisis (only pre-selected victim) ──
+    if (doCrisisCheck && crisisVictim && r.name === crisisVictim.name && !crisisHandledThisTick) {
       const events = RIVAL_CRISIS_EVENTS[r.name];
       const ev     = events ? events[Math.floor(Math.random() * events.length)] : null;
       const loss   = currentNet * (ev ? ev.loss : (0.005 + Math.random() * 0.02));
       state.rivalNets[r.name] = Math.round(currentNet - loss);
       window.rivalLastChange[r.name] = { delta: -loss, crisis: true, text: ev?.text || 'Ринкова криза' };
       showCrisisToast(r, loss, ev?.text);
-      return; // no growth this tick
+      crisisHandledThisTick = true;
+      return;
     }
 
     // ── Phase-based growth ──
@@ -5079,78 +5483,254 @@ function buildContainerSVG(c, w, h) {
 
 // ── Vehicle 3D SVG models ──
 function buildVehicleSVG(vehicleType, rarity) {
-  const glowColor = rarity === 'legendary' ? '#f5c842' : rarity === 'epic' ? '#a855f7' : rarity === 'rare' ? '#3b82f6' : '#888';
+  const glowColor = rarity === 'legendary' ? '#f5c842' : rarity === 'epic' ? '#a855f7' : rarity === 'rare' ? '#3b82f6' : '#6ee7b7';
 
-  // Single unified car model with headlights for all vehicle types
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110" width="200" height="110">
+  // ── MOTO / BIKE ──
+  if (vehicleType === 'moto') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 110" width="180" height="110">
+      <defs>
+        <radialGradient id="mg" cx="50%" cy="80%" r="60%"><stop offset="0%" stop-color="${glowColor}" stop-opacity=".35"/><stop offset="100%" stop-color="${glowColor}" stop-opacity="0"/></radialGradient>
+        <filter id="mb"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <ellipse cx="90" cy="105" rx="80" ry="6" fill="rgba(0,0,0,.45)"/>
+      <ellipse cx="90" cy="95" rx="85" ry="14" fill="url(#mg)"/>
+      <!-- Rear wheel -->
+      <circle cx="130" cy="80" r="22" fill="none" stroke="#222" stroke-width="7"/>
+      <circle cx="130" cy="80" r="14" fill="none" stroke="#444" stroke-width="3"/>
+      <circle cx="130" cy="80" r="5" fill="#777"/>
+      ${[0,1,2,3,4].map(i=>{const a=i*72*Math.PI/180;return `<line x1="${Math.round(130+5*Math.cos(a))}" y1="${Math.round(80+5*Math.sin(a))}" x2="${Math.round(130+14*Math.cos(a))}" y2="${Math.round(80+14*Math.sin(a))}" stroke="#666" stroke-width="2.5"/>`;}).join('')}
+      <!-- Front wheel -->
+      <circle cx="45" cy="80" r="22" fill="none" stroke="#222" stroke-width="7"/>
+      <circle cx="45" cy="80" r="14" fill="none" stroke="#444" stroke-width="3"/>
+      <circle cx="45" cy="80" r="5" fill="#777"/>
+      ${[0,1,2,3,4].map(i=>{const a=i*72*Math.PI/180;return `<line x1="${Math.round(45+5*Math.cos(a))}" y1="${Math.round(80+5*Math.sin(a))}" x2="${Math.round(45+14*Math.cos(a))}" y2="${Math.round(80+14*Math.sin(a))}" stroke="#666" stroke-width="2.5"/>`;}).join('')}
+      <!-- Swing arm -->
+      <path d="M90 78 L130 78" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+      <!-- Frame -->
+      <path d="M55 78 L70 50 L95 44 L120 55 L130 78" fill="none" stroke="#c0392b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Seat -->
+      <path d="M80 44 Q100 38 118 44" fill="none" stroke="#111" stroke-width="7" stroke-linecap="round"/>
+      <path d="M80 44 Q100 36 118 44" fill="none" stroke="#333" stroke-width="5" stroke-linecap="round"/>
+      <!-- Tank -->
+      <ellipse cx="90" cy="54" rx="20" ry="10" fill="#aa2200"/>
+      <ellipse cx="88" cy="51" rx="14" ry="6" fill="#ee3311" opacity=".5"/>
+      <!-- Fork / handlebar -->
+      <path d="M55 78 L52 52 L46 48" stroke="#888" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <line x1="38" y1="46" x2="58" y2="46" stroke="#aaa" stroke-width="5" stroke-linecap="round"/>
+      <!-- Exhaust -->
+      <path d="M130 72 L148 69 L150 76 L130 80" fill="#888"/>
+      <!-- Headlight (animated) -->
+      <ellipse id="hl_left" cx="44" cy="62" rx="9" ry="6" fill="url(#mg)" opacity="0" filter="url(#mb)"/>
+      <ellipse cx="44" cy="62" rx="6" ry="4" fill="#fffde0" opacity=".95"/>
+      <ellipse cx="43" cy="61" rx="3" ry="2" fill="white"/>
+    </svg>`;
+  }
+
+  // ── MICRO (scooter / skateboard / gyroscooter) ──
+  if (vehicleType === 'micro') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 110" width="180" height="110">
+      <defs>
+        <radialGradient id="scg" cx="50%" cy="80%" r="60%"><stop offset="0%" stop-color="${glowColor}" stop-opacity=".3"/><stop offset="100%" stop-color="${glowColor}" stop-opacity="0"/></radialGradient>
+        <filter id="scb"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <ellipse cx="90" cy="106" rx="70" ry="5" fill="rgba(0,0,0,.4)"/>
+      <ellipse cx="90" cy="96" rx="75" ry="13" fill="url(#scg)"/>
+      <!-- Scooter deck -->
+      <rect x="25" y="76" width="130" height="10" rx="5" fill="#1a1a2e"/>
+      <rect x="27" y="74" width="126" height="6" rx="3" fill="#2d2d5e"/>
+      <!-- Wheels -->
+      <circle cx="48"  cy="87" r="11" fill="none" stroke="#333" stroke-width="5"/>
+      <circle cx="48"  cy="87" r="6"  fill="none" stroke="#555" stroke-width="2"/>
+      <circle cx="48"  cy="87" r="3"  fill="#777"/>
+      <circle cx="132" cy="87" r="11" fill="none" stroke="#333" stroke-width="5"/>
+      <circle cx="132" cy="87" r="6"  fill="none" stroke="#555" stroke-width="2"/>
+      <circle cx="132" cy="87" r="3"  fill="#777"/>
+      <!-- Stem -->
+      <rect x="87" y="30" width="8" height="47" rx="4" fill="#888"/>
+      <!-- Folding joint -->
+      <circle cx="91" cy="74" r="7" fill="#555"/>
+      <circle cx="91" cy="74" r="4" fill="#333"/>
+      <!-- Handlebar -->
+      <rect x="60" y="28" width="62" height="7" rx="4" fill="#aaa"/>
+      <!-- Grip caps -->
+      <rect x="58"  y="26" width="10" height="11" rx="3" fill="#333"/>
+      <rect x="114" y="26" width="10" height="11" rx="3" fill="#333"/>
+      <!-- Brake lever -->
+      <line x1="62" y1="34" x2="68" y2="40" stroke="#666" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- LED strip on deck -->
+      <rect x="30" y="83" width="120" height="3" rx="1" fill="${glowColor}" opacity=".7" filter="url(#scb)"/>
+      <!-- Headlight (animated) -->
+      <ellipse id="hl_left" cx="28" cy="82" rx="8" ry="5" fill="${glowColor}" opacity="0" filter="url(#scb)"/>
+      <circle cx="28" cy="82" r="4" fill="#fffde0" opacity=".9"/>
+    </svg>`;
+  }
+
+  // ── CAR — 45° supercar with front-quarter view ──
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 130" width="220" height="130">
     <defs>
-      <radialGradient id="cglow_v" cx="50%" cy="80%" r="60%">
-        <stop offset="0%" stop-color="${glowColor}" stop-opacity=".25"/>
+      <radialGradient id="cgv" cx="35%" cy="85%" r="65%">
+        <stop offset="0%" stop-color="${glowColor}" stop-opacity=".3"/>
         <stop offset="100%" stop-color="${glowColor}" stop-opacity="0"/>
       </radialGradient>
-      <radialGradient id="headlight_glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff9aa" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#ffd700" stop-opacity=".6"/>
+      <radialGradient id="hlg" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="#fff8aa" stop-opacity="1"/>
+        <stop offset="50%"  stop-color="#ffd700" stop-opacity=".7"/>
         <stop offset="100%" stop-color="#ffd700" stop-opacity="0"/>
       </radialGradient>
-      <filter id="carblur"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      <filter id="hglow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="hgf"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="bdf"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     </defs>
+
     <!-- Ground shadow -->
-    <ellipse cx="100" cy="104" rx="85" ry="7" fill="rgba(0,0,0,.5)"/>
-    <!-- Glow under car -->
-    <ellipse cx="100" cy="95" rx="90" ry="18" fill="url(#cglow_v)"/>
+    <ellipse cx="105" cy="124" rx="95" ry="7" fill="rgba(0,0,0,.55)"/>
+    <!-- Ambient glow -->
+    <ellipse cx="85"  cy="110" rx="100" ry="20" fill="url(#cgv)"/>
 
-    <!-- Car body - lower -->
-    <rect x="15" y="62" width="170" height="32" rx="6" fill="#1a1a2e"/>
-    <!-- Car body - upper cabin -->
-    <path d="M48 62 Q55 32 75 28 L128 28 Q148 32 155 62 Z" fill="#22224a"/>
+    <!-- ── BODY – low wide supercar silhouette ── -->
+    <!-- Main lower body (quarter-angle) -->
+    <path d="M18 80 Q22 68 55 62 L155 58 Q185 58 200 68 L202 80 Q202 92 195 95 L30 98 Q18 96 18 80Z"
+      fill="#1a1a2e" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+
+    <!-- Side skirt / underline -->
+    <path d="M30 95 L195 92 L202 98 L25 100Z" fill="#111"/>
+
+    <!-- Roof / cabin (sloping back, aggressive rake) -->
+    <path d="M62 62 Q68 34 88 24 L148 22 Q170 26 178 40 L182 62Z"
+      fill="#14142a"/>
     <!-- Roof highlight -->
-    <path d="M60 55 Q75 34 100 32 Q125 34 140 55" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="3"/>
+    <path d="M75 55 Q82 36 98 28 Q118 22 138 26 Q155 32 164 46"
+      fill="none" stroke="rgba(255,255,255,.1)" stroke-width="2.5"/>
 
-    <!-- Windows -->
-    <path d="M65 58 Q70 40 80 36 L98 36 L98 58 Z" fill="#4488cc" opacity=".7"/>
-    <path d="M102 58 L102 36 L122 36 Q132 40 135 58 Z" fill="#4488cc" opacity=".7"/>
-    <!-- Window glare -->
-    <path d="M68 55 Q72 43 78 40 L82 40 L82 55 Z" fill="rgba(255,255,255,.2)"/>
+    <!-- Windshield (raked at ~30°) -->
+    <path d="M70 60 Q76 38 92 26 L148 24 Q166 28 174 44 L176 62Z"
+      fill="#334477" opacity=".8"/>
+    <!-- Windshield glare -->
+    <path d="M76 56 Q80 40 92 30 L108 28 L105 56Z"
+      fill="rgba(255,255,255,.18)"/>
 
-    <!-- Side door lines -->
-    <line x1="100" y1="62" x2="100" y2="94" stroke="rgba(0,0,0,.4)" stroke-width="2"/>
-    <line x1="48"  y1="62" x2="48"  y2="94" stroke="rgba(0,0,0,.3)" stroke-width="1.5"/>
-    <line x1="152" y1="62" x2="152" y2="94" stroke="rgba(0,0,0,.3)" stroke-width="1.5"/>
+    <!-- Front fascia / bumper -->
+    <path d="M18 76 Q22 60 48 56 L58 62 L55 80 Q36 82 18 80Z"
+      fill="#22224a"/>
 
-    <!-- Wheels -->
-    <circle cx="48"  cy="90" r="18" fill="#111" stroke="#333" stroke-width="2"/>
-    <circle cx="152" cy="90" r="18" fill="#111" stroke="#333" stroke-width="2"/>
-    <circle cx="48"  cy="90" r="11" fill="none" stroke="#555" stroke-width="3"/>
-    <circle cx="152" cy="90" r="11" fill="none" stroke="#555" stroke-width="3"/>
-    <!-- Wheel spokes -->
-    ${[0,1,2,3,4].map(i => {
-      const a = i * 72 * Math.PI/180;
-      const x1l = Math.round(48  + 5*Math.cos(a)); const y1l = Math.round(90 + 5*Math.sin(a));
-      const x2l = Math.round(48  + 13*Math.cos(a)); const y2l = Math.round(90 + 13*Math.sin(a));
-      const x1r = Math.round(152 + 5*Math.cos(a)); const y1r = Math.round(90 + 5*Math.sin(a));
-      const x2r = Math.round(152 + 13*Math.cos(a)); const y2r = Math.round(90 + 13*Math.sin(a));
-      return `<line x1="${x1l}" y1="${y1l}" x2="${x2l}" y2="${y2l}" stroke="#777" stroke-width="2"/>
-              <line x1="${x1r}" y1="${y1r}" x2="${x2r}" y2="${y2r}" stroke="#777" stroke-width="2"/>`;
-    }).join('')}
-    <circle cx="48"  cy="90" r="4" fill="#999"/>
-    <circle cx="152" cy="90" r="4" fill="#999"/>
+    <!-- Hood (long flat) -->
+    <path d="M55 62 L58 58 L155 58 Q178 60 198 68 L200 74 L55 76Z"
+      fill="#1e1e3a"/>
+    <!-- Hood vent slits -->
+    <line x1="100" y1="62" x2="155" y2="60" stroke="rgba(255,255,255,.06)" stroke-width="2"/>
+    <line x1="100" y1="66" x2="162" y2="64" stroke="rgba(255,255,255,.06)" stroke-width="2"/>
+    <line x1="100" y1="70" x2="168" y2="69" stroke="rgba(255,255,255,.06)" stroke-width="2"/>
 
-    <!-- Headlights (animated via JS after reveal) -->
-    <ellipse id="hl_left"  cx="24"  cy="72" rx="10" ry="7" fill="url(#headlight_glow)" opacity="0" filter="url(#hglow)"/>
-    <ellipse id="hl_right" cx="176" cy="72" rx="10" ry="7" fill="url(#headlight_glow)" opacity="0" filter="url(#hglow)"/>
-    <!-- Headlight housing -->
-    <ellipse cx="22"  cy="72" rx="7" ry="5" fill="#fffde0" opacity=".9"/>
-    <ellipse cx="178" cy="72" rx="7" ry="5" fill="#fffde0" opacity=".9"/>
+    <!-- Air intake (front lower) -->
+    <path d="M22 82 Q24 74 44 72 L54 74 L52 88 L22 88Z" fill="#111" rx="3"/>
+    <!-- Splitter -->
+    <rect x="16" y="93" width="40" height="5" rx="2" fill="#333"/>
 
-    <!-- Front bumper detail -->
-    <rect x="16" y="88" width="30" height="5" rx="2" fill="#333"/>
-    <rect x="154" y="88" width="30" height="5" rx="2" fill="#333"/>
-    <!-- Grille -->
-    <rect x="80" y="78" width="40" height="10" rx="3" fill="#111"/>
-    ${[0,1,2,3,4].map(i => `<line x1="${82+i*7}" y1="78" x2="${82+i*7}" y2="88" stroke="#333" stroke-width="1.5"/>`).join('')}
+    <!-- Door line / character line -->
+    <path d="M58 68 Q100 65 180 68" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
+
+    <!-- Mirror (left, aggressive) -->
+    <path d="M60 66 L52 58 L48 62 L56 70Z" fill="#333"/>
+
+    <!-- Front wheel arch -->
+    <ellipse cx="45" cy="97" rx="27" ry="10" fill="#0d0d1a"/>
+    <!-- Front wheel -->
+    <ellipse cx="45" cy="97" rx="22" ry="22" fill="#111" stroke="#2a2a2a" stroke-width="2"/>
+    <ellipse cx="45" cy="97" rx="14" ry="14" fill="none" stroke="#444" stroke-width="3"/>
+    ${[0,1,2,3,4].map(i=>{const a=i*72*Math.PI/180+0.3;return `<line x1="${Math.round(45+5*Math.cos(a))}" y1="${Math.round(97+5*Math.sin(a))}" x2="${Math.round(45+15*Math.cos(a))}" y2="${Math.round(97+15*Math.sin(a))}" stroke="#666" stroke-width="2.5"/>`;}).join('')}
+    <circle cx="45" cy="97" r="5" fill="#888"/>
+
+    <!-- Rear wheel arch (partial, angled view) -->
+    <ellipse cx="170" cy="97" rx="24" ry="10" fill="#0d0d1a"/>
+    <ellipse cx="170" cy="97" rx="20" ry="20" fill="#111" stroke="#2a2a2a" stroke-width="2"/>
+    <ellipse cx="170" cy="97" rx="12" ry="12" fill="none" stroke="#444" stroke-width="3"/>
+    ${[0,1,2,3,4].map(i=>{const a=i*72*Math.PI/180;return `<line x1="${Math.round(170+4*Math.cos(a))}" y1="${Math.round(97+4*Math.sin(a))}" x2="${Math.round(170+13*Math.cos(a))}" y2="${Math.round(97+13*Math.sin(a))}" stroke="#666" stroke-width="2.5"/>`;}).join('')}
+    <circle cx="170" cy="97" r="5" fill="#888"/>
+
+    <!-- Rear diffuser -->
+    <rect x="182" y="88" width="20" height="8" rx="2" fill="#111"/>
+    ${[0,1,2].map(i=>`<line x1="${184+i*6}" y1="88" x2="${184+i*6}" y2="96" stroke="#333" stroke-width="1.5"/>`).join('')}
+
+    <!-- Exhaust tips -->
+    <ellipse cx="188" cy="97" rx="5" ry="4" fill="#222"/>
+    <ellipse cx="196" cy="97" rx="4" ry="3" fill="#222"/>
+    <ellipse cx="188" cy="97" rx="3" ry="2.5" fill="#333"/>
+    <ellipse cx="196" cy="97" rx="2.5" ry="2" fill="#333"/>
+
+    <!-- ── HEADLIGHTS (front quarter view) — animated ── -->
+    <!-- Glow halo (animated) -->
+    <ellipse id="hl_left"  cx="26" cy="76" rx="18" ry="12" fill="url(#hlg)" opacity="0" filter="url(#hgf)"/>
+    <ellipse id="hl_right" cx="36" cy="72" rx="14" ry="9"  fill="url(#hlg)" opacity="0" filter="url(#hgf)"/>
+    <!-- Housing -->
+    <path d="M20 72 Q22 65 40 63 L46 65 L44 76 Q30 78 20 76Z" fill="#fffde0" opacity=".9"/>
+    <!-- DRL strip -->
+    <path d="M22 70 Q28 65 42 64" fill="none" stroke="${glowColor}" stroke-width="2.5" stroke-linecap="round" opacity=".9"/>
+    <!-- Lens detail -->
+    <path d="M24 73 Q30 68 40 66 L42 68 L38 75 Q28 76 24 75Z" fill="rgba(255,255,255,.2)"/>
   </svg>`;
+}
+
+
+// ── Container preview modal ──
+function openContainerPreviewModal(containerId) {
+  const c = CONTAINERS.find(x => x.id === containerId);
+  if (!c) return;
+
+  document.getElementById('previewTitle').textContent = '🚢 ' + c.name + ' — ' + c.subtitle;
+  const list = document.getElementById('previewList');
+  list.innerHTML = '';
+
+  const p = getPityForCase(containerId);
+  const hasPity = p.rare > 0 || p.epic > 0 || p.legendary > 0;
+  if (hasPity) {
+    const pityHeader = document.createElement('div');
+    pityHeader.style.cssText = 'background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:10px 14px;margin-bottom:4px;font-size:12px;';
+    pityHeader.innerHTML =
+      '<div style="color:var(--gold);font-weight:700;margin-bottom:6px;">🍀 Pity System — накопичені бонуси:</div>' +
+      (p.rare      > 0 ? '<div style="color:var(--rare)">🔵 Рідкісний: +'      + p.rare.toFixed(1)      + '%</div>' : '') +
+      (p.epic      > 0 ? '<div style="color:var(--epic)">🟣 Епічний: +'        + p.epic.toFixed(1)      + '%</div>' : '') +
+      (p.legendary > 0 ? '<div style="color:var(--legendary)">🟡 Легендарний: +' + p.legendary.toFixed(1) + '%</div>' : '');
+    list.appendChild(pityHeader);
+  }
+
+  const chances     = getDisplayChances(containerId);
+  const baseChances = { common:60, rare:25, epic:12, legendary:3 };
+  const rarityOrder = ['legendary','epic','rare','common'];
+  const byRarity    = {};
+  [...c.items].sort((a,b) => b.value - a.value).forEach(item => {
+    if (!byRarity[item.rarity]) byRarity[item.rarity] = [];
+    byRarity[item.rarity].push(item);
+  });
+
+  rarityOrder.forEach(rarity => {
+    if (!byRarity[rarity]) return;
+    const currentChance  = chances[rarity];
+    const baseChance     = baseChances[rarity];
+    const bonus = +(currentChance - baseChance).toFixed(1);
+    const bonusStr = bonus > 0 ? ' <span style="color:var(--green);font-size:10px">+' + bonus + '%</span>' : '';
+    const itemCount     = byRarity[rarity].length;
+    const perItemChance = +(currentChance / itemCount).toFixed(2);
+
+    const divider = document.createElement('div');
+    divider.style.cssText = 'font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--' + rarity + ');padding:6px 2px 2px;display:flex;align-items:center;gap:6px;';
+    divider.innerHTML = RARITY_LABELS[rarity] + ' — ' + currentChance + '%' + bonusStr +
+      '<span style="color:var(--muted);font-size:10px;font-weight:400;margin-left:auto;">~' + perItemChance + '% кожен</span>';
+    list.appendChild(divider);
+
+    byRarity[rarity].forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'preview-item ' + rarity;
+      div.innerHTML =
+        '<span class="pi-emoji">' + item.emoji + '</span>' +
+        '<span class="pi-name r-' + rarity + '">' + item.name + '</span>' +
+        '<div style="text-align:right">' +
+          '<div class="pi-val r-' + rarity + '">' + fmtCapital(item.value) + '</div>' +
+          '<div style="font-size:10px;color:var(--muted);">~' + perItemChance + '%</div>' +
+        '</div>';
+      list.appendChild(div);
+    });
+  });
+
+  document.getElementById('previewModal').classList.add('show');
 }
 
 // ── Render container cards ──
@@ -5159,55 +5739,80 @@ function renderContainers() {
   if (!grid) return;
   grid.innerHTML = '';
   CONTAINERS.forEach(c => {
+    const canAfford = state.balance >= c.price;
+    const ch        = getDisplayChances(c.id);
+    const base      = { common:60, rare:25, epic:12, legendary:3 };
+    const p         = getPityForCase(c.id);
+
     const card = document.createElement('div');
     card.className = 'cnt-card';
 
-    const canAfford = state.balance >= c.price;
+    // Rarity bar segments with pity labels
+    function cntSeg(pct, color, label, bonus) {
+      const bonusStr = bonus > 0 ? ' <span class="pity-plus">+' + bonus.toFixed(1) + '</span>' : '';
+      const showLbl  = pct >= 7;
+      return '<div class="rarity-seg" style="width:' + pct + '%;background:' + color + '">' +
+        (showLbl ? '<span class="rarity-seg-label">' + label + '%' + bonusStr + '</span>' : '') +
+      '</div>';
+    }
 
-    // Rarity bar
-    const weights = { common: 60, rare: 25, epic: 10, legendary: 5 };
-    const total = 100;
+    const rarityBarHTML =
+      cntSeg(ch.common,    'var(--common)',    ch.common,    0) +
+      cntSeg(ch.rare,      'var(--rare)',      ch.rare,      +(ch.rare - base.rare).toFixed(1)) +
+      cntSeg(ch.epic,      'var(--epic)',      ch.epic,      +(ch.epic - base.epic).toFixed(1)) +
+      cntSeg(ch.legendary, 'var(--legendary)', ch.legendary, +(ch.legendary - base.legendary).toFixed(1));
 
-    card.innerHTML = `
-      <div class="cnt-header" style="background:${c.color}22;">
-        ${buildContainerSVG(c, 340, 160)}
-      </div>
-      <div class="cnt-body">
-        <div class="cnt-title" style="color:${c.accent};">${c.name}</div>
-        <div class="cnt-subtitle">${c.subtitle} · ${c.items.length} предметів</div>
-        <div class="cnt-rarity-bar" style="display:flex;gap:2px;border-radius:6px;overflow:hidden;height:6px;margin-bottom:10px;">
-          <div style="width:60%;background:#888;" title="Common 60%"></div>
-          <div style="width:25%;background:#3b82f6;" title="Rare 25%"></div>
-          <div style="width:10%;background:#a855f7;" title="Epic 10%"></div>
-          <div style="width:5%;background:#f5c842;" title="Legendary 5%"></div>
-        </div>
-        <div class="cnt-price-row">
-          <div>
-            <div style="font-size:11px;color:var(--muted);">Ціна відкриття</div>
-            <div style="font-size:18px;font-weight:800;color:${canAfford ? 'var(--gold)' : '#ef4444'};">${fmtCapital(c.price)}</div>
-          </div>
-          <button class="cnt-open-btn" ${canAfford ? '' : 'disabled'}
-            onclick="openContainer('${c.id}')"
-            style="background:linear-gradient(135deg,${c.accent},${c.color});">
-            🚢 ВІДКРИТИ
-          </button>
-        </div>
-      </div>`;
+    const pityBadge = (p.rare > 0 || p.epic > 0 || p.legendary > 0)
+      ? '<span style="font-size:10px;color:var(--gold);margin-left:6px;">🍀 Pity активний</span>' : '';
+
+    card.innerHTML =
+      '<div class="cnt-header" style="background:' + c.color + '18;">' +
+        buildContainerSVG(c, 340, 160) +
+      '</div>' +
+      '<div class="cnt-body">' +
+        '<div class="cnt-title" style="color:' + c.accent + ';">' + c.name + '</div>' +
+        '<div class="cnt-subtitle">' + c.subtitle + ' · ' + c.items.length + ' предметів' + pityBadge + '</div>' +
+        '<div class="case-rarity-bar" id="cnt-rarity-' + c.id + '" style="margin:8px 0 10px;">' +
+          '<div class="case-rarity-bar-track">' + rarityBarHTML + '</div>' +
+        '</div>' +
+        '<div class="cnt-price-row">' +
+          '<div>' +
+            '<div style="font-size:11px;color:var(--muted);">Ціна відкриття</div>' +
+            '<div style="font-size:18px;font-weight:800;color:' + (canAfford ? 'var(--gold)' : '#ef4444') + ';">' + fmtCapital(c.price) + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;align-items:center;">' +
+            '<button style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;font-size:16px;flex-shrink:0;" onclick="openContainerPreviewModal(\'' + c.id + '\')">👁️</button>' +
+            '<button class="cnt-open-btn" ' + (canAfford ? '' : 'disabled') +
+              ' onclick="openContainer(\'' + c.id + '\')"' +
+              ' style="background:linear-gradient(135deg,' + c.accent + ',' + c.color + ');">' +
+              '🚢 ВІДКРИТИ' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
     grid.appendChild(card);
   });
 }
 
-// ── Roll a container item ──
+// ── Roll a container item (uses pity system identical to cases) ──
 function rollContainerItem(c) {
-  const weights = { common: 60, rare: 25, epic: 10, legendary: 5 };
-  let roll = Math.random() * 100;
-  let rarity = 'common';
-  if (roll < 5)       rarity = 'legendary';
-  else if (roll < 15) rarity = 'epic';
-  else if (roll < 40) rarity = 'rare';
-  const pool = c.items.filter(x => x.rarity === rarity);
-  if (!pool.length) return c.items[Math.floor(Math.random() * c.items.length)];
-  return pool[Math.floor(Math.random() * pool.length)];
+  // Containers: базові ваги 60/25/12/3 + pity, БЕЗ collection rarity bonuses
+  const w = getCurrentWeights(c.id); // pity only (CASE_IDS excludes containers)
+  const item = pickItem(c, w);       // reuse pickItem from cases
+
+  // Update pity: if we got a rarity, reset its counter; else increment others
+  const p = getPityForCase(c.id);
+  if (item.rarity === 'legendary') {
+    p.legendary = 0; p.epic = 0; p.rare = 0;
+  } else if (item.rarity === 'epic') {
+    p.epic = 0; p.legendary += 0.3;
+  } else if (item.rarity === 'rare') {
+    p.rare = 0; p.epic += 0.5; p.legendary += 0.15;
+  } else {
+    p.rare += 0.8; p.epic += 0.4; p.legendary += 0.1;
+  }
+
+  return item;
 }
 
 // ── Open container animation ──
@@ -5252,21 +5857,21 @@ function openContainer(containerId) {
 
 function animateHeadlights() {
   const hlL = document.getElementById('hl_left');
-  const hlR = document.getElementById('hl_right');
-  if (!hlL || !hlR) return;
+  const hlR = document.getElementById('hl_right'); // may be null for moto/micro
+  if (!hlL) return;
   let on = false;
   let count = 0;
   const iv = setInterval(() => {
     on = !on;
     hlL.style.opacity = on ? '1' : '0';
-    hlR.style.opacity = on ? '1' : '0';
+    if (hlR) hlR.style.opacity = on ? '1' : '0';
     count++;
-    if (count > 5) {
+    if (count > 7) {
       hlL.style.opacity = '1';
-      hlR.style.opacity = '1';
+      if (hlR) hlR.style.opacity = '1';
       clearInterval(iv);
     }
-  }, 200);
+  }, 180);
 }
 
 function buildContainerOpenHTML(c, item) {
@@ -5388,9 +5993,13 @@ function sellContainerResult() {
 }
 
 function closeContainerModal() {
+  // П.12: if there's still an unclaimed result, auto-keep it
+  if (currentContainerResult) {
+    keepContainerResult(); // this calls closeContainerModal again after keeping, but currentContainerResult is null then
+    return;
+  }
   const modal = document.getElementById('containerModal');
   if (modal) { modal.style.display = 'none'; modal.innerHTML = ''; }
-  currentContainerResult = null;
   renderContainers();
 }
 
@@ -5589,11 +6198,23 @@ const WHEEL_COLORS = {
 function getWheelItems() {
   const mb = MYSTERY_BOXES.find(x => x.id === mboxCurrentId);
   if (!mb) return [];
-  // Show a representative slice of items on the wheel (max 20 for readability)
-  const pool = [...mb.items];
-  // Shuffle and take up to 20
-  pool.sort(() => Math.random() - 0.5);
-  return pool.slice(0, Math.min(20, pool.length));
+  // Build representative 15-item wheel ensuring each rarity appears proportionally
+  const byRarity = { legendary:[], epic:[], rare:[], common:[] };
+  mb.items.forEach(x => { if (byRarity[x.rarity]) byRarity[x.rarity].push(x); });
+  byRarity.legendary.sort(() => Math.random()-0.5);
+  byRarity.epic.sort(()      => Math.random()-0.5);
+  byRarity.rare.sort(()      => Math.random()-0.5);
+  byRarity.common.sort(()    => Math.random()-0.5);
+  // ~1 legendary, ~2 epic, ~4 rare, ~8 common = 15
+  const picks = [
+    ...byRarity.legendary.slice(0,1),
+    ...byRarity.epic.slice(0,2),
+    ...byRarity.rare.slice(0,4),
+    ...byRarity.common.slice(0,8),
+  ];
+  // Shuffle final list
+  picks.sort(() => Math.random()-0.5);
+  return picks.slice(0,15);
 }
 
 let wheelItems     = [];
@@ -5615,11 +6236,19 @@ function drawWheel(angle) {
   const ctx  = canvas.getContext('2d');
   const cx   = canvas.width  / 2;
   const cy   = canvas.height / 2;
-  const r    = cx - 8;
+  const r    = cx - 6;
   const n    = wheelItems.length;
+  if (n === 0) return;
   const slice = (Math.PI * 2) / n;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Outer glow ring
+  const outerGlow = ctx.createRadialGradient(cx,cy,r-4,cx,cy,r+10);
+  outerGlow.addColorStop(0,'rgba(245,200,66,0.15)');
+  outerGlow.addColorStop(1,'transparent');
+  ctx.beginPath(); ctx.arc(cx,cy,r+10,0,Math.PI*2);
+  ctx.fillStyle = outerGlow; ctx.fill();
 
   // Draw each slice
   for (let i = 0; i < n; i++) {
@@ -5627,68 +6256,79 @@ function drawWheel(angle) {
     const start = angle + i * slice;
     const end   = start + slice;
     const colors = WHEEL_COLORS[item.rarity] || ['#4a5568','#2d3748'];
+    const midAngle = start + slice / 2;
 
-    // Slice fill with gradient
+    // Slice fill
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, r, start, end);
     ctx.closePath();
-    const grad = ctx.createLinearGradient(cx, cy,
-      cx + Math.cos(start + slice/2) * r,
-      cy + Math.sin(start + slice/2) * r);
-    grad.addColorStop(0, colors[0] + '99');
-    grad.addColorStop(1, colors[1]);
+    const grad = ctx.createLinearGradient(
+      cx + Math.cos(start)*r*0.3, cy + Math.sin(start)*r*0.3,
+      cx + Math.cos(midAngle)*r,  cy + Math.sin(midAngle)*r);
+    grad.addColorStop(0, colors[0] + 'cc');
+    grad.addColorStop(1, colors[1] + 'ff');
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // Slice border
+    // Slice separator line
     ctx.beginPath();
     ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, start, end);
-    ctx.closePath();
-    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+    ctx.lineTo(cx + Math.cos(start)*r, cy + Math.sin(start)*r);
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Emoji + text
-    const midAngle = start + slice / 2;
-    const textR = r * 0.68;
-    const tx = cx + Math.cos(midAngle) * textR;
-    const ty = cy + Math.sin(midAngle) * textR;
+    // Rarity accent arc near rim
+    ctx.beginPath();
+    ctx.arc(cx, cy, r - 3, start + 0.03, end - 0.03);
+    ctx.strokeStyle = colors[0] + 'aa';
+    ctx.lineWidth = 3;
+    ctx.stroke();
 
+    // Emoji only (no text)
+    const emojiR = r * 0.65;
+    const tx = cx + Math.cos(midAngle) * emojiR;
+    const ty = cy + Math.sin(midAngle) * emojiR;
     ctx.save();
     ctx.translate(tx, ty);
     ctx.rotate(midAngle + Math.PI / 2);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-
-    // Emoji
-    ctx.font = n <= 12 ? '14px Arial' : '11px Arial';
-    ctx.fillText(item.emoji, 0, -8);
-
-    // Short name
-    const short = item.name.length > 10 ? item.name.slice(0,9)+'…' : item.name;
-    ctx.font = 'bold ' + (n <= 12 ? '7px' : '6px') + ' Arial';
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.font = '16px Arial';
     ctx.shadowColor = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur  = 2;
-    ctx.fillText(short, 0, 4);
+    ctx.shadowBlur = 4;
+    ctx.fillText(item.emoji, 0, 0);
     ctx.restore();
   }
 
-  // Outer ring
+  // Gold outer border
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(245,200,66,0.6)';
+  ctx.strokeStyle = 'rgba(245,200,66,0.8)';
   ctx.lineWidth   = 4;
+  ctx.stroke();
+
+  // Inner center circle (hub)
+  const hubGrad = ctx.createRadialGradient(cx,cy,0,cx,cy,r*0.12);
+  hubGrad.addColorStop(0,'#fff8e0');
+  hubGrad.addColorStop(1,'#d4a017');
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.12, 0, Math.PI * 2);
+  ctx.fillStyle = hubGrad;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.12, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+  ctx.lineWidth = 2;
   ctx.stroke();
 }
 
 function rollPrize() {
   const mb = MYSTERY_BOXES.find(x => x.id === mboxCurrentId);
   if (!mb) return null;
-  // Use pity-adjusted weights (reuses existing getCurrentWeights)
-  const w = getCurrentWeights(mboxCurrentId);
+  // Mystery Boxes: базові ваги 60/25/12/3 + pity, БЕЗ collection rarity bonuses
+  const w = getCurrentWeights(mboxCurrentId); // pity only (CASE_IDS excludes mboxes)
   const total = w.common + w.rare + w.epic + w.legendary;
   const roll  = Math.random() * total;
   let rarity = 'common';
@@ -5733,27 +6373,29 @@ function spinForPrize() {
     saveState();
   }
 
-  // Find the prize on the wheel (or closest rarity)
+  // Find the prize on the wheel (or closest rarity match)
   const n = wheelItems.length;
   const slice = (Math.PI * 2) / n;
   let targetIdx = wheelItems.findIndex(x => x.name === prize.name);
-  if (targetIdx === -1) {
-    // Find same rarity
-    targetIdx = wheelItems.findIndex(x => x.rarity === prize.rarity);
-  }
+  if (targetIdx === -1) targetIdx = wheelItems.findIndex(x => x.rarity === prize.rarity);
   if (targetIdx === -1) targetIdx = 0;
 
-  // Calculate target: pointer is at top (−π/2), so target slice center = −π/2
-  const targetSliceAngle = targetIdx * slice + slice / 2;
-  const pointerAngle     = -Math.PI / 2;
-  // How much to rotate so targetSlice lands at pointer
-  let delta = pointerAngle - targetSliceAngle - wheelAngle;
-  // Normalize to 0..2π
-  delta = delta % (Math.PI * 2);
-  if (delta < 0) delta += Math.PI * 2;
-  // Add 3-5 full spins
-  const fullSpins = (3 + Math.floor(Math.random() * 3)) * Math.PI * 2;
-  const finalAngle = wheelAngle + fullSpins + delta;
+  // Pointer is at top = angle -π/2
+  // For slice i to land at pointer: wheelAngle + i*slice + slice/2 = -π/2  (mod 2π)
+  // => finalAngle = -π/2 - i*slice - slice/2
+  // Add small random offset within slice for natural feel (±30% of slice width)
+  const jitter = (Math.random() - 0.5) * slice * 0.5;
+  let baseAngle = -Math.PI / 2 - targetIdx * slice - slice / 2 + jitter;
+
+  // Normalize baseAngle so finalAngle > wheelAngle + minSpins
+  const minSpins = (4 + Math.floor(Math.random() * 3)) * Math.PI * 2;
+  const minFinal = wheelAngle + minSpins;
+  // Bring baseAngle into same 2π period, then add full rotations until past minFinal
+  const TAU = Math.PI * 2;
+  baseAngle = baseAngle % TAU;
+  // Find how many full turns needed
+  let finalAngle = baseAngle;
+  while (finalAngle < minFinal) finalAngle += TAU;
 
   // Animate — faster: 2.0–2.8s
   const duration = 2000 + Math.random() * 800;
@@ -5773,7 +6415,7 @@ function spinForPrize() {
     const normAngle = (((-wheelAngle - Math.PI/2) % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
     const currentIdx = Math.floor(normAngle / slice) % n;
     if (wheelItems[currentIdx] && label) {
-      label.textContent = wheelItems[currentIdx].emoji + ' ' + wheelItems[currentIdx].name;
+      label.textContent = wheelItems[currentIdx].emoji;
     }
 
     if (t < 1) {
@@ -5872,6 +6514,65 @@ function showScreen(id, btn) {
   if (id === 'stats')     renderStats();
 }
 
+
+// ── П.8: Offline sales modal ──
+function showOfflineSalesModal() {
+  if (!state.pendingOfflineSales) return;
+  const p = state.pendingOfflineSales;
+  const modal = document.getElementById('offlineModal');
+  document.getElementById('offlineMsg').textContent =
+    'За ваші відсутності магазин продав ' + p.count + (p.count === 1 ? ' товар' : p.count < 5 ? ' товари' : ' товарів') + '.';
+  document.getElementById('offlineAmount').textContent = '+' + fmtCapital(p.earned);
+  const itemsList = document.getElementById('offlineItems');
+  itemsList.innerHTML = p.names.map(n => '• ' + n).join('<br>');
+  modal.style.display = 'flex';
+}
+
+function claimOfflineSales() {
+  if (!state.pendingOfflineSales) return;
+  const earned = state.pendingOfflineSales.earned;
+  state.balance     += earned;
+  state.totalEarned += earned;
+  state.pendingOfflineSales = null;
+  document.getElementById('offlineModal').style.display = 'none';
+  updateHUD(); saveState();
+  showToast('💰 Отримано ' + fmtCapital(earned) + ' з магазину!', 'gold');
+}
+
+
+// ── П.8: Restore in-progress timers after page reload ──
+function restoreActiveTimers() {
+  const now = Date.now();
+  state.shop.filter(x => !x.sold && x.timerActive && x.endTime && x.endTime > now).forEach(entry => {
+    const remaining = entry.endTime - now;
+    const listPrice = entry.listPrice || entry.value;
+    // timerSec: use stored value (full duration) for bar % calculation
+    const timerSec = entry.timerSec || Math.ceil(remaining / 1000);
+    const endTime  = entry.endTime;
+
+    const interval = setInterval(() => {
+      const rem = Math.max(0, endTime - Date.now());
+      const pct = (rem / (timerSec * 1000)) * 100;
+      const timerBar   = document.getElementById('timer-bar-'   + entry.id);
+      const timerLabel = document.getElementById('timer-label-' + entry.id);
+      if (timerBar)   timerBar.style.width = Math.max(0, pct) + '%';
+      if (timerLabel) {
+        const sec = Math.ceil(rem / 1000);
+        timerLabel.textContent = rem > 0
+          ? (sec >= 60 ? 'Продається... ' + Math.floor(sec/60) + 'хв ' + (sec%60) + 'с' : 'Продається... ' + sec + 'с')
+          : 'Продано!';
+      }
+      if (rem <= 0) {
+        clearInterval(interval);
+        delete activeTimers[entry.id];
+        completeSale(entry, listPrice);
+      }
+    }, 500);
+
+    activeTimers[entry.id] = { interval, endTime, timerSec, listPrice };
+  });
+}
+
 // =================== INIT ===================
 loadState();
 // Apply collection bonuses immediately (must run after COLLECTION_UNIQUE_BONUS is defined)
@@ -5883,6 +6584,12 @@ if (!state.rivalNets) {
 }
 updateHUD();
 renderUpgrades();
+// П.8: Restore timers for items that were selling
+setTimeout(restoreActiveTimers, 200);
+// П.8: Show offline sales if any
+if (state.pendingOfflineSales) {
+  setTimeout(showOfflineSalesModal, 800);
+}
 </script>
 
 <!-- ===== MYSTERY BOX MODAL ===== -->
@@ -6026,5 +6733,20 @@ renderUpgrades();
 
 <!-- ===== CONTAINER OPEN MODAL ===== -->
 <div id="containerModal" style="display:none;"></div>
+
+
+<!-- ===== OFFLINE SALES MODAL ===== -->
+<div id="offlineModal" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--bg2);border:1px solid rgba(245,200,66,.3);border-radius:18px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);">
+    <div style="font-size:36px;margin-bottom:8px;">🏪</div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;color:var(--gold);margin-bottom:8px;">Магазин працював без вас!</div>
+    <div id="offlineMsg" style="font-size:13px;color:var(--muted);margin-bottom:6px;"></div>
+    <div id="offlineAmount" style="font-size:26px;font-weight:800;color:var(--gold);margin:12px 0;"></div>
+    <div id="offlineItems" style="font-size:11px;color:var(--muted);margin-bottom:16px;max-height:100px;overflow-y:auto;text-align:left;background:var(--bg3);border-radius:8px;padding:8px;"></div>
+    <button onclick="claimOfflineSales()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold),#f97316);color:#000;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:1px;">
+      💰 ЗАБРАТИ ГРОШІ
+    </button>
+  </div>
+</div>
 
 </body></html>
