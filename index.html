@@ -1779,10 +1779,29 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
         <div style="font-size:12px;color:var(--muted);font-weight:700;">🔧 Одночасних ремонтів</div>
-        <div id="repairBaysText" style="font-size:12px;color:var(--text);font-weight:700;">0 / 3</div>
+        <div id="repairBaysText" style="font-size:12px;color:var(--text);font-weight:700;">0 / 5</div>
       </div>
       <div style="height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-bottom:14px;">
         <div id="repairBaysBar" style="height:100%;border-radius:3px;background:linear-gradient(90deg,#f97316,#f5c842);transition:width .4s;width:0%;"></div>
+      </div>
+      <!-- Repair All button -->
+      <div id="serviceActionBtns" style="display:none;gap:8px;margin-bottom:12px;">
+        <button id="repairAllBtn" onclick="repairAll()" style="
+          flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+          padding:11px 8px;border-radius:12px;border:none;cursor:pointer;
+          background:linear-gradient(135deg,#f97316,#f5c842);
+          color:#000;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:800;
+          letter-spacing:.5px;box-shadow:0 4px 14px rgba(249,115,22,.3);">
+          🔧 Ремонт всіх
+        </button>
+        <button id="moveAllToSalonBtn" onclick="moveAllToSalon()" style="
+          flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+          padding:11px 8px;border-radius:12px;border:none;cursor:pointer;
+          background:linear-gradient(135deg,#f5c842,#a78bfa);
+          color:#000;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:800;
+          letter-spacing:.5px;box-shadow:0 4px 14px rgba(245,200,66,.3);">
+          🚗 Все в автосалон
+        </button>
       </div>
       <div id="serviceItemsList" style="display:flex;flex-direction:column;gap:10px;">
         <div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 0;">
@@ -1836,6 +1855,25 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
       </div>
       <div style="height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-bottom:14px;">
         <div id="salonLimitBar" style="height:100%;border-radius:3px;background:linear-gradient(90deg,#f5c842,#f97316);transition:width .4s;width:0%;"></div>
+      </div>
+      <!-- List All button -->
+      <div id="salonActionBtns" style="display:none;gap:8px;margin-bottom:12px;">
+        <button id="listAllBtn" onclick="listAllForSale()" style="
+          flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+          padding:11px 8px;border-radius:12px;border:none;cursor:pointer;
+          background:linear-gradient(135deg,#4ade80,#22d3ee);
+          color:#000;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:800;
+          letter-spacing:.5px;box-shadow:0 4px 14px rgba(74,222,128,.3);">
+          🏷️ Виставити все
+        </button>
+        <button id="collectAllBtn" onclick="collectAll()" style="
+          flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+          padding:11px 8px;border-radius:12px;border:none;cursor:pointer;
+          background:linear-gradient(135deg,#f5c842,#4ade80);
+          color:#000;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:800;
+          letter-spacing:.5px;box-shadow:0 4px 14px rgba(245,200,66,.3);">
+          💰 Зібрати гроші
+        </button>
       </div>
       <div id="salonItemsList" style="display:flex;flex-direction:column;gap:10px;">
         <div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 0;">
@@ -3430,7 +3468,7 @@ let state = {
     parts:   0,   // Дешеві запчастини (0-4)
     speed:   0,   // Кваліфікація майстрів (0-5)
     parking: 0,   // Розширення парковки (0-4)
-    bays:    0,   // Ремонтні бокси +бокси понад базу 3 (0-7)
+    bays:    0,   // Ремонтні бокси +бокси понад базу 5 (0-10)
     quality: 0,   // Вхідний контроль (0-3)
     wholesaler: 0  // Оптовик (0-4)
   }
@@ -4270,15 +4308,21 @@ function getCurrentWeights(caseId) {
   let epicBonus      = p.epic;
   let legendaryBonus = p.legendary;
 
+  // Bonuses only for cases and mystery boxes — containers/hangars always use base rates
+  const MBOX_IDS = new Set(['mbox1','mbox2','mbox3','mbox4','mbox5']);
+  const isCaseOrMbox = CASE_IDS.has(id) || MBOX_IDS.has(id);
   if (CASE_IDS.has(id)) {
-    // Case-specific bonuses (only for regular cases)
+    // Case-specific bonuses
     if (id === 'fitness' && state._collBonus_fitnessRare) rareBonus += 12;
     if (state._collBonus_officeRare) rareBonus += 5;
   }
-  // Global rarity bonuses apply to ALL openings — cases AND containers
-  rareBonus      += (state._collBonus_globalRareChance || 0);
-  epicBonus      += (state._collBonus_globalEpicChance || 0);
-  legendaryBonus += (state._collBonus_globalLegChance  || 0);
+  if (isCaseOrMbox) {
+    // Global shop upgrade bonuses — cases and mystery boxes only
+    rareBonus      += (state._collBonus_globalRareChance || 0);
+    epicBonus      += (state._collBonus_globalEpicChance || 0);
+    legendaryBonus += (state._collBonus_globalLegChance  || 0);
+  }
+  // Containers (urban_micro, street_classics...) and hangars (hangar1-5) get base+pity only
 
   const totalBonus = rareBonus + epicBonus + legendaryBonus;
   return {
@@ -7563,14 +7607,37 @@ function isLuckReady(id) {
   return getLuck(id) >= 10;
 }
 
-// Check 3-item combo and award luck points, returns combo info or null
+// Check 3-item combo and award luck points, returns ARRAY of all combos triggered
 function checkLuckCombo(items) {
   if (items.length < 3) return null;
-  // Check if all 3 have same rarity
+  const combos = [];
+
+  // ── COMBO 1: всі 3 однакової рідкості ──
   const r0 = items[0].rarity;
-  if (items[1].rarity !== r0 || items[2].rarity !== r0) return null;
-  const pointsMap = { common: 1, rare: 3, epic: 5, legendary: 10 };
-  return { rarity: r0, points: pointsMap[r0] || 1 };
+  if (items[1].rarity === r0 && items[2].rarity === r0) {
+    const pointsMap = { common: 1, rare: 3, epic: 5, legendary: 10 };
+    combos.push({ type: 'same_rarity', rarity: r0, points: pointsMap[r0] || 1, label: 'Три однакової рідкості!' });
+  }
+
+  // ── COMBO 2: хоча б 2 предмети з однаковою назвою ──
+  const names = items.map(x => x.name);
+  const hasDuplicate = names.some((name, i) => names.indexOf(name) !== i);
+  if (hasDuplicate) {
+    combos.push({ type: 'duplicate', rarity: 'rare', points: 1, label: 'Подвійний предмет!' });
+  }
+
+  // ── COMBO 3: legendary + epic + rare (в будь-якому порядку) ──
+  const rarities = items.map(x => x.rarity).sort().join(',');
+  if (rarities === 'epic,legendary,rare') {
+    combos.push({ type: 'rainbow', rarity: 'legendary', points: 1, label: 'Легенда + Епік + Рідкісний!' });
+  }
+
+  if (combos.length === 0) return null;
+  // Merge all combos into one result — sum points, show best rarity
+  const totalPoints = combos.reduce((s, x) => s + x.points, 0);
+  const bestRarity  = ['legendary','epic','rare','common'].find(r => combos.some(x => x.rarity === r));
+  const label       = combos.map(x => x.label).join(' + ');
+  return { combos, points: totalPoints, rarity: bestRarity, label };
 }
 
 // Apply combo to luck points; returns { added, newTotal, ready, justReached }
@@ -7633,7 +7700,7 @@ function updateAllLuckBars() {
 }
 
 // Show combo alert animation above mboxPrizesWon
-function showComboAlert(rarity, points) {
+function showComboAlert(rarity, points, label) {
   const wrap = document.getElementById('mboxPrizesWon');
   if (!wrap) return;
   const colorMap = { common:'#94a3b8', rare:'#60a5fa', epic:'#c084fc', legendary:'#f5c842' };
@@ -7642,11 +7709,12 @@ function showComboAlert(rarity, points) {
   alert.className = 'combo-alert';
   alert.style.color = col;
   alert.style.top = '0';
-  alert.textContent = '🎯 COMBO! +' + points + ' LUCK';
-  // Insert before the prize cards
+  alert.style.lineHeight = '1.3';
+  alert.innerHTML = '<div>🎯 COMBO! +' + points + ' LUCK</div>' +
+    (label ? '<div style="font-size:11px;opacity:.8;margin-top:2px;">' + label + '</div>' : '');
   wrap.style.position = 'relative';
   wrap.insertBefore(alert, wrap.firstChild);
-  setTimeout(() => alert.remove(), 2500);
+  setTimeout(() => alert.remove(), 2800);
 }
 
 // ─── LUCKY SPIN STARTER ───────────────────────────────
@@ -8239,7 +8307,7 @@ function revealPrize(item, num) {
         const result = applyLuckCombo(mboxCurrentId, combo.points);
         saveState();
         // Show combo alert
-        setTimeout(() => showComboAlert(combo.rarity, combo.points), 300);
+        setTimeout(() => showComboAlert(combo.rarity, combo.points, combo.label), 300);
         // Toast if just reached 10 for the first time
         if (result.justReached) {
           const mbName = MYSTERY_BOXES.find(x => x.id === mboxCurrentId)?.name || '';
@@ -8397,8 +8465,8 @@ function getRepairSpeedMult() {
 
 // Upg3b: repair bays (how many can repair simultaneously)
 function getRepairBays() {
-  if (!state.garageUpgrades) return 3;
-  return 3 + (state.garageUpgrades.bays || 0);
+  if (!state.garageUpgrades) return 5;
+  return 5 + (state.garageUpgrades.bays || 0);
 }
 function getSalonSlots() {
   const lvl = (state.garageUpgrades && state.garageUpgrades.salon) || 0;
@@ -8571,6 +8639,24 @@ function renderServiceTab() {
   if (baysEl)  baysEl.textContent  = activeBaysNow + ' / ' + maxBays;
   if (baysBar) baysBar.style.width = Math.min(100, (activeBaysNow / maxBays) * 100) + '%';
 
+  // ── Service action buttons ──
+  const serviceActionBtns = document.getElementById('serviceActionBtns');
+  const repairAllBtn      = document.getElementById('repairAllBtn');
+  const moveAllBtn        = document.getElementById('moveAllToSalonBtn');
+  const hasCandidates     = state.serviceItems.some(x => !x.repairing && !x.repaired && x.condition < 100);
+  const hasRepaired       = state.serviceItems.some(x => x.repaired || x.condition === 100);
+  if (serviceActionBtns) serviceActionBtns.style.display = cnt > 0 ? 'flex' : 'none';
+  if (repairAllBtn) {
+    repairAllBtn.disabled      = !hasCandidates || (activeBaysNow >= maxBays);
+    repairAllBtn.style.opacity = (!hasCandidates || activeBaysNow >= maxBays) ? '0.45' : '1';
+    repairAllBtn.style.cursor  = (!hasCandidates || activeBaysNow >= maxBays) ? 'not-allowed' : 'pointer';
+  }
+  if (moveAllBtn) {
+    moveAllBtn.disabled      = !hasRepaired;
+    moveAllBtn.style.opacity = !hasRepaired ? '0.45' : '1';
+    moveAllBtn.style.cursor  = !hasRepaired ? 'not-allowed' : 'pointer';
+  }
+
   if (cnt === 0) {
     list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 0;">🔧 Сервіс порожній.<br><small>Відкривай контейнери \u2014 транспорт з\u2019явиться тут.</small></div>';
     return;
@@ -8649,6 +8735,123 @@ function sellAsIs(id) {
 }
 
 // ── Start repair
+
+// ── Move All Repaired to Salon ──────────────────────────
+function moveAllToSalon() {
+  const items = state.serviceItems || [];
+  const readyItems = items.filter(x => x.repaired || x.condition === 100);
+  if (readyItems.length === 0) {
+    showToast('❌ Немає відремонтованих авто!'); return;
+  }
+  const salonSlots = getSalonSlots();
+  let moved = 0;
+  for (let i = readyItems.length - 1; i >= 0; i--) {
+    if (state.salonItems.length >= salonSlots) break;
+    const it = readyItems[i];
+    state.salonItems.push({
+      id: it.id, name: it.name, emoji: it.emoji, rarity: it.rarity,
+      value: it.value, selling: false, saleReady: false, finishSaleTime: null,
+    });
+    const idx = state.serviceItems.findIndex(x => String(x.id) === String(it.id));
+    if (idx >= 0) state.serviceItems.splice(idx, 1);
+    moved++;
+  }
+  if (moved === 0) {
+    showToast('❌ Автосалон повний!'); return;
+  }
+  saveState();
+  showToast('🚗 ' + moved + ' авто переміщено в автосалон!', 'gold');
+  renderServiceTab();
+  if (currentGarageTab === 'salon') renderSalonTab();
+}
+
+// ── Collect All Sales ───────────────────────────────────
+function collectAll() {
+  const items = state.salonItems || [];
+  const ready = items.filter(x => x.saleReady);
+  if (ready.length === 0) {
+    showToast('❌ Немає завершених продажів!'); return;
+  }
+  let totalEarned = 0;
+  let count = 0;
+  ready.forEach(it => {
+    const price = getLoyaltyFinalPrice(it.value);
+    state.balance     += price;
+    state.totalEarned += price;
+    state.totalCarsSold = (state.totalCarsSold || 0) + 1;
+    state.stats.itemsSold++;
+    totalEarned += price;
+    count++;
+  });
+  // Remove all collected items
+  state.salonItems = state.salonItems.filter(x => !x.saleReady);
+  updateHUD(); saveState();
+  const bonus = getLoyaltyBonus();
+  const bonusStr = bonus > 0 ? ' (+' + bonus + '% репутація)' : '';
+  showToast('💰 Зібрано ' + count + ' продажів: +' + fmtCapital(totalEarned) + bonusStr + '!', 'gold');
+  renderSalonTab();
+}
+
+// ── Repair All ──────────────────────────────────────────
+function repairAll() {
+  const maxBays   = getRepairBays();
+  const items     = state.serviceItems || [];
+  const repairing = items.filter(x => x.repairing).length;
+  const freeSlots = maxBays - repairing;
+
+  if (freeSlots <= 0) {
+    showToast('❌ Всі ремонтні бокси зайняті!'); return;
+  }
+
+  // Candidates: not repairing, not already repaired (condition < 100)
+  const candidates = items.filter(x => !x.repairing && !x.repaired && x.condition < 100);
+  if (candidates.length === 0) {
+    showToast('✅ Нема предметів для ремонту!'); return;
+  }
+
+  let started = 0;
+  let totalCost = 0;
+
+  for (let i = 0; i < candidates.length && started < freeSlots; i++) {
+    const it = candidates[i];
+    const cost = calcRepairCost(it);
+    if (state.balance < cost) continue; // not enough — skip this item
+    // Start repair
+    state.balance -= cost;
+    totalCost += cost;
+    const dur = getRepairDuration(cost);
+    it.repairing        = true;
+    it.repairDuration   = dur;
+    it.finishRepairTime = Date.now() + dur;
+    started++;
+  }
+
+  if (started === 0) {
+    showToast('❌ Недостатньо коштів для ремонту!'); return;
+  }
+
+  updateHUD(); saveState();
+  showToast('🔧 Запущено ремонт ' + started + ' авто на ' + fmtCapital(totalCost), 'teal');
+  renderServiceTab();
+}
+
+// ── List All For Sale ───────────────────────────────────
+function listAllForSale() {
+  const items = state.salonItems || [];
+  const candidates = items.filter(x => !x.selling && !x.saleReady);
+  if (candidates.length === 0) {
+    showToast('✅ Всі предмети вже виставлені або продані!'); return;
+  }
+  candidates.forEach(it => {
+    const dur = (Math.floor(Math.random() * 5) + 1) * 60 * 1000;
+    it.selling        = true;
+    it.saleDuration   = dur;
+    it.finishSaleTime = Date.now() + dur;
+  });
+  saveState();
+  showToast('🚗 Виставлено на продаж ' + candidates.length + ' авто!', 'gold');
+  renderSalonTab();
+}
 function startRepair(id) {
   const it = state.serviceItems.find(x => String(x.id) === String(id));
   if (!it || it.repairing || it.repaired) return;
@@ -8779,6 +8982,24 @@ function renderSalonTab() {
   const lim = getSalonSlots();
   if (ltext) ltext.textContent = cnt + ' / ' + lim;
   if (lbar)  lbar.style.width  = Math.min(100, (cnt / lim) * 100) + '%';
+
+  // ── Salon action buttons ──
+  const salonActionBtns = document.getElementById('salonActionBtns');
+  const listAllBtn      = document.getElementById('listAllBtn');
+  const collectAllBtn   = document.getElementById('collectAllBtn');
+  const hasUnlisted     = state.salonItems.some(x => !x.selling && !x.saleReady);
+  const hasCollectable  = state.salonItems.some(x => x.saleReady);
+  if (salonActionBtns) salonActionBtns.style.display = cnt > 0 ? 'flex' : 'none';
+  if (listAllBtn) {
+    listAllBtn.disabled      = !hasUnlisted;
+    listAllBtn.style.opacity = !hasUnlisted ? '0.45' : '1';
+    listAllBtn.style.cursor  = !hasUnlisted ? 'not-allowed' : 'pointer';
+  }
+  if (collectAllBtn) {
+    collectAllBtn.disabled      = !hasCollectable;
+    collectAllBtn.style.opacity = !hasCollectable ? '0.45' : '1';
+    collectAllBtn.style.cursor  = !hasCollectable ? 'not-allowed' : 'pointer';
+  }
 
   if (cnt === 0) {
     list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 0;">🚗 Автосалон порожній.<br><small>Відремонтуй транспорт у сервісі та перемісти сюди.</small></div>';
@@ -8920,16 +9141,19 @@ function renderGarageUpgrades() {
     },
     {
       key: 'bays', icon: '🔧', title: 'Ремонтні бокси',
-      desc: 'Більше машин можуть ремонтуватись одночасно',
-      maxLvl: 7,
+      desc: 'Більше машин можуть ремонтуватись одночасно. Базово 5 боксів безкоштовно.',
+      maxLvl: 10,
       levels: [
-        { price: 2500000,    label: 'Бокс №4',  bonus: '4 одночасних ремонти' },
-        { price: 10000000,   label: 'Бокс №5',  bonus: '5 одночасних ремонти' },
-        { price: 35000000,   label: 'Бокс №6',  bonus: '6 одночасних ремонти' },
-        { price: 80000000,   label: 'Бокс №7',  bonus: '7 одночасних ремонти' },
-        { price: 150000000,  label: 'Бокс №8',  bonus: '8 одночасних ремонти' },
-        { price: 300000000,  label: 'Бокс №9',  bonus: '9 одночасних ремонти' },
-        { price: 750000000,  label: 'Бокс №10', bonus: '10 одночасних ремонти' },
+        { price: 500_000,     label: 'Бокс №6',  bonus: '6 одночасних ремонтів' },
+        { price: 1_500_000,   label: 'Бокс №7',  bonus: '7 одночасних ремонтів' },
+        { price: 5_000_000,   label: 'Бокс №8',  bonus: '8 одночасних ремонтів' },
+        { price: 12_000_000,  label: 'Бокс №9',  bonus: '9 одночасних ремонтів' },
+        { price: 25_000_000,  label: 'Бокс №10', bonus: '10 одночасних ремонтів' },
+        { price: 50_000_000,  label: 'Бокс №11', bonus: '11 одночасних ремонтів' },
+        { price: 100_000_000, label: 'Бокс №12', bonus: '12 одночасних ремонтів' },
+        { price: 200_000_000, label: 'Бокс №13', bonus: '13 одночасних ремонтів' },
+        { price: 350_000_000, label: 'Бокс №14', bonus: '14 одночасних ремонтів' },
+        { price: 500_000_000, label: 'Бокс №15', bonus: '15 одночасних ремонтів' },
       ],
       currentDesc: () => 'Поточно: ' + getRepairBays() + ' бокс(и) одночасно'
     },
@@ -10628,18 +10852,16 @@ function sellTerminalItem(id) {
   let msg   = '💸 Продано за ' + fmtCapital(price);
 
   if (it.renting) {
-    const elapsed   = (now - it.rentStart) / 1000;
-    const cycSec    = getTerminalCycleSec();
-    const condition = Math.max(0, 100 - Math.min(100, (elapsed / cycSec) * 100));
-    const earned    = it.earned + Math.round(getTerminalEarnRate(it) * elapsed);
-    // Collect accumulated rent
-    state.balance     += earned;
-    state.totalEarned += earned;
-    // Sell at condition price
+    // it.earned is already fully accumulated (tick adds each second, offline adds on load)
+    // it.condition is already updated by tick each second
+    const earned    = Math.round(it.earned || 0);
+    const condition = it.condition !== undefined ? it.condition : 100;
+    // Collect accumulated rent (already credited to balance via tick/offline — DON'T add again)
+    // Sell at condition price only
     price = Math.round(it.value * (condition / 100));
     state.balance     += price;
     state.totalEarned += price;
-    msg = '💸 Дохід: ' + fmtCapital(earned) + ' + продаж: ' + fmtCapital(price);
+    msg = '💸 Зароблено: ' + fmtCapital(earned) + ' + продаж: ' + fmtCapital(price);
   } else {
     state.balance     += price;
     state.totalEarned += price;
@@ -10683,15 +10905,17 @@ function startTerminalTick() {
       const elapsed = (now - it.rentStart) / 1000;
       const rate    = getTerminalEarnRate(it);
 
-      // Collect tick income (every second)
+      // Only add balance for this 1-second tick (avoid double-counting offline income)
       const tickEarn = rate;
       state.balance     += tickEarn;
       state.totalEarned += tickEarn;
       it.earned = (it.earned || 0) + tickEarn;
 
+      // Update real condition based on total elapsed time from original rentStart
+      it.condition = Math.max(0, Math.round(100 - Math.min(100, (elapsed / cycSec) * 100)));
+
       // Check if cycle complete
       if (elapsed >= cycSec) {
-        // Full cycle done — collect remaining, item survives
         it.renting   = false;
         it.rentStart = null;
         it.earned    = 0;
@@ -10757,14 +10981,20 @@ function processTerminalOffline() {
     totalEarned += earned;
 
     if (elapsed >= cycSec) {
-      // Completed in offline
-      lines.push('✅ ' + it.name + ': цикл завершено, ' + fmtCapital(earned));
-      it.renting = false; it.rentStart = null; it.earned = 0; it.condition = 100;
+      // Completed in offline — cycle done, item ready again
+      lines.push('✅ ' + it.name + ': цикл завершено, +' + fmtCapital(earned));
+      it.renting   = false;
+      it.rentStart = null;
+      it.earned    = 0;
+      it.condition = 100;
+      // Don't reset rentStart — item is no longer renting
     } else {
-      const cond = Math.round(100 - (elapsed / cycSec) * 100);
+      // Still in progress — save real condition and keep rentStart as-is (don't reset!)
+      const cond = Math.max(0, Math.round(100 - (elapsed / cycSec) * 100));
+      it.condition = cond; // save real condition for sell price calculation
       lines.push('⏳ ' + it.name + ': +' + fmtCapital(earned) + ' (міцність ' + cond + '%)');
+      // Do NOT reset rentStart — tick will calculate remaining time correctly
     }
-    it.rentStart = now; // reset for next session
   });
 
   if (totalEarned === 0) return;
