@@ -4270,17 +4270,15 @@ function getCurrentWeights(caseId) {
   let epicBonus      = p.epic;
   let legendaryBonus = p.legendary;
 
-  // Rarity bonuses лише для кейсів — НЕ для Mystery Boxes і Containers
   if (CASE_IDS.has(id)) {
-    // Fitness Pro collection bonus: +12% rare chance for fitness case
+    // Case-specific bonuses (only for regular cases)
     if (id === 'fitness' && state._collBonus_fitnessRare) rareBonus += 12;
-    // Office Hero cert: +5% Rare global (only cases)
     if (state._collBonus_officeRare) rareBonus += 5;
-    // Global rarity bonuses from shop upgrades (only cases)
-    rareBonus      += (state._collBonus_globalRareChance || 0);
-    epicBonus      += (state._collBonus_globalEpicChance || 0);
-    legendaryBonus += (state._collBonus_globalLegChance  || 0);
   }
+  // Global rarity bonuses apply to ALL openings — cases AND containers
+  rareBonus      += (state._collBonus_globalRareChance || 0);
+  epicBonus      += (state._collBonus_globalEpicChance || 0);
+  legendaryBonus += (state._collBonus_globalLegChance  || 0);
 
   const totalBonus = rareBonus + epicBonus + legendaryBonus;
   return {
@@ -6815,12 +6813,13 @@ function renderContainers() {
     const card = document.createElement('div');
     card.className = 'cnt-card';
 
-    // Rarity bar segments with pity labels
+    // Rarity bar segments — label shows TOTAL %, bonus shows how much pity+coll added
     function cntSeg(pct, color, label, bonus) {
-      const bonusStr = bonus > 0 ? ' <span class="pity-plus">+' + bonus.toFixed(1) + '</span>' : '';
+      // label = total %, bonus = pity + collection bonus added on top of base
+      const bonusStr = bonus > 0 ? '<span class="pity-plus" style="font-size:9px;opacity:.85;"> (+' + bonus.toFixed(1) + ')</span>' : '';
       const showLbl  = pct >= 7;
       return '<div class="rarity-seg" style="width:' + pct + '%;background:' + color + '">' +
-        (showLbl ? '<span class="rarity-seg-label">' + label + '%' + bonusStr + '</span>' : '') +
+        (showLbl ? '<span class="rarity-seg-label">' + pct.toFixed(1) + '%' + bonusStr + '</span>' : '') +
       '</div>';
     }
 
@@ -6924,7 +6923,7 @@ function renderContainers() {
 // ── Roll a container item (uses pity system identical to cases) ──
 function rollContainerItem(c) {
   // Containers: базові ваги 60/25/12/3 + pity, БЕЗ collection rarity bonuses
-  const w = getCurrentWeights(c.id); // pity only (CASE_IDS excludes containers)
+  const w = getCurrentWeights(c.id); // pity + global collection bonuses
   const item = pickItem(c, w);       // reuse pickItem from cases
 
   // Update pity: if we got a rarity, reset its counter; else increment others
@@ -6979,6 +6978,8 @@ function openContainer(containerId) {
 
   // Assign random condition 10–100
   const item = rollContainerItem(c);
+  // Update pity bar immediately after roll
+  updateRarityBar(containerId);
   const minCond   = getMinCondition ? getMinCondition() : 10;
   const condRange = 100 - minCond;
   item.condition  = Math.floor(Math.random() * (condRange + 1)) + minCond; // minCond..100
@@ -7948,11 +7949,28 @@ let wheelVelocity  = 0;
 let wheelRAF       = null;
 let wheelTarget    = null;  // target angle for current spin
 let spinCallback   = null;  // called when spin stops
+const wheelImgCache = {};   // emoji → HTMLImageElement (preloaded)
+
+function preloadWheelImages(items, cb) {
+  // For items with SVG data URLs, preload into Image objects for canvas drawImage
+  let pending = 0;
+  items.forEach(it => {
+    const src = ITEM_IMAGES[it.emoji];
+    if (src && !wheelImgCache[it.emoji]) {
+      pending++;
+      const img = new Image();
+      img.onload  = () => { wheelImgCache[it.emoji] = img; pending--; if (pending === 0) cb(); };
+      img.onerror = () => { pending--; if (pending === 0) cb(); };
+      img.src = src;
+    }
+  });
+  if (pending === 0) cb();
+}
 
 function initFortuneWheel() {
   wheelItems = getWheelItems();
   wheelAngle = 0;
-  drawWheel(0);
+  preloadWheelImages(wheelItems, () => drawWheel(0));
 }
 
 function drawWheel(angle) {
@@ -8011,19 +8029,28 @@ function drawWheel(angle) {
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    // Emoji only (no text)
+    // Draw item icon — SVG image if available, else emoji text
     const emojiR = r * 0.65;
     const tx = cx + Math.cos(midAngle) * emojiR;
     const ty = cy + Math.sin(midAngle) * emojiR;
     ctx.save();
     ctx.translate(tx, ty);
     ctx.rotate(midAngle + Math.PI / 2);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '16px Arial';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur = 4;
-    ctx.fillText(item.emoji, 0, 0);
+    const cachedImg = wheelImgCache[item.emoji];
+    if (cachedImg) {
+      const sz = r * 0.22; // icon size relative to wheel radius
+      ctx.shadowColor = 'rgba(0,0,0,0.7)';
+      ctx.shadowBlur  = 4;
+      ctx.drawImage(cachedImg, -sz/2, -sz/2, sz, sz);
+    } else {
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font         = Math.round(r * 0.12) + 'px Arial';
+      ctx.shadowColor  = 'rgba(0,0,0,0.8)';
+      ctx.shadowBlur   = 4;
+      ctx.fillStyle    = '#fff';
+      ctx.fillText(item.emoji, 0, 0);
+    }
     ctx.restore();
   }
 
@@ -9955,6 +9982,8 @@ function openHangar(hangarId) {
   const item = rollHangarItem(h);
   hangarResult = { item, hangar: h };
   updateBestDrop(item);
+  // Update pity bar immediately after roll
+  updateRarityBar(h.id);
   if (item.rarity === 'legendary') playHangarLegendary(h, item);
   else                              playHangarStandard(h, item);
 }
