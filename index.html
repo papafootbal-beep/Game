@@ -9486,7 +9486,9 @@ function openContainer(containerId) {
 
   // ── Відео анімація перед результатом ──
   const CONTAINER_VIDEOS = {
-    urban_micro: 'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_urban_micro.mp4',
+    urban_micro:     'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_urban_micro.mp4',
+    street_classics: 'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_street_classics_video.mp4',
+    hyper_track:     'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_hyper_track.mp4',
   };
 
   function showContainerResult() {
@@ -10557,61 +10559,101 @@ function initFortuneWheel() {
 function drawWheel(angle) {
   const canvas = document.getElementById('fortuneWheel');
   if (!canvas) return;
-  const ctx  = canvas.getContext('2d');
-  const cx   = canvas.width  / 2;
-  const cy   = canvas.height / 2;
-  const r    = cx - 6;
-  const n    = wheelItems.length;
+  const ctx = canvas.getContext('2d');
+  const cx  = canvas.width  / 2;
+  const cy  = canvas.height / 2;
+  const r   = cx - 8;
+  const n   = wheelItems.length;
   if (n === 0) return;
   const slice = (Math.PI * 2) / n;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Outer glow ring
-  const outerGlow = ctx.createRadialGradient(cx,cy,r-4,cx,cy,r+10);
-  outerGlow.addColorStop(0,'rgba(245,200,66,0.15)');
-  outerGlow.addColorStop(1,'transparent');
-  ctx.beginPath(); ctx.arc(cx,cy,r+10,0,Math.PI*2);
-  ctx.fillStyle = outerGlow; ctx.fill();
+  // ── Cyberpunk rarity colors: [neon, fill]
+  const CYBER_COLORS = {
+    common:    ['#94a3b8', '#2d3f52'],
+    rare:      ['#38bdf8', '#0a3a5c'],
+    epic:      ['#c084fc', '#2d0a52'],
+    legendary: ['#f5c842', '#3d2200'],
+  };
 
-  // Draw each slice
+  // ── Outer glow rings
+  [r+18, r+10].forEach((gr, i) => {
+    const glow = ctx.createRadialGradient(cx,cy,r-5,cx,cy,gr);
+    glow.addColorStop(0, i===0 ? 'rgba(56,189,248,0.08)' : 'rgba(192,132,252,0.12)');
+    glow.addColorStop(1, 'transparent');
+    ctx.beginPath(); ctx.arc(cx,cy,gr,0,Math.PI*2);
+    ctx.fillStyle = glow; ctx.fill();
+  });
+
+  // ── Draw slices
   for (let i = 0; i < n; i++) {
-    const item  = wheelItems[i];
-    const start = angle + i * slice;
-    const end   = start + slice;
-    const colors = WHEEL_COLORS[item.rarity] || ['#4a5568','#2d3748'];
+    const item     = wheelItems[i];
+    const start    = angle + i * slice;
+    const end      = start + slice;
     const midAngle = start + slice / 2;
+    const col      = CYBER_COLORS[item.rarity] || CYBER_COLORS.common;
+    const neon     = col[0];
+    const dark     = col[1];
 
-    // Slice fill
+    // Заливка сектору — насичений непрозорий колір
+    const grad = ctx.createRadialGradient(
+      cx + Math.cos(midAngle)*r*0.35, cy + Math.sin(midAngle)*r*0.35, 0,
+      cx, cy, r);
+    grad.addColorStop(0, dark);
+    grad.addColorStop(0.7, dark + 'ee');
+    grad.addColorStop(1, neon + '55');
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, r, start, end);
     ctx.closePath();
-    const grad = ctx.createLinearGradient(
-      cx + Math.cos(start)*r*0.3, cy + Math.sin(start)*r*0.3,
-      cx + Math.cos(midAngle)*r,  cy + Math.sin(midAngle)*r);
-    grad.addColorStop(0, colors[0] + 'cc');
-    grad.addColorStop(1, colors[1] + 'ff');
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // Slice separator line
+    // Neon edge arc — stronger glow
+    ctx.beginPath();
+    ctx.arc(cx, cy, r - 2, start + 0.02, end - 0.02);
+    ctx.strokeStyle = neon;
+    ctx.lineWidth   = 4;
+    ctx.shadowColor = neon;
+    ctx.shadowBlur  = 18;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Second inner neon arc — rarity band
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.52, start + 0.04, end - 0.04);
+    ctx.strokeStyle = neon + '66';
+    ctx.lineWidth   = 2;
+    ctx.shadowColor = neon;
+    ctx.shadowBlur  = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Divider lines — thin neon
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(cx + Math.cos(start)*r, cy + Math.sin(start)*r);
-    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = neon + '55';
+    ctx.lineWidth   = 1;
     ctx.stroke();
 
-    // Rarity accent arc near rim
+    // Glass sheen — highlight near top of slice
+    const sheenGrad = ctx.createLinearGradient(
+      cx + Math.cos(midAngle - 0.2)*r*0.3, cy + Math.sin(midAngle - 0.2)*r*0.3,
+      cx + Math.cos(midAngle)*r*0.85,      cy + Math.sin(midAngle)*r*0.85);
+    sheenGrad.addColorStop(0, 'rgba(255,255,255,0.12)');
+    sheenGrad.addColorStop(0.4, 'rgba(255,255,255,0.04)');
+    sheenGrad.addColorStop(1, 'transparent');
     ctx.beginPath();
-    ctx.arc(cx, cy, r - 3, start + 0.03, end - 0.03);
-    ctx.strokeStyle = colors[0] + 'aa';
-    ctx.lineWidth = 3;
-    ctx.stroke();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r - 3, start + 0.05, end - 0.05);
+    ctx.closePath();
+    ctx.fillStyle = sheenGrad;
+    ctx.fill();
 
-    // Draw item icon — SVG image if available, else emoji text
-    const emojiR = r * 0.65;
+    // Icon / emoji
+    const emojiR   = r * 0.64;
     const tx = cx + Math.cos(midAngle) * emojiR;
     const ty = cy + Math.sin(midAngle) * emojiR;
     ctx.save();
@@ -10619,42 +10661,45 @@ function drawWheel(angle) {
     ctx.rotate(midAngle + Math.PI / 2);
     const cachedImg = wheelImgCache[item.emoji];
     if (cachedImg) {
-      const sz = r * 0.22; // icon size relative to wheel radius
-      ctx.shadowColor = 'rgba(0,0,0,0.7)';
-      ctx.shadowBlur  = 4;
+      const sz = r * 0.21;
+      ctx.shadowColor = neon;
+      ctx.shadowBlur  = 8;
       ctx.drawImage(cachedImg, -sz/2, -sz/2, sz, sz);
+      ctx.shadowBlur = 0;
     } else {
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'middle';
       ctx.font         = Math.round(r * 0.12) + 'px Arial';
-      ctx.shadowColor  = 'rgba(0,0,0,0.8)';
-      ctx.shadowBlur   = 4;
+      ctx.shadowColor  = neon;
+      ctx.shadowBlur   = 8;
       ctx.fillStyle    = '#fff';
       ctx.fillText(item.emoji, 0, 0);
+      ctx.shadowBlur = 0;
     }
     ctx.restore();
   }
 
-  // Gold outer border
+  // ── Outer border — neon cyan ring
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(245,200,66,0.8)';
-  ctx.lineWidth   = 4;
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth   = 3;
+  ctx.shadowColor = '#38bdf8';
+  ctx.shadowBlur  = 18;
   ctx.stroke();
+  ctx.shadowBlur = 0;
 
-  // Inner center circle (hub)
-  const hubGrad = ctx.createRadialGradient(cx,cy,0,cx,cy,r*0.12);
-  hubGrad.addColorStop(0,'#fff8e0');
-  hubGrad.addColorStop(1,'#d4a017');
+  // Second outer ring — purple
   ctx.beginPath();
-  ctx.arc(cx, cy, r * 0.12, 0, Math.PI * 2);
-  ctx.fillStyle = hubGrad;
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(cx, cy, r * 0.12, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-  ctx.lineWidth = 2;
+  ctx.arc(cx, cy, r + 4, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(192,132,252,0.4)';
+  ctx.lineWidth   = 1.5;
+  ctx.shadowColor = '#c084fc';
+  ctx.shadowBlur  = 12;
   ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Hub намальований як HTML div поверх canvas
 }
 
 function rollPrize() {
@@ -13855,12 +13900,12 @@ function imgRetry(el) {
     <div id="mboxWheelSection" style="opacity:0;transition:opacity 0.5s;display:flex;flex-direction:column;align-items:center;gap:10px;">
       <div id="wheelSpinHeader" style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Крутиться колесо</div>
       <!-- Wheel -->
-      <div style="position:relative;width:240px;height:240px;">
-        <canvas id="fortuneWheel" width="240" height="240" style="border-radius:50%;"></canvas>
+      <div style="position:relative;width:260px;height:260px;">
+        <canvas id="fortuneWheel" width="260" height="260" style="border-radius:50%;filter:drop-shadow(0 0 16px rgba(56,189,248,0.5)) drop-shadow(0 0 32px rgba(192,132,252,0.3));"></canvas>
         <!-- Center pointer arrow -->
-        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.8));">▼</div>
+        <div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:22px solid #38bdf8;filter:drop-shadow(0 0 8px #38bdf8) drop-shadow(0 0 3px #fff);"></div>
         <!-- Center circle -->
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:var(--bg);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;">🎰</div>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:radial-gradient(circle,#0ea5e9,#0c4a6e);border:2px solid #38bdf8;box-shadow:0 0 12px #38bdf8, 0 0 24px rgba(56,189,248,0.4);"></div>
       </div>
       <!-- Current spinning item label -->
       <div id="mboxSpinLabel" style="font-size:13px;color:var(--gold);font-weight:600;min-height:20px;text-align:center;"></div>
