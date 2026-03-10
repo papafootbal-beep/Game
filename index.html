@@ -2882,55 +2882,56 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:#000;overflow:hidden;">
 
-  <!-- Container that preserves image aspect ratio (768:1376 = 9:16.1) -->
   <div id="splashInner" style="
     position:relative;
-    width:100%;
-    height:100%;
+    width:100%;height:100%;
     display:flex;align-items:center;justify-content:center;">
 
-    <!-- Image fills container, never distorts — contain on PC, cover on phone -->
-    <img src="data:image/webp;base64,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"
+    <!-- Нова картинка завантаження -->
+    <img src="https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/loading_screen.png"
       id="splashImg"
-      style="position:absolute;
-             width:100%;height:100%;
-             object-fit:contain;
-             object-position:center center;">
+      crossorigin="anonymous"
+      style="position:absolute;width:100%;height:100%;object-fit:cover;object-position:center center;">
 
-    <!-- Overlay: only the progress bar with % centered inside -->
+    <!-- Overlay з прогрес баром — внизу екрану -->
     <div id="splashOverlay" style="
       position:absolute;
-      left:50%;top:73%;
+      bottom:18%;
+      left:50%;
       transform:translateX(-50%);
-      width:74%;
-      display:flex;flex-direction:column;align-items:center;gap:0;">
+      width:78%;
+      display:flex;flex-direction:column;align-items:center;gap:10px;">
 
-      <!-- Progress bar track with % text centered inside -->
+      <!-- Прогрес бар -->
       <div style="
         position:relative;
         width:100%;
-        height:clamp(18px,5vw,28px);
+        height:clamp(16px,4.5vw,24px);
         border-radius:99px;
-        border:2px solid rgba(168,85,247,0.8);
-        background:rgba(0,0,0,0.3);
+        border:1.5px solid rgba(245,200,66,0.7);
+        background:rgba(0,0,0,0.5);
         overflow:hidden;
-        box-shadow:0 0 20px rgba(168,85,247,0.5);">
+        box-shadow:0 0 18px rgba(245,200,66,0.4), inset 0 0 8px rgba(0,0,0,0.6);">
+
         <!-- Fill -->
         <div id="splashBar" style="
           height:100%;width:0%;
           border-radius:99px;
-          background:linear-gradient(90deg,#5b21b6,#7c3aed,#a855f7,#c084fc);
-          transition:width 0.08s linear;
-          box-shadow:0 0 16px rgba(168,85,247,0.9);">
+          background:linear-gradient(90deg,#92400e,#d97706,#f5c842,#fde68a,#f5c842);
+          background-size:200% 100%;
+          animation:barShimmer 1.5s linear infinite;
+          transition:width 0.15s ease-out;
+          box-shadow:0 0 14px rgba(245,200,66,0.8);">
         </div>
-        <!-- % label centered over bar -->
+
+        <!-- % label -->
         <div style="
           position:absolute;inset:0;
           display:flex;align-items:center;justify-content:center;
           font-family:'Orbitron',sans-serif;
-          font-size:clamp(9px,2.8vw,14px);
-          font-weight:800;color:#ffffff;
-          text-shadow:0 0 6px rgba(0,0,0,0.9),0 1px 3px rgba(0,0,0,1);
+          font-size:clamp(8px,2.5vw,13px);
+          font-weight:900;color:#000;
+          text-shadow:0 1px 2px rgba(255,255,255,0.3);
           letter-spacing:1px;pointer-events:none;">
           <span id="splashPct">0%</span>
         </div>
@@ -2942,6 +2943,10 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 @keyframes splashFadeOut {
   0%   { opacity:1; }
   100% { opacity:0; pointer-events:none; }
+}
+@keyframes barShimmer {
+  0%   { background-position:200% 0; }
+  100% { background-position:-200% 0; }
 }
 </style>
 
@@ -9872,7 +9877,24 @@ function switchCasesTab(tab) {
   if (tab === 'mystery')    renderMysteryBoxes();
   if (tab === 'containers') renderContainers();
   if (tab === 'hangars') renderHangars();
+  // Пауза відео ангару коли йдемо з вкладки
+  hangarVideoControl(tab === 'hangars');
 }
+
+function hangarVideoControl(shouldPlay) {
+  const vid = document.getElementById('hangar1Video');
+  if (!vid) return;
+  if (shouldPlay && !document.hidden) {
+    vid.play().catch(() => {});
+  } else {
+    vid.pause();
+  }
+}
+
+// Пауза коли браузер згорнутий
+document.addEventListener('visibilitychange', function() {
+  hangarVideoControl(!document.hidden && document.getElementById('casesPane-hangars')?.style.display === 'block');
+});
 
 
 // ─── Themed Mystery Box SVGs ────────────────────────────────────
@@ -12576,7 +12598,7 @@ function renderHangars() {
     card.innerHTML =
       '<div class="hangar-visual' + (h.id === "hangar1" ? " hangar1-visual" : h.id === "hangar2" ? " hangar2-visual" : h.id === "hangar3" ? " hangar3-visual" : h.id === "hangar4" ? " hangar4-visual" : h.id === "hangar5" ? " hangar5-visual" : "") + '">' +
         (h.id === 'hangar1'
-          ? '<img src="' + STEEL_LEGION_HANGAR_IMG + '" class="hangar1-img" alt="Сталевий Легіон"><div class="h1-smoke"></div>'
+          ? '<video src="https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/hangar_steel_legion_anim.mp4" class="hangar1-img" id="hangar1Video" autoplay loop muted playsinline></video><div class="h1-smoke"></div>'
           : h.id === 'hangar2'
           ? '<img src="' + POSEIDON_HANGAR_IMG + '" class="hangar2-img" alt="Посейдон"><div class="h2-water"></div><div class="h2-ripple"></div>'
           : h.id === 'hangar3'
@@ -13681,49 +13703,6 @@ function updateNameConfirmBtn(val) {
   const bar     = document.getElementById('splashBar');
   const pctText = document.getElementById('splashPct');
   if (!splash || !bar) return;
-
-  // On phone (portrait) image fills screen perfectly.
-  // On PC: adjust overlay position based on actual rendered image bounds.
-  function positionOverlay() {
-    const img     = document.getElementById('splashImg');
-    const overlay = document.getElementById('splashOverlay');
-    if (!img || !overlay) return;
-    const iw = img.naturalWidth  || 768;
-    const ih = img.naturalHeight || 1376;
-    const cr = splash.getBoundingClientRect();
-    // Rendered image rect (object-fit:contain)
-    const screenRatio = cr.width / cr.height;
-    const imgRatio    = iw / ih;
-    let rw, rh, rx, ry;
-    if (screenRatio > imgRatio) {
-      // Letterbox left/right
-      rh = cr.height;
-      rw = rh * imgRatio;
-      rx = (cr.width - rw) / 2;
-      ry = 0;
-    } else {
-      // Letterbox top/bottom
-      rw = cr.width;
-      rh = rw / imgRatio;
-      rx = 0;
-      ry = (cr.height - rh) / 2;
-    }
-    // Bar is at 72.5% from top of image, centered, 76% wide
-    const barTop  = ry + rh * 0.725;
-    const barLeft = rx + rw * 0.12;
-    const barW    = rw * 0.76;
-    overlay.style.position = 'absolute';
-    overlay.style.top      = barTop  + 'px';
-    overlay.style.left     = barLeft + 'px';
-    overlay.style.width    = barW    + 'px';
-    overlay.style.transform = 'none';
-  }
-
-  // Run positioning after image loads
-  const img = document.getElementById('splashImg');
-  if (img.complete) positionOverlay();
-  else img.onload = positionOverlay;
-  window.addEventListener('resize', positionOverlay);
 
   // ── Реальне завантаження картинок ──
   const GAME_IMAGES = [
