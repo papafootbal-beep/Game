@@ -9478,58 +9478,100 @@ function openContainer(containerId) {
   item.condition  = Math.floor(Math.random() * (condRange + 1)) + minCond; // minCond..100
   currentContainerResult = { item, container: c };
   updateBestDrop(item);
-  // Build and show modal
-  const modal = document.getElementById('containerModal');
-  modal.innerHTML = buildContainerOpenHTML(c, item);
-  modal.style.cssText = 'display:flex;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.96);flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:20px;';
 
-  // Animate: after 600ms open doors
-  setTimeout(() => {
-    const left  = document.getElementById('cont-door-L');
-    const right = document.getElementById('cont-door-R');
-    const prize = document.getElementById('cont-prize-area');
-    const card  = document.getElementById('cont-result-card');
-    const btns  = document.getElementById('cont-result-btns');
-    // ── Door sound + vibrate
-    playContainerDoorSound();
-    if (navigator.vibrate) navigator.vibrate([80,40,80]);
-    if (left)  left.classList.add('open');
-    if (right) right.classList.add('open');
-    // Show prize SVG
-    setTimeout(() => { if (prize) prize.classList.add('show'); }, 900);
-    // Show result card WITH rarity glow + alarm sound
-    setTimeout(() => {
-      if (card) {
-        card.classList.add('show');
-        const rc = {common:'#64748b',rare:'#3b82f6',epic:'#a855f7',legendary:'#f5c842'}[item.rarity]||'#888';
-        card.style.boxShadow = '0 0 35px 10px ' + rc + '55, inset 0 0 20px ' + rc + '11';
-        card.style.borderColor = rc + '77';
-      }
-    }, 1400);
-    // Alarm beeps
-    setTimeout(() => playContainerAlarm(), 1750);
-    // Reveal sound
-    setTimeout(() => playContainerReveal(item.rarity), 2150);
-    // LEGENDARY: gold bg + confetti + screen glow
-    if (item.rarity === 'legendary') {
-      setTimeout(() => {
-        const modal = document.getElementById('containerModal');
-        if (modal) {
-          modal.style.background = 'radial-gradient(ellipse at 50% 40%, rgba(245,200,66,.22) 0%, rgba(20,15,0,.97) 65%)';
-          modal.style.transition = 'background 1.5s ease';
-        }
-        // Gold confetti burst
-        spawnConfetti(80, ['#f5c842','#fde68a','#f97316','#fff7cc','#d4a017','#fbbf24','#ffffff']);
-        if (navigator.vibrate) navigator.vibrate([200,100,200,100,500]);
-        // Pulsing card
-        if (card) card.style.animation = 'legendaryPulse 1.5s ease-in-out infinite';
-      }, 2000);
+  // ── Відео анімація перед результатом ──
+  const CONTAINER_VIDEOS = {
+    urban_micro: 'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_urban_micro.mp4',
+  };
+
+  function showContainerResult() {
+    const modal = document.getElementById('containerModal');
+    modal.innerHTML = buildContainerOpenHTML(c, item);
+    modal.style.cssText = 'display:flex;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.96);flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:20px;';
+
+    const card = document.getElementById('cont-result-card');
+    const btns = document.getElementById('cont-result-btns');
+
+    // Картка одразу видима
+    if (card) {
+      card.classList.add('show');
+      const rc = {common:'#64748b',rare:'#3b82f6',epic:'#a855f7',legendary:'#f5c842'}[item.rarity]||'#888';
+      card.style.boxShadow = '0 0 35px 10px ' + rc + '55, inset 0 0 20px ' + rc + '11';
+      card.style.borderColor = rc + '77';
     }
-    // Show buttons
-    setTimeout(() => { if (btns) btns.classList.add('show'); }, 2200);
-    // Headlights
-    setTimeout(() => animateHeadlights(), 1900);
-  }, 600);
+    playContainerReveal(item.rarity);
+    if (navigator.vibrate) navigator.vibrate([80,40,80]);
+
+    // LEGENDARY: gold bg + confetti
+    if (item.rarity === 'legendary') {
+      modal.style.background = 'radial-gradient(ellipse at 50% 40%, rgba(245,200,66,.22) 0%, rgba(20,15,0,.97) 65%)';
+      spawnConfetti(80, ['#f5c842','#fde68a','#f97316','#fff7cc','#d4a017','#fbbf24','#ffffff']);
+      if (navigator.vibrate) navigator.vibrate([200,100,200,100,500]);
+      if (card) card.style.animation = 'legendaryPulse 1.5s ease-in-out infinite';
+    }
+
+    // Кнопки одразу
+    setTimeout(() => { if (btns) btns.classList.add('show'); }, 400);
+  } // end showContainerResult
+
+  // Якщо є відео для цього контейнера — показуємо спочатку його
+  const videoSrc = CONTAINER_VIDEOS[containerId];
+  if (videoSrc) {
+    const overlay = document.createElement('div');
+    overlay.id = 'containerVideoOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:4000;background:#000;display:flex;align-items:center;justify-content:center;';
+
+    const vid = document.createElement('video');
+    vid.src = videoSrc;
+    vid.autoplay = true;
+    vid.muted = false;
+    vid.playsInline = true;
+    vid.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+
+    // Після завершення відео — прибираємо overlay і показуємо результат
+    vid.onended = function() {
+      overlay.style.transition = 'opacity 0.3s';
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.remove();
+        showContainerResult();
+      }, 300);
+    };
+
+    // Якщо відео не завантажилось — пропускаємо і одразу показуємо результат
+    vid.onerror = function() {
+      overlay.remove();
+      showContainerResult();
+    };
+
+    // Tap/click щоб пропустити відео
+    overlay.addEventListener('click', function() {
+      vid.pause();
+      overlay.style.transition = 'opacity 0.3s';
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.remove();
+        showContainerResult();
+      }, 300);
+    });
+
+    const skipHint = document.createElement('div');
+    skipHint.textContent = '👆 Натисни щоб пропустити';
+    skipHint.style.cssText = 'position:absolute;bottom:30px;left:0;right:0;text-align:center;color:rgba(255,255,255,.5);font-size:13px;pointer-events:none;';
+
+    overlay.appendChild(vid);
+    overlay.appendChild(skipHint);
+    document.body.appendChild(overlay);
+
+    vid.play().catch(() => {
+      // Автовідтворення заблоковано — пропускаємо
+      overlay.remove();
+      showContainerResult();
+    });
+  } else {
+    // Немає відео — одразу показуємо результат
+    showContainerResult();
+  }
 }
 
 
@@ -9663,52 +9705,14 @@ function buildContainerOpenHTML(c, item) {
   const rarityNames  = { common:'Звичайний', rare:'Рідкісний', epic:'Епічний', legendary:'Легендарний' };
   const rc = rarityColors[item.rarity] || '#888';
 
-  const vehicleSVG = buildVehicleSVG(item.vehicleType || 'car', item.rarity);
-
   return `
   <div class="cont-modal-inner">
     <div style="font-family:Orbitron,sans-serif;font-size:13px;font-weight:700;color:${c.accent};
-      letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">
+      letter-spacing:2px;text-align:center;margin-bottom:16px;text-transform:uppercase;">
       ${c.name} · ${c.subtitle}
     </div>
 
-    <!-- Container door scene -->
-    <div class="cont-scene">
-      <!-- Background (inside of container) -->
-      <div style="position:absolute;inset:0;border-radius:8px;
-        background:radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a12 100%);
-        border:2px solid ${c.color}44;">
-      </div>
-
-      <!-- Prize inside (shown after doors open) -->
-      <div class="cont-prize-area" id="cont-prize-area">
-        <div style="transform:scale(.85);">${vehicleSVG}</div>
-      </div>
-
-      <!-- Left door -->
-      <div class="cont-door-left" id="cont-door-L"
-        style="background:linear-gradient(180deg,${c.accent}cc,${c.color}ee);
-          border-right:2px solid rgba(0,0,0,.4);border-radius:8px 0 0 8px;">
-        <div class="cont-door-stripe" style="background:${c.stripeColor};"></div>
-        <div class="cont-door-lock">🔒</div>
-        <div class="cont-door-stripe" style="background:${c.stripeColor};"></div>
-        <div class="cont-door-hinge" style="background:rgba(0,0,0,.4);"></div>
-        ${[0,1,2,3,4,5].map(()=>`<div style="width:90%;height:3px;background:rgba(0,0,0,.15);border-radius:2px;"></div>`).join('')}
-      </div>
-
-      <!-- Right door -->
-      <div class="cont-door-right" id="cont-door-R"
-        style="background:linear-gradient(180deg,${c.color}ee,${c.accent}cc);
-          border-left:2px solid rgba(0,0,0,.4);border-radius:0 8px 8px 0;">
-        <div class="cont-door-stripe" style="background:${c.stripeColor};"></div>
-        <div class="cont-door-lock">🔒</div>
-        <div class="cont-door-stripe" style="background:${c.stripeColor};"></div>
-        <div class="cont-door-hinge" style="background:rgba(0,0,0,.4);"></div>
-        ${[0,1,2,3,4,5].map(()=>`<div style="width:90%;height:3px;background:rgba(0,0,0,.15);border-radius:2px;"></div>`).join('')}
-      </div>
-    </div>
-
-    <!-- Result card (appears after animation) -->
+    <!-- Result card -->
     <div class="cont-result-card" id="cont-result-card"
       style="border-color:${rc}44;box-shadow:0 0 20px ${rc}22;">
       <div class="cont-result-rarity" style="color:${rc};">${rarityNames[item.rarity]}</div>
