@@ -1346,12 +1346,12 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 .mbox-img-col {
   position: relative;
   flex-shrink: 0;
-  width: 210px;
-  height: 210px;
+  width: 180px;
+  height: 190px;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
 }
 .mbox-img-glow {
@@ -1365,7 +1365,7 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 }
 .mbox-img-col img {
   position: relative;
-  width: 200px; height: 200px;
+  width: 220px; height: 220px;
   object-fit: contain;
   z-index: 1;
   filter: drop-shadow(0 4px 18px rgba(14,165,233,.25));
@@ -1984,7 +1984,7 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 .cnt-header {
   padding: 0;
   position: relative;
-  height: 160px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13721,47 +13721,72 @@ function updateNameConfirmBtn(val) {
   else img.onload = positionOverlay;
   window.addEventListener('resize', positionOverlay);
 
-  let pct = 0;
-  const steps = [
-    { target: 8,   delay: 80  },
-    { target: 22,  delay: 100 },
-    { target: 38,  delay: 70  },
-    { target: 51,  delay: 90  },
-    { target: 65,  delay: 80  },
-    { target: 76,  delay: 110 },
-    { target: 85,  delay: 90  },
-    { target: 92,  delay: 130 },
-    { target: 97,  delay: 160 },
-    { target: 100, delay: 220 },
-  ];
+  // ── Реальне завантаження картинок ──
+  const GAME_IMAGES = [
+    typeof STREET_CASE_IMG !== 'undefined' ? STREET_CASE_IMG : null,
+    typeof OFFICE_CASE_IMG !== 'undefined' ? OFFICE_CASE_IMG : null,
+    typeof CHEF_CASE_IMG !== 'undefined' ? CHEF_CASE_IMG : null,
+    typeof GAMER_CASE_IMG !== 'undefined' ? GAMER_CASE_IMG : null,
+    typeof FITNESS_CASE_IMG !== 'undefined' ? FITNESS_CASE_IMG : null,
+    typeof APPLE_CASE_IMG !== 'undefined' ? APPLE_CASE_IMG : null,
+    typeof PHOTO_CASE_IMG !== 'undefined' ? PHOTO_CASE_IMG : null,
+    typeof HOBBY_CASE_IMG !== 'undefined' ? HOBBY_CASE_IMG : null,
+    typeof SMART_CASE_IMG !== 'undefined' ? SMART_CASE_IMG : null,
+    typeof ELITE_CASE_IMG !== 'undefined' ? ELITE_CASE_IMG : null,
+    typeof MBOX1_IMG !== 'undefined' ? MBOX1_IMG : null,
+    typeof MBOX2_IMG !== 'undefined' ? MBOX2_IMG : null,
+    typeof MBOX3_IMG !== 'undefined' ? MBOX3_IMG : null,
+    typeof MBOX4_IMG !== 'undefined' ? MBOX4_IMG : null,
+    typeof MBOX5_IMG !== 'undefined' ? MBOX5_IMG : null,
+    typeof URBAN_MICRO_IMG !== 'undefined' ? URBAN_MICRO_IMG : null,
+    typeof STREET_CLASSICS_IMG !== 'undefined' ? STREET_CLASSICS_IMG : null,
+    typeof BUSINESS_CLASS_IMG !== 'undefined' ? BUSINESS_CLASS_IMG : null,
+    typeof HYPER_TRACK_IMG !== 'undefined' ? HYPER_TRACK_IMG : null,
+    typeof ULTIMATE_COLLECTION_IMG !== 'undefined' ? ULTIMATE_COLLECTION_IMG : null,
+    typeof STEEL_LEGION_HANGAR_IMG !== 'undefined' ? STEEL_LEGION_HANGAR_IMG : null,
+    typeof POSEIDON_HANGAR_IMG !== 'undefined' ? POSEIDON_HANGAR_IMG : null,
+    typeof SKYLIMITS_HANGAR_IMG !== 'undefined' ? SKYLIMITS_HANGAR_IMG : null,
+    typeof ATLANTIS_HANGAR_IMG !== 'undefined' ? ATLANTIS_HANGAR_IMG : null,
+    typeof GALACTIC_HANGAR_IMG !== 'undefined' ? GALACTIC_HANGAR_IMG : null,
+  ].filter(Boolean);
 
-  let stepIdx = 0;
-  function runStep() {
-    if (stepIdx >= steps.length) {
+  let loaded = 0;
+  const total = GAME_IMAGES.length;
+
+  function onImageDone() {
+    loaded++;
+    const pct = Math.round((loaded / total) * 100);
+    bar.style.width = pct + '%';
+    if (pctText) pctText.textContent = pct + '%';
+    if (loaded >= total) {
       setTimeout(() => {
         splash.style.animation = 'splashFadeOut 0.7s ease-out forwards';
         setTimeout(() => { splash.style.display = 'none'; }, 720);
-      }, 200);
-      return;
+      }, 300);
     }
-    const step  = steps[stepIdx++];
-    const from  = pct;
-    const to    = step.target;
-    const dur   = step.delay;
-    const start = performance.now();
-    function animate(now) {
-      const elapsed = now - start;
-      const t = Math.min(1, elapsed / dur);
-      pct = from + (to - from) * t;
-      bar.style.width = pct.toFixed(1) + '%';
-      if (pctText) pctText.textContent = Math.round(pct) + '%';
-      if (t < 1) requestAnimationFrame(animate);
-      else runStep();
-    }
-    requestAnimationFrame(animate);
   }
 
-  setTimeout(runStep, 150);
+  // Якщо немає картинок для завантаження — одразу закриваємо
+  if (total === 0) {
+    bar.style.width = '100%';
+    if (pctText) pctText.textContent = '100%';
+    setTimeout(() => {
+      splash.style.animation = 'splashFadeOut 0.7s ease-out forwards';
+      setTimeout(() => { splash.style.display = 'none'; }, 720);
+    }, 500);
+  } else {
+    // Починаємо з 5% одразу щоб показати що щось відбувається
+    bar.style.width = '5%';
+    if (pctText) pctText.textContent = '5%';
+
+    GAME_IMAGES.forEach(function(src) {
+      var img = new Image();
+      img.onload = onImageDone;
+      img.onerror = onImageDone; // рахуємо і помилки щоб не зависнути
+      img.src = src;
+    });
+  }
+
 })();
 
 
