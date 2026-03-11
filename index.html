@@ -200,6 +200,202 @@ header::before {
   animation: balancePop .3s ease-out;
   filter: drop-shadow(0 0 18px rgba(200,160,50,.85)) drop-shadow(0 1px 1px rgba(0,0,0,.9));
 }
+/* ── Gold Credits HUD block ── */
+.gc-hud-block {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: linear-gradient(160deg, rgba(30,15,0,.9), rgba(20,10,0,.95));
+  border: 1px solid rgba(251,191,36,.35);
+  border-radius: 14px; padding: 5px 10px 6px;
+  cursor: pointer; transition: border-color .2s, box-shadow .2s;
+  box-shadow: 0 0 10px rgba(251,191,36,.1), inset 0 1px 0 rgba(255,255,255,.05);
+  min-width: 72px;
+}
+.gc-hud-block:hover { border-color: rgba(251,191,36,.7); box-shadow: 0 0 16px rgba(251,191,36,.3); }
+.gc-hud-label {
+  font-family: 'Rajdhani', sans-serif; font-size: 8px; font-weight: 700;
+  color: rgba(251,191,36,.55); letter-spacing: 1.5px; text-transform: uppercase;
+}
+.gc-hud-row { display: flex; align-items: center; gap: 4px; }
+.gc-hud-icon { font-size: 14px; line-height: 1; filter: drop-shadow(0 0 4px rgba(251,191,36,.6)); }
+.gc-hud-amount {
+  font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 900;
+  background: linear-gradient(135deg, #f59e0b, #fde68a, #fbbf24);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  filter: drop-shadow(0 0 6px rgba(251,191,36,.5));
+}
+.gc-hud-block.pop .gc-hud-amount { animation: balancePop .3s ease-out; }
+/* ── Daily Streak Modal ── */
+#dailyStreakModal {
+  display: none; position: fixed; inset: 0; z-index: 3500;
+  background: rgba(0,0,0,.88); backdrop-filter: blur(6px);
+  align-items: center; justify-content: center; padding: 16px;
+}
+#dailyStreakModal.open { display: flex; }
+.ds-card {
+  background: linear-gradient(160deg, #0f0a00 0%, #1a1000 50%, #0a0800 100%);
+  border: 1px solid rgba(251,191,36,.3);
+  border-radius: 24px; padding: 20px 16px 24px;
+  width: 100%; max-width: 380px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 0 40px rgba(251,191,36,.12), 0 20px 60px rgba(0,0,0,.8);
+}
+.ds-title {
+  font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 900;
+  background: linear-gradient(135deg,#fbbf24,#fde68a,#f59e0b);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  text-align: center; margin-bottom: 4px;
+}
+.ds-subtitle { font-size: 11px; color: rgba(255,255,255,.5); text-align: center; margin-bottom: 16px; }
+.ds-grid {
+  display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; margin-bottom: 16px;
+}
+.ds-day {
+  border-radius: 10px; padding: 5px 2px; text-align: center;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  font-size: 9px; color: rgba(255,255,255,.4);
+  cursor: default; transition: all .2s; position: relative;
+}
+.ds-day.claimed { background: rgba(251,191,36,.12); border-color: rgba(251,191,36,.35); color: rgba(255,255,255,.7); }
+.ds-day.claimed .ds-day-amount { color: rgba(251,191,36,.7); }
+.ds-day.claimed::after { content: '✓'; position: absolute; top: 2px; right: 3px; font-size: 8px; color: #4ade80; }
+.ds-day.today { border-color: #fbbf24; background: rgba(251,191,36,.18); color: #fff; box-shadow: 0 0 10px rgba(251,191,36,.3); }
+.ds-day.today .ds-day-amount { color: #fbbf24; font-weight: 800; }
+.ds-day.bonus { border-color: rgba(168,85,247,.6); background: rgba(168,85,247,.1); }
+.ds-day.bonus .ds-day-amount { color: #c084fc; }
+.ds-day.jackpot { border-color: rgba(239,68,68,.6); background: rgba(239,68,68,.08); }
+.ds-day.jackpot .ds-day-amount { color: #f87171; }
+.ds-day-num { font-size: 8px; margin-bottom: 2px; opacity: .6; }
+.ds-day-icon { font-size: 14px; margin: 1px 0; }
+.ds-day-amount { font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 800; }
+.ds-claim-btn {
+  width: 100%; padding: 14px; border-radius: 14px; border: none; cursor: pointer;
+  font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 900;
+  background: linear-gradient(135deg, #92400e, #d97706, #fbbf24, #fde68a);
+  color: #000; letter-spacing: 1px;
+  box-shadow: 0 4px 20px rgba(251,191,36,.4);
+  transition: transform .1s, box-shadow .2s;
+}
+.ds-claim-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(251,191,36,.6); }
+.ds-claim-btn:disabled { background: rgba(255,255,255,.08); color: rgba(255,255,255,.3); cursor: not-allowed; box-shadow: none; transform: none; }
+.ds-watch-btn {
+  width: 100%; padding: 11px; border-radius: 12px; border: 1px solid rgba(251,191,36,.3);
+  background: transparent; color: rgba(251,191,36,.8); cursor: pointer;
+  font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700;
+  margin-top: 8px; transition: all .2s;
+}
+.ds-watch-btn:hover { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.6); }
+.ds-close-btn {
+  position: absolute; top: 12px; right: 14px; background: none; border: none;
+  color: rgba(255,255,255,.4); font-size: 20px; cursor: pointer; line-height: 1;
+}
+.ds-close-btn:hover { color: rgba(255,255,255,.8); }
+
+/* ══ Donate Shop Modal ══ */
+#donateShopModal {
+  display: none; position: fixed; inset: 0; z-index: 3500;
+  background: rgba(0,0,0,.92); backdrop-filter: blur(8px);
+  align-items: flex-start; justify-content: center; padding: 16px;
+  overflow-y: auto;
+}
+#donateShopModal.open { display: flex; }
+.dshop-card {
+  background: linear-gradient(160deg,#0a0800 0%,#110d00 60%,#080600 100%);
+  border: 1px solid rgba(251,191,36,.25);
+  border-radius: 24px; padding: 22px 16px 28px;
+  width: 100%; max-width: 400px; margin: auto;
+  box-shadow: 0 0 60px rgba(251,191,36,.08), 0 24px 80px rgba(0,0,0,.9);
+  position: relative;
+}
+.dshop-header { text-align: center; margin-bottom: 20px; }
+.dshop-title {
+  font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 900;
+  background: linear-gradient(135deg,#f59e0b,#fde68a,#fbbf24);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 4px;
+}
+.dshop-subtitle { font-size: 11px; color: rgba(255,255,255,.4); letter-spacing: 1px; text-transform: uppercase; }
+.dshop-section-label {
+  font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,.35); letter-spacing: 2px; text-transform: uppercase;
+  margin: 18px 0 8px; padding-left: 4px; border-left: 2px solid rgba(251,191,36,.3);
+}
+/* Credit packs */
+.dshop-packs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+.dshop-pack {
+  background: linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px; padding: 14px 10px 12px; text-align: center;
+  cursor: pointer; position: relative; transition: all .2s; overflow: hidden;
+}
+.dshop-pack:hover { border-color: rgba(251,191,36,.5); background: linear-gradient(160deg,rgba(251,191,36,.08),rgba(251,191,36,.03)); box-shadow: 0 0 20px rgba(251,191,36,.15); transform: translateY(-2px); }
+.dshop-pack.popular { border-color: rgba(251,191,36,.4); }
+.dshop-pack.best    { border-color: rgba(34,197,94,.4); }
+.dshop-pack.value   { border-color: rgba(59,130,246,.4); }
+.dshop-pack-badge {
+  position: absolute; top: 0; right: 0;
+  font-size: 8px; font-weight: 800; padding: 3px 8px;
+  border-radius: 0 14px 0 10px; letter-spacing: .5px;
+  font-family: 'Rajdhani', sans-serif;
+}
+.badge-popular { background: rgba(251,191,36,.9); color: #000; }
+.badge-value   { background: rgba(34,197,94,.85); color: #000; }
+.badge-best    { background: rgba(99,102,241,.85); color: #fff; }
+.dshop-pack-icon { font-size: 28px; margin-bottom: 4px; }
+.dshop-pack-name { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.8); margin-bottom: 4px; }
+.dshop-pack-gc {
+  font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 900;
+  background: linear-gradient(135deg,#fbbf24,#fde68a);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 6px;
+}
+.dshop-pack-price {
+  background: linear-gradient(135deg,rgba(251,191,36,.9),#f97316);
+  border-radius: 8px; padding: 4px 10px;
+  font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 800; color: #000;
+  display: inline-block;
+}
+/* Premium items */
+.dshop-premium-list { display: flex; flex-direction: column; gap: 10px; }
+.dshop-premium-item {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: all .2s;
+}
+.dshop-premium-item:hover { border-color: rgba(139,92,246,.5); background: rgba(139,92,246,.06); transform: translateY(-1px); }
+.dshop-premium-item.owned { border-color: rgba(74,222,128,.3); background: rgba(74,222,128,.04); cursor: default; opacity: .7; }
+.dshop-premium-item.owned:hover { transform: none; }
+.dshop-prem-icon { font-size: 28px; flex-shrink: 0; }
+.dshop-prem-info { flex: 1; }
+.dshop-prem-name { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: #e2e8f0; margin-bottom: 2px; }
+.dshop-prem-desc { font-size: 10px; color: rgba(255,255,255,.45); line-height: 1.3; }
+.dshop-prem-price {
+  background: linear-gradient(135deg,#7c3aed,#a855f7);
+  border-radius: 10px; padding: 6px 12px;
+  font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 800; color: #fff;
+  white-space: nowrap; flex-shrink: 0;
+}
+.dshop-prem-owned { font-size: 11px; color: #4ade80; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+/* Payment modal */
+#dshopPayModal {
+  display: none; position: fixed; inset: 0; z-index: 4000;
+  background: rgba(0,0,0,.88); align-items: center; justify-content: center;
+}
+#dshopPayModal.open { display: flex; }
+.dshop-pay-card {
+  background: #0f0a00; border: 1px solid rgba(251,191,36,.3);
+  border-radius: 20px; padding: 28px 24px; width: 90%; max-width: 320px; text-align: center;
+  box-shadow: 0 0 40px rgba(251,191,36,.1);
+}
+.dshop-pay-title { font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 800; color: #fbbf24; margin-bottom: 6px; }
+.dshop-pay-item  { font-size: 13px; color: rgba(255,255,255,.8); margin-bottom: 16px; }
+.dshop-pay-timer { font-size: 28px; font-family: 'Orbitron', sans-serif; color: #fbbf24; margin: 12px 0; }
+.dshop-pay-bar   { height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
+.dshop-pay-bar-fill { height: 100%; background: linear-gradient(90deg,#f59e0b,#fbbf24); border-radius: 2px; transition: width .9s linear; }
+.dshop-pay-btns  { display: flex; gap: 10px; }
+.dshop-pay-yes   { flex: 1; padding: 12px; border-radius: 12px; border: none; background: linear-gradient(135deg,#d97706,#fbbf24); color: #000; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; }
+.dshop-pay-no    { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.15); background: transparent; color: rgba(255,255,255,.6); font-family: 'Rajdhani', sans-serif; font-size: 14px; cursor: pointer; }
+.dshop-pay-processing { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 12px; }
 .passive-rate {
   font-size: 10px;
   background: linear-gradient(90deg, #30d060, #50e880);
@@ -799,6 +995,35 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 .btn-sell { background: var(--green); color: #000; }
 .btn-keep { background: var(--bg3); color: var(--text); border: 1px solid var(--border)!important; }
 .btn-sell:active, .btn-keep:active { transform: scale(.96); }
+/* ── Insurance / Try Again ── */
+.insurance-block {
+  margin-top: 10px; padding: 10px 12px 12px;
+  background: linear-gradient(135deg, rgba(251,191,36,.07), rgba(251,191,36,.03));
+  border: 1px solid rgba(251,191,36,.25); border-radius: 14px;
+  text-align: center;
+}
+.insurance-label {
+  font-size: 10px; color: rgba(251,191,36,.6); letter-spacing: 1.5px;
+  text-transform: uppercase; font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  margin-bottom: 6px;
+}
+.insurance-counter {
+  font-size: 11px; color: rgba(255,255,255,.4); margin-bottom: 8px;
+}
+.insurance-counter span { color: #fbbf24; font-weight: 800; }
+.btn-insurance {
+  width: 100%; padding: 10px; border-radius: 10px; border: none; cursor: pointer;
+  font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 800;
+  background: linear-gradient(135deg, rgba(251,191,36,.15), rgba(251,191,36,.08));
+  border: 1px solid rgba(251,191,36,.4); color: #fbbf24;
+  transition: all .2s;
+}
+.btn-insurance:hover { background: linear-gradient(135deg, rgba(251,191,36,.25), rgba(251,191,36,.12)); border-color: rgba(251,191,36,.7); }
+.btn-insurance.noads {
+  background: linear-gradient(135deg, rgba(168,85,247,.15), rgba(168,85,247,.08));
+  border-color: rgba(168,85,247,.4); color: #c084fc;
+}
+.btn-insurance.noads:hover { background: linear-gradient(135deg, rgba(168,85,247,.25), rgba(168,85,247,.12)); border-color: rgba(168,85,247,.7); }
 .spin-btn {
   width: 100%; padding: 16px;
   background: var(--gold); color: #000;
@@ -1894,7 +2119,7 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 .coll-slot.filled.rare      { border-color: rgba(59,130,246,.35); background: rgba(59,130,246,.03); }
 .coll-slot.filled.common    { border-color: rgba(156,163,175,.3); }
 .coll-slot.empty .coll-slot-emoji { filter: grayscale(1); opacity: .22; }
-.coll-slot-emoji { font-size: 26px; display: block; margin-bottom: 4px; }
+.coll-slot-emoji { font-size: 26px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; min-height: 32px; }
 .coll-slot-name { font-size: 10px; color: var(--muted); line-height: 1.2; }
 .coll-slot.filled .coll-slot-name { color: var(--text); }
 .coll-slot-check { position:absolute;top:4px;right:5px;font-size:11px; }
@@ -2956,6 +3181,14 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
     <div class="logo-title">Mystery Boxes</div>
     <div class="logo-sub">★ Simulator ★</div>
   </div>
+  <!-- Gold Credits — окремий блок лівіше від балансу -->
+  <div class="gc-hud-block" id="gcHudChip" onclick="openDonateShop()" title="Gold Credits Shop">
+    <div class="gc-hud-label">Gold Credits</div>
+    <div class="gc-hud-row">
+      <span class="gc-hud-icon">💎</span>
+      <span class="gc-hud-amount" id="gcHudAmount">0</span>
+    </div>
+  </div>
   <div class="balance-display">
     <div class="balance-label">♦ Баланс</div>
     <div class="balance-amount" id="balanceDisplay">0€</div>
@@ -3606,6 +3839,22 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
       <div class="sb-label">В магазині</div>
     </div>
   </div>
+  <!-- Daily Streak button — вгорі статистики -->
+  <div style="margin:0 0 14px;">
+    <button onclick="openDailyStreak()" style="width:100%;padding:14px;border-radius:14px;border:1px solid rgba(251,191,36,.4);background:linear-gradient(135deg,rgba(20,10,0,.9),rgba(40,20,0,.95));cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:26px;">💎</span>
+        <div style="text-align:left;">
+          <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;color:#fbbf24;">DAILY STREAK</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;">Щоденні нагороди Gold Credits</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;color:#fbbf24;" id="gcStatsDisplay">0 💎</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.4);">Gold Credits</div>
+      </div>
+    </button>
+  </div>
   <div class="section-title">Найкращий дроп</div>
   <div class="best-drop-card" id="bestDropCard">
     <div class="best-drop-emoji">🎁</div>
@@ -3654,6 +3903,11 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
         <div class="result-actions">
           <button class="btn-sell" onclick="sellResult()">💸 Продати</button>
           <button class="btn-keep" onclick="keepResult()">🎒 До складу</button>
+        </div>
+        <div class="insurance-block" id="caseInsuranceBlock" style="display:none;">
+          <div class="insurance-label">🛡️ Insurance</div>
+          <div class="insurance-counter">Залишилось: <span id="caseInsuranceTry">3</span>/3</div>
+          <button class="btn-insurance" id="caseInsuranceBtn" onclick="tryInsurance('case')"></button>
         </div>
       </div>
       <button class="spin-btn" id="spinBtn" onclick="spinCarousel()">🎲 ВІДКРИТИ</button>
@@ -4955,7 +5209,20 @@ let state = {
     bays:    0,   // Ремонтні бокси +бокси понад базу 5 (0-10)
     quality: 0,   // Вхідний контроль (0-3)
     wholesaler: 0  // Оптовик (0-4)
-  }
+  },
+  goldCredits: 0,          // Донатна валюта
+  dailyStreak: {
+    day: 0,                // Поточний день (1-30)
+    lastClaim: null,       // ISO date string останнього claim
+    claimedDays: {},       // { dayIndex: true }
+  },
+  achGoldClaimed: {},      // { achId: true } — отримані GC за досягнення
+  collGoldClaimed: {},     // { caseId: true } — отримані GC за колекції
+  premiumOwned: {          // одноразові покупки
+    noAds: false,
+    vip: false,
+    vipPlus: false,
+  },
 };
 
 function saveState() {
@@ -5029,6 +5296,15 @@ function loadState() {
       if (_gu.bays    === undefined) _gu.bays    = 0;
       if (_gu.quality === undefined) _gu.quality = 0;
       if (!state.salonLimit)    state.salonLimit   = 3;
+      if (state.goldCredits    === undefined) state.goldCredits    = 0;
+      if (!state.dailyStreak)  state.dailyStreak  = { day:0, lastClaim:null, claimedDays:{} };
+      if (!state.dailyStreak.claimedDays) state.dailyStreak.claimedDays = {};
+      if (!state.achGoldClaimed)  state.achGoldClaimed  = {};
+      if (!state.collGoldClaimed) state.collGoldClaimed = {};
+      if (!state.premiumOwned) state.premiumOwned = { noAds:false, vip:false, vipPlus:false };
+      if (state.premiumOwned.noAds    === undefined) state.premiumOwned.noAds    = false;
+      if (state.premiumOwned.vip      === undefined) state.premiumOwned.vip      = false;
+      if (state.premiumOwned.vipPlus  === undefined) state.premiumOwned.vipPlus  = false;
       // Process offline repairs on load
       const _now = Date.now();
       state.serviceItems.forEach(it => {
@@ -5181,6 +5457,8 @@ function handleClick(e) {
   clickAmt = Math.round(clickAmt * (state._collBonus_clickMult || 1));
   // Ad bonus x2
   if (typeof adState !== 'undefined' && adState.click2x) clickAmt *= 2;
+  // VIP/VIP+ multiplier
+  clickAmt = Math.round(clickAmt * getVipMult());
 
   // Critical click chance (Elite Collector bonus)
   const critChance = state._collBonus_critChance || 0;
@@ -5230,7 +5508,7 @@ setInterval(() => {
     const dynBonus     = getDynamicPassiveBonus();
     const adMult       = (typeof adState !== 'undefined' && adState.passive2x) ? 2 : 1;
     const base = state.passivePerSec * passiveMult * passiveSpeed * adMult + passiveFlat;
-    const earned = Math.round(base * (1 + dynBonus));
+    const earned = Math.round(base * (1 + dynBonus) * getVipMult());
     if (earned > 0) {
       state.balance     += earned;
       state.totalEarned += earned;
@@ -5248,17 +5526,23 @@ function updateHUD() {
   void el.offsetWidth;
   el.classList.add('pop');
   setTimeout(() => el.classList.remove('pop'), 100);
+  // Gold Credits
+  const gcEl = document.getElementById('gcHudAmount');
+  if (gcEl) gcEl.textContent = (state.goldCredits || 0).toLocaleString();
+  const gcStats = document.getElementById('gcStatsDisplay');
+  if (gcStats) gcStats.textContent = (state.goldCredits || 0).toLocaleString() + ' 💎';
 
   document.getElementById('totalEarned').textContent = fmt(state.totalEarned);
   const _clickMultHUD = state._collBonus_clickMult || 1;
   const _adClickMult  = (typeof adState !== 'undefined' && adState.click2x) ? 2 : 1;
-  const _totalClick = Math.round((state.clickValue + (state._collBonus_clickFlat || 0)) * _clickMultHUD * _adClickMult);
+  const _vipMult = getVipMult();
+  const _totalClick = Math.round((state.clickValue + (state._collBonus_clickFlat || 0)) * _clickMultHUD * _adClickMult * _vipMult);
   document.getElementById('perClickDisplay').textContent = _totalClick;
   // Показуємо бонус у підказці
   const clickHint = document.getElementById('clickValHint');
   if (clickHint) {
     clickHint.textContent = _totalClick;
-    clickHint.parentElement.style.color = _adClickMult > 1 ? '#f5c842' : '';
+    clickHint.parentElement.style.color = _adClickMult > 1 ? '#f5c842' : (_vipMult > 1 ? '#c084fc' : '');
   }
   const pm  = state._collBonus_passiveMult  || 1;
   const ps  = state._collBonus_passiveSpeed || 1;
@@ -5266,7 +5550,7 @@ function updateHUD() {
   const dyn = getDynamicPassiveBonus ? getDynamicPassiveBonus() : 0;
   const _adPassMult = (typeof adState !== 'undefined' && adState.passive2x) ? 2 : 1;
   const actualPassive = (state.passivePerSec > 0 || pfl > 0)
-    ? Math.round((state.passivePerSec * pm * ps * _adPassMult + pfl) * (1 + dyn)) : 0;
+    ? Math.round((state.passivePerSec * pm * ps * _adPassMult + pfl) * (1 + dyn) * _vipMult) : 0;
   // П.11: Update clicker capital banner
   const _cc = calcCapital();
   const _cr = getForbesRank(_cc.total);
@@ -6484,7 +6768,7 @@ function openPreviewModal(caseId) {
       div.innerHTML =
         '<span class="pi-emoji">' + itemDisplay(item.emoji, 30) + '</span>' +
         '<span class="pi-name">' + item.name + '</span>' +
-        '<span class="pi-val">' + fmt(item.value) + '</span>';
+        '<span class="pi-val">' + fmtV(item) + '</span>';
       list.appendChild(div);
     });
   });
@@ -6558,7 +6842,7 @@ function openMboxPreviewModal(mbId) {
       div.innerHTML =
         '<span class="pi-emoji">' + itemDisplay(item.emoji, 30) + '</span>' +
         '<span class="pi-name">' + item.name + '</span>' +
-        '<span class="pi-val">' + fmt(item.value) + '</span>';
+        '<span class="pi-val">' + fmtV(item) + '</span>';
       list.appendChild(div);
     });
   });
@@ -6720,13 +7004,16 @@ function spinCarousel() {
     showToast('Недостатньо коштів!'); return;
   }
 
-  // Auto-keep previous result on re-spin
-  if (hasSpunOnce && currentResult) {
+  // Auto-keep previous result on re-spin (not during insurance — player keeps the item)
+  if (!_insuranceFreeSpin && hasSpunOnce && currentResult) {
     autoKeepResult(currentResult);
+    resetInsurance('case');
   }
 
-  state.balance -= casePrice;
-  state.stats.casesOpened++;
+  if (!_insuranceFreeSpin) {
+    state.balance -= casePrice;
+    state.stats.casesOpened++;
+  }
   updateHUD();
   saveState();
 
@@ -6859,6 +7146,129 @@ function autoKeepResult(item) {
   renderInventory();
 }
 
+// ── Insurance state ──────────────────────────────────────
+const INSURANCE_MAX = 3;
+const INSURANCE_RARITIES = ['common', 'rare']; // only these trigger insurance
+let insuranceState = {
+  case:      { tries: 0 },
+  mbox:      { tries: 0 },
+  container: { tries: 0 },
+  hangar:    { tries: 0 },
+};
+
+function hasNoAds() {
+  return !!(state.premiumOwned && (state.premiumOwned.noAds || state.premiumOwned.vipPlus));
+}
+
+function showInsuranceBlock(type, elBlockId, elTryId, elBtnId, rarity) {
+  const block = document.getElementById(elBlockId);
+  const tryEl = document.getElementById(elTryId);
+  const btn   = document.getElementById(elBtnId);
+  if (!block || !tryEl || !btn) return;
+
+  const st = insuranceState[type];
+  const eligible = INSURANCE_RARITIES.includes(rarity);
+
+  if (!eligible) { block.style.display = 'none'; return; }
+
+  // Always show block for eligible rarity, but disable btn if no tries left
+  block.style.display = 'block';
+  const remaining = INSURANCE_MAX - st.tries;
+  tryEl.textContent = remaining; // span only shows number; HTML has "/3" after span
+  const noAds = hasNoAds();
+
+  if (remaining <= 0) {
+    btn.disabled = true;
+    btn.className = 'btn-insurance';
+    btn.textContent = '🚫 Ліміт спроб вичерпано';
+    btn.style.opacity = '0.4';
+    btn.style.cursor = 'not-allowed';
+  } else {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+    btn.className = 'btn-insurance' + (noAds ? ' noads' : '');
+    btn.textContent = noAds ? '⚡ Спробувати ще раз' : '📺 Дивитись рекламу → Спробувати ще раз';
+  }
+}
+
+function tryInsurance(type) {
+  const st = insuranceState[type];
+  if (st.tries >= INSURANCE_MAX) return;
+
+  const btnId = type === 'case' ? 'caseInsuranceBtn' :
+                type === 'mbox' ? 'mboxInsuranceBtn' :
+                type === 'container' ? 'contInsuranceBtn' : 'hangarInsuranceBtn';
+  const btn = document.getElementById(btnId);
+
+  // Immediately increment and disable button to prevent double-tap
+  st.tries++;
+  if (btn) { btn.disabled = true; }
+
+  const noAds = hasNoAds();
+  if (noAds) {
+    executeInsuranceSpin(type);
+  } else {
+    if (btn) btn.textContent = '⏳ Завантаження реклами...';
+    let sec = 3;
+    const iv = setInterval(() => {
+      sec--;
+      if (btn) btn.textContent = '📺 ' + sec + '...';
+      if (sec <= 0) {
+        clearInterval(iv);
+        executeInsuranceSpin(type);
+      }
+    }, 1000);
+  }
+}
+
+let _insuranceFreeSpin = false;
+
+function executeInsuranceSpin(type) {
+  _insuranceFreeSpin = true;
+  if (type === 'case') {
+    document.getElementById('caseInsuranceBlock').style.display = 'none';
+    document.getElementById('modalResult').style.display = 'none';
+    // Case: refund price since spinCarousel will deduct it again
+    if (currentCase) {
+      const price = currentCase._effectivePrice || currentCase.price;
+      state.balance += price;
+      updateHUD();
+    }
+    spinCarousel();
+  } else if (type === 'mbox') {
+    const mb = document.getElementById('mboxInsuranceBlock');
+    if (mb) mb.style.display = 'none';
+    // Refund mbox price
+    if (mboxCurrentId) {
+      const mbox = MYSTERY_BOXES.find(x => x.id === mboxCurrentId);
+      if (mbox) { state.balance += mbox.price; updateHUD(); }
+    }
+    mboxWonPrizes = [];
+    mboxPrizesDone = 0;
+    document.getElementById('mboxPrizesWon').innerHTML = '';
+    document.getElementById('mboxCollectWrap').style.display = 'none';
+    const ws = document.getElementById('mboxWheelSection');
+    if (ws) ws.style.opacity = '1';
+    const lbl = document.getElementById('mboxSpinLabel');
+    if (lbl) lbl.textContent = '';
+    spinForPrize();
+  } else if (type === 'container') {
+    const modal = document.getElementById('containerModal');
+    if (modal) { modal.style.display = 'none'; modal.innerHTML = ''; }
+    if (window._lastContainerId) openContainer(window._lastContainerId);
+  } else if (type === 'hangar') {
+    const modal = document.getElementById('hangarModal');
+    if (modal) { modal.style.display = 'none'; modal.innerHTML = ''; }
+    if (window._lastHangarId) openHangar(window._lastHangarId);
+  }
+  _insuranceFreeSpin = false;
+}
+
+function resetInsurance(type) {
+  insuranceState[type] = { tries: 0 };
+}
+
 function showResult(item) {
   const spinBtnEl = document.getElementById('spinBtn');
   spinBtnEl.style.display = '';
@@ -6882,7 +7292,10 @@ function showResult(item) {
       (p.legendary > 0 ? '<span style="color:var(--legendary)">Leg +' + p.legendary.toFixed(1) + '%</span>' : '') +
     '</div>';
   }
-  document.getElementById('resultVal').innerHTML = 'Ринкова ціна: <span>' + fmt(item.value) + '</span>' + pityLine;
+  document.getElementById('resultVal').innerHTML = 'Ринкова ціна: <span>' + fmtV(item) + '</span>' + pityLine;
+
+  // Insurance block
+  showInsuranceBlock('case', 'caseInsuranceBlock', 'caseInsuranceTry', 'caseInsuranceBtn', item.rarity);
 
   res.style.opacity = '0';
   res.style.transform = 'translateY(10px)';
@@ -7003,7 +7416,7 @@ function renderInventory() {
     nameEl.textContent = item.name;
     const valEl = document.createElement('div');
     valEl.className = 'item-val';
-    valEl.innerHTML = 'Ціна: <span>' + fmt(item.value) + '</span>';
+    valEl.innerHTML = 'Ціна: <span>' + fmtV(item) + '</span>';
     const fromEl = document.createElement('div');
     fromEl.className = 'item-val';
     fromEl.style.fontSize = '11px';
@@ -7066,6 +7479,8 @@ function getSellValue(item) {
     if (r === 'legendary' && (state._collBonus_legSellMult||1)    > 1)
       val = Math.round(val * state._collBonus_legSellMult);
   }
+  // VIP sell bonus
+  val = Math.round(val * getVipMult());
   return val;
 }
 
@@ -7606,7 +8021,7 @@ function startSellTimer(entryId) {
   const listPrice = Math.min(Math.max(rawPrice, 1), entry.maxPrice);
   entry.listPrice = listPrice;
 
-  const timerSec = calcSellTimer(listPrice, entry.value, entry.maxPrice, entry.fromCase);
+  const timerSec = calcSellTimer(listPrice, getSellValue({rarity: entry.rarity, value: entry.value, fromCase: entry.fromCase, fromContainer: entry.fromContainer}), entry.maxPrice, entry.fromCase);
   entry.timerSec = timerSec; // persisted for offline bar calculation
   entry.listedAt = Date.now();
   saveState();
@@ -7952,6 +8367,32 @@ const CAPITAL_ACHIEVEMENTS = [
   { id:'cap1t',    threshold:1_000_000_000_000,icon:'🌌',title:'Трильйонер',          desc:'Досягни капіталу 1T€',          label:'Трильйонер' },
 ];
 
+// ── Gold Credits constants (must be before renderAchievements) ──
+const ACH_GC_REWARDS = {
+  cap1k:   10,  cap10k:  25,  cap100k: 50,  cap1m:   100,
+  cap10m:  200, cap100m: 350, cap1b:   500, cap10b:  650,
+  cap100b: 800, cap1t:   1000,
+};
+const COLL_GC_REWARD = 250;
+const DAILY_REWARDS = [
+  { day:1,  gc:5,   type:'normal'  }, { day:2,  gc:5,   type:'normal'  },
+  { day:3,  gc:10,  type:'normal'  }, { day:4,  gc:10,  type:'normal'  },
+  { day:5,  gc:15,  type:'normal'  }, { day:6,  gc:15,  type:'normal'  },
+  { day:7,  gc:50,  type:'weekly'  }, { day:8,  gc:20,  type:'normal'  },
+  { day:9,  gc:20,  type:'normal'  }, { day:10, gc:25,  type:'normal'  },
+  { day:11, gc:25,  type:'normal'  }, { day:12, gc:30,  type:'normal'  },
+  { day:13, gc:30,  type:'normal'  }, { day:14, gc:100, type:'big'     },
+  { day:15, gc:35,  type:'normal'  }, { day:16, gc:35,  type:'normal'  },
+  { day:17, gc:40,  type:'normal'  }, { day:18, gc:40,  type:'normal'  },
+  { day:19, gc:45,  type:'normal'  }, { day:20, gc:45,  type:'normal'  },
+  { day:21, gc:150, type:'elite'   }, { day:22, gc:50,  type:'normal'  },
+  { day:23, gc:50,  type:'normal'  }, { day:24, gc:55,  type:'normal'  },
+  { day:25, gc:55,  type:'normal'  }, { day:26, gc:60,  type:'normal'  },
+  { day:27, gc:60,  type:'normal'  }, { day:28, gc:65,  type:'normal'  },
+  { day:29, gc:70,  type:'normal'  }, { day:30, gc:500, type:'jackpot' },
+];
+const DAILY_TYPE_ICONS = { normal:'💎', weekly:'⭐', big:'🌟', elite:'👑', jackpot:'🎰' };
+
 // ── Popup notification ────────────────────────────────────────
 function showAchievementPopup(ach) {
   // Remove existing if any
@@ -7994,37 +8435,7 @@ function checkCapitalAchievements(capital) {
 }
 
 // ── Render achievements section in stats ─────────────────────
-function renderAchievements() {
-  const container = document.getElementById('achievementsSection');
-  if (!container) return;
-  const cap = calcCapital();
-  container.innerHTML = '';
-
-  CAPITAL_ACHIEVEMENTS.forEach(ach => {
-    const done    = !!state.capitalAchievements[ach.id];
-    const current = Math.min(cap.total, ach.threshold);
-    const pct     = Math.min(100, (cap.total / ach.threshold) * 100);
-
-    const card = document.createElement('div');
-    card.className = 'ach-card' + (done ? ' ach-done' : '');
-    card.innerHTML =
-      '<div class="ach-icon' + (done ? ' ach-icon-done' : '') + '">' + ach.icon + '</div>' +
-      '<div class="ach-body">' +
-        '<div class="ach-title">' + ach.title + '</div>' +
-        '<div class="ach-desc">' + ach.desc + '</div>' +
-        (!done ?
-          '<div class="ach-progress-wrap">' +
-            '<div class="ach-progress-bar"><div class="ach-progress-fill" style="width:' + pct.toFixed(1) + '%"></div></div>' +
-            '<div class="ach-pct">' + fmtCapital(cap.total) + ' / ' + fmtCapital(ach.threshold) + '</div>' +
-          '</div>'
-        : '') +
-      '</div>' +
-      '<div class="ach-badge' + (done ? ' ach-badge-done' : ' ach-badge-locked') + '">' +
-        (done ? '✅ Виконано' : '🔒 Заблоковано') +
-      '</div>';
-    container.appendChild(card);
-  });
-}
+function renderAchievements() { renderAchievementsWithGC(); }
 
 
 
@@ -8259,10 +8670,10 @@ function showCertificate(c) {
         (_ub ? '<div style="margin-bottom:5px;">✨ <b style="color:#60a5fa">Унікальний бонус</b> — ' + _ub.desc + '</div>' : '') +
         _shopUpgHtml +
       '</div>' +
-      '<button onclick="this.closest(\'.cert-popup\').remove()" ' +
+      '<button onclick="claimCollectionGC(\'' + c.id + '\'); this.closest(\'.cert-popup\').remove();" ' +
         'style="margin-top:14px;padding:10px 28px;border-radius:10px;border:none;' +
         'background:linear-gradient(135deg,var(--gold),#f97316);color:#000;' +
-        'font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">🎉 ОТРИМАТИ!</button>' +
+        'font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">🎉 ОТРИМАТИ! +250 💎</button>' +
     '</div>';
   document.body.appendChild(div);
   spawnConfetti();
@@ -8305,6 +8716,7 @@ function renderCollections() {
         return '<div class="coll-bonuses">' +
           '<span class="coll-bonus-badge' + (bonus.multiOpen ? '' : ' inactive') + '">⚡ ×5' + (bonus.multiOpen ? '' : ' 🔒') + '</span>' +
           '<span class="coll-bonus-badge' + (bonus.discount  ? '' : ' inactive') + '">💚 −20%' + (bonus.discount  ? '' : ' 🔒') + '</span>' +
+          '<span class="coll-bonus-badge" style="background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35);color:#fbbf24;font-weight:800;">💎 +250 GC</span>' +
           (ub ? '<span class="coll-bonus-badge' + (bonus.multiOpen ? '' : ' inactive') + '" style="font-size:9px;" title="' + ub.desc + '">' + (bonus.multiOpen ? '' : '🔒 ') + ub.desc + '</span>' : '') +
           (su3 && bonus.multiOpen ? '<span class="coll-bonus-badge" style="font-size:9px;background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);" title="Покращення магазину">🏪 ' + upLvl3 + '/' + su3.steps + '</span>' : '') +
         '</div>';
@@ -8347,7 +8759,7 @@ function openCollModal(caseId) {
     const div = document.createElement('div');
     div.className = 'coll-slot ' + (inColl ? 'filled ' + item.rarity : 'empty');
     div.innerHTML =
-      '<span class="coll-slot-emoji">' + item.emoji + '</span>' +
+      '<div class="coll-slot-emoji">' + itemDisplay(item.emoji, 30) + '</div>' +
       '<div class="coll-slot-name r-' + item.rarity + '">' + item.name + '</div>' +
       (inColl ? '<div class="coll-slot-check">✅</div>' : '');
     slots.appendChild(div);
@@ -8574,7 +8986,7 @@ function showMultiOpenResults(c, results) {
     card.innerHTML =
       '<div style="font-size:32px;margin-bottom:4px;display:flex;align-items:center;justify-content:center;height:40px;">' + itemDisplay(item.emoji, 36) + '</div>' +
       '<div class="r-' + item.rarity + '" style="font-size:11px;font-weight:700;line-height:1.3;margin-bottom:3px;">' + item.name + '</div>' +
-      '<div style="font-size:11px;color:var(--gold);font-weight:700;">' + fmt(item.value) + '</div>' +
+      '<div style="font-size:11px;color:var(--gold);font-weight:700;">' + fmtV(item) + '</div>' +
       '<div style="font-size:9px;color:var(--' + item.rarity + ');text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">' + item.rarity + '</div>';
     grid.appendChild(card);
   });
@@ -8854,10 +9266,27 @@ function devToggleHangarLegBoost() {
 function devClearCollections() {
   state.collections = {};
   state.collectionBonuses = {};
+  state.collUpgLevels = {};
+  // Reset all collection bonuses
+  state._collBonus_clickFlat      = 0;
+  state._collBonus_clickMult      = 1;
+  state._collBonus_passiveFlat    = 0;
+  state._collBonus_passiveMult    = 1;
+  state._collBonus_passiveSpeed   = 1;
+  state._collBonus_commonSellMult = 1;
+  state._collBonus_rareSellMult   = 1;
+  state._collBonus_epicSellMult   = 1;
+  state._collBonus_legSellMult    = 1;
+  state._collBonus_casePriceMult  = 1;
+  state._collBonus_shopTimerMult  = 1;
+  state._collBonus_officeRare     = false;
+  state._collBonus_dynamicPassive = false;
+  state._collBonus_critChance     = 0;
   saveState();
   renderCases();
   renderCollections();
-  showToast('🗑️ Колекції скинуто');
+  updateHUD();
+  showToast('🗑️ Колекції та всі бонуси скинуто');
 }
 
 
@@ -9246,7 +9675,7 @@ function openContainerPreviewModal(containerId) {
       div.innerHTML =
         '<span class="pi-emoji">' + (ITEM_IMAGES[item.emoji] ? itemDisplay(item.emoji,30) : '<span style="font-size:22px;line-height:1">' + item.emoji + '</span>') + '</span>' +
         '<span class="pi-name">' + item.name + '</span>' +
-        '<span class="pi-val">' + fmtCapital(item.value) + '</span>';
+        '<span class="pi-val">' + fmtCapitalV(item) + '</span>';
       list.appendChild(div);
     });
   });
@@ -9441,6 +9870,8 @@ let currentContainerResult = null;
 function openContainer(containerId) {
   const c = CONTAINERS.find(x => x.id === containerId);
   if (!c) return;
+  window._lastContainerId = containerId;
+  if (!_insuranceFreeSpin) resetInsurance('container');
 
   // ─── Wholesaler bonus logic ───
   if (!state.containerCounters) state.containerCounters = {};
@@ -9458,16 +9889,18 @@ function openContainer(containerId) {
     state.containerCounters[containerId] = cnt + 1;
   }
 
-  if (state.balance < actualPrice) { showToast('❌ Недостатньо коштів!'); return; }
+  if (!_insuranceFreeSpin && state.balance < actualPrice) { showToast('❌ Недостатньо коштів!'); return; }
 
-  state.balance -= actualPrice;
+  if (!_insuranceFreeSpin) {
+    state.balance -= actualPrice;
+    if (bonusUsed) {
+      const disc = getWholesalerDiscount();
+      const saved = c.price - actualPrice;
+      showToast(disc >= 1 ? '🎁 Оптовик: безкоштовний контейнер!' : '🎁 Оптовик: знижка ' + Math.round(disc*100) + '% — збережено ' + fmtCapital(saved) + '!', 'gold');
+    }
+  }
   state.stats.casesOpened++;
   state.garageOpened = true;
-  if (bonusUsed) {
-    const disc = getWholesalerDiscount();
-    const saved = c.price - actualPrice;
-    showToast(disc >= 1 ? '🎁 Оптовик: безкоштовний контейнер!' : '🎁 Оптовик: знижка ' + Math.round(disc*100) + '% — збережено ' + fmtCapital(saved) + '!', 'gold');
-  }
   updateHUD(); saveState();
 
   // Assign random condition 10–100
@@ -9516,7 +9949,11 @@ function openContainer(containerId) {
     }
 
     // Кнопки одразу
-    setTimeout(() => { if (btns) btns.classList.add('show'); }, 400);
+    setTimeout(() => {
+      if (btns) btns.classList.add('show');
+      // Insurance
+      showInsuranceBlock('container', 'contInsuranceBlock', 'contInsuranceTry', 'contInsuranceBtn', item.rarity);
+    }, 400);
   } // end showContainerResult
 
   // Якщо є відео для цього контейнера — показуємо спочатку його
@@ -9726,7 +10163,7 @@ function buildContainerOpenHTML(c, item) {
       style="border-color:${rc}44;box-shadow:0 0 20px ${rc}22;">
       <div class="cont-result-rarity" style="color:${rc};">${rarityNames[item.rarity]}</div>
       <div class="cont-result-name">${item.emoji} ${item.name}</div>
-      <div class="cont-result-value">${fmtCapital(item.value)}</div>
+      <div class="cont-result-value">${fmtCapitalV(item)}</div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px;">Ринкова вартість</div>
     </div>
 
@@ -9737,8 +10174,15 @@ function buildContainerOpenHTML(c, item) {
       </button>
       <button onclick="sellContainerResult()" class="open-case-btn can"
         style="flex:1;padding:11px;background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.4);color:#ef4444;">
-        💸 Продати за ${fmtCapital(item.value)}
+        💸 Продати за ${fmtCapitalV(item)}
       </button>
+    </div>
+
+    <!-- Insurance block -->
+    <div class="insurance-block" id="contInsuranceBlock" style="display:none;margin-top:10px;">
+      <div class="insurance-label">🛡️ Insurance</div>
+      <div class="insurance-counter">Залишилось: <span id="contInsuranceTry">3</span>/3</div>
+      <button class="btn-insurance" id="contInsuranceBtn" onclick="tryInsurance('container')"></button>
     </div>
 
     <button onclick="closeContainerModal()"
@@ -10394,6 +10838,7 @@ function startMysteryBox(id) {
   mboxWonPrizes  = [];
   mboxPrizesDone = 0;
   mboxPhase      = 1;
+  if (!_insuranceFreeSpin) resetInsurance('mbox');
   updateHUD(); saveState();
   // Show modal phase 1
   const modal = document.getElementById('mysteryModal');
@@ -10854,7 +11299,7 @@ function revealPrize(item, num) {
     '<div class="prize-won-num">#' + num + '</div>' +
     '<div style="font-size:22px;">' + item.emoji + '</div>' +
     '<div class="prize-won-name">' + item.name + '</div>' +
-    '<div class="prize-won-val">' + fmt(item.value) + '</div>';
+    '<div class="prize-won-val">' + fmtV(item) + '</div>';
   wrap.appendChild(card);
 
   // Update pity display
@@ -10903,6 +11348,13 @@ function revealPrize(item, num) {
     if (label) label.textContent = '🎉 Всі призи відкрито!';
     setTimeout(() => {
       document.getElementById('mboxCollectWrap').style.display = 'block';
+      // Insurance: show if all prizes are common/rare and not lucky spin
+      if (!isLuckySpin) {
+        const allLow = mboxWonPrizes.every(p => INSURANCE_RARITIES.includes(p.rarity));
+        if (allLow) {
+          showInsuranceBlock('mbox', 'mboxInsuranceBlock', 'mboxInsuranceTry', 'mboxInsuranceBtn', 'common');
+        }
+      }
     }, 500);
   }
 }
@@ -11283,12 +11735,12 @@ function renderServiceTab() {
       actionsHTML = '<button disabled style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(34,211,238,.3);background:rgba(34,211,238,.08);color:#22d3ee;font-size:12px;cursor:not-allowed;opacity:.6;">⏳ Ремонтується…</button>';
 
     } else if (it.repaired) {
-      const salePrice = getLoyaltyFinalPrice(it.value);
+      const salePrice = getLoyaltyFinalPrice(getDisplayValue(it));
       progressHTML = '<div style="margin:4px 0 8px;"><span style="font-size:11px;color:#4ade80;font-weight:700;">✅ Ремонт завершено! Стан: 100%</span></div>';
       actionsHTML = '<button onclick="moveToSalon(\'' + it.id + '\')" style="flex:1;padding:8px 6px;border-radius:8px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.1);color:#f5c842;font-size:12px;font-weight:700;cursor:pointer;">🚗 В автосалон</button>';
 
     } else {
-      const sellPrice   = Math.round(it.value * (it.condition / 100));
+      const sellPrice   = Math.round(getDisplayValue(it) * (it.condition / 100));
       const repairCost  = calcRepairCost(it);
       const baseCost    = calcBaseRepairCost(it);
       const discount    = getRepairDiscount();
@@ -11307,7 +11759,7 @@ function renderServiceTab() {
         '<span style="font-size:26px;">' + it.emoji + '</span>' +
         '<div style="flex:1;">' +
           '<div style="font-weight:700;font-size:14px;color:' + rc + ';">' + it.name + '</div>' +
-          '<div style="font-size:11px;color:var(--muted);">' + it.rarity + ' • ' + fmt(it.value) + ' ринкова</div>' +
+          '<div style="font-size:11px;color:var(--muted);">' + it.rarity + ' • ' + fmtV(it) + ' ринкова</div>' +
         '</div>' +
         (!it.repaired && !it.repairing ? condBadge(it.condition) : '') +
       '</div>' +
@@ -11323,7 +11775,7 @@ function sellAsIs(id) {
   if (idx < 0) return;
   const it   = state.serviceItems[idx];
   if (it.repairing) { showToast('⏳ Зачекай завершення ремонту!'); return; }
-  const price = Math.round(it.value * (it.condition / 100));
+  const price = Math.round(getDisplayValue(it) * (it.condition / 100));
   state.balance     += price;
   state.totalEarned += price;
   state.serviceItems.splice(idx, 1);
@@ -11373,7 +11825,7 @@ function collectAll() {
   let totalEarned = 0;
   let count = 0;
   ready.forEach(it => {
-    const price = getLoyaltyFinalPrice(it.value);
+    const price = getLoyaltyFinalPrice(getDisplayValue(it));
     state.balance     += price;
     state.totalEarned += price;
     state.totalCarsSold = (state.totalCarsSold || 0) + 1;
@@ -11621,7 +12073,7 @@ function renderSalonTab() {
   state.salonItems.forEach(it => {
     const card = document.createElement('div');
     const rc   = rarityColor(it.rarity);
-    const salePrice    = getLoyaltyFinalPrice(it.value);
+    const salePrice    = getLoyaltyFinalPrice(getDisplayValue(it));
     const loyaltyBonus = getLoyaltyBonus();
     let actionsHTML = '';
 
@@ -11653,7 +12105,7 @@ function renderSalonTab() {
           '<div style="font-size:11px;color:var(--muted);">' + it.rarity + ' • 💎 100% стан</div>' +
         '</div>' +
         '<div style="text-align:right;">' +
-          '<div style="font-size:12px;color:var(--muted);text-decoration:line-through;">' + fmtCapital(it.value) + '</div>' +
+          '<div style="font-size:12px;color:var(--muted);text-decoration:line-through;">' + fmtCapitalV(it) + '</div>' +
           '<div style="font-size:15px;font-weight:800;color:#f5c842;">' + fmtCapital(salePrice) + (loyaltyBonus > 0 ? ' <span style="font-size:10px;color:#4ade80;font-family:sans-serif;">+' + loyaltyBonus + '%</span>' : '') + '</div>' +
         '</div>' +
       '</div>' +
@@ -11681,8 +12133,8 @@ function collectSale(id) {
   if (idx < 0) return;
   const it = state.salonItems[idx];
   if (!it.saleReady) { showToast('❌ Ще не проданий!'); return; }
-  const price = getLoyaltyFinalPrice(it.value);
-  const base  = it.value * 2;
+  const price = getLoyaltyFinalPrice(getDisplayValue(it));
+  const base  = getDisplayValue(it) * 2;
   const bonus = getLoyaltyBonus();
   state.balance       += price;
   state.totalEarned   += price;
@@ -12757,7 +13209,7 @@ function openHangarPreview(hangarId) {
       div.innerHTML =
         '<span class="pi-emoji">' + (ITEM_IMAGES[it.emoji] ? itemDisplay(it.emoji, 30) : '<span style="font-size:22px;line-height:1">' + it.emoji + '</span>') + '</span>' +
         '<span class="pi-name">' + it.name + '</span>' +
-        '<span class="pi-val">' + fmtCapital(it.value) + '</span>';
+        '<span class="pi-val">' + fmtCapitalV(it) + '</span>';
       list.appendChild(div);
     });
   });
@@ -12819,8 +13271,10 @@ let devHangarLegBoost = false; // +50% legendary chance toggle
 function openHangar(hangarId) {
   const h = HANGARS.find(x => x.id === hangarId);
   if (!h) return;
-  if (state.balance < h.price) { showToast('❌ Недостатньо коштів!'); return; }
-  state.balance -= h.price;
+  if (!_insuranceFreeSpin && state.balance < h.price) { showToast('❌ Недостатньо коштів!'); return; }
+  window._lastHangarId = hangarId;
+  if (!_insuranceFreeSpin) resetInsurance('hangar');
+  if (!_insuranceFreeSpin) state.balance -= h.price;
   if (typeof maybeRecordFirstHangar === 'function') maybeRecordFirstHangar(h.name);
   state.stats.casesOpened++;
   updateHUD(); saveState();
@@ -13030,7 +13484,7 @@ function playHangarStandard(h, item) {
       <div style="font-size:74px;margin-bottom:10px;line-height:1;">${item.emoji}</div>
       <div style="font-size:10px;font-weight:800;color:${rc};letter-spacing:2.5px;text-transform:uppercase;margin-bottom:4px;">${rNames[item.rarity]}</div>
       <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:7px;line-height:1.3;">${item.name}</div>
-      <div style="font-size:22px;font-weight:800;color:var(--gold);">${fmtCapital(item.value)}</div>
+      <div style="font-size:22px;font-weight:800;color:var(--gold);">${fmtCapitalV(item)}</div>
       <div style="font-size:10px;color:var(--muted);margin:3px 0 16px;">ринкова вартість</div>
       <div id="sg-btns" style="display:flex;gap:10px;opacity:0;transition:opacity .5s;">
         <button onclick="keepHangarResult()" style="flex:1;padding:12px;border-radius:10px;border:none;
@@ -13039,6 +13493,11 @@ function playHangarStandard(h, item) {
         <button onclick="sellHangarResult()" style="flex:1;padding:12px;border-radius:10px;border:none;
           background:linear-gradient(135deg,#f5c842,#f97316);color:#000;
           font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">💸 Продати</button>
+      </div>
+      <div class="insurance-block" id="hangarInsuranceBlock" style="display:none;margin-top:10px;">
+        <div class="insurance-label">🛡️ Insurance</div>
+        <div class="insurance-counter">Залишилось: <span id="hangarInsuranceTry">3</span>/3</div>
+        <button class="btn-insurance" id="hangarInsuranceBtn" onclick="tryInsurance('hangar')"></button>
       </div>
     </div>`;
 
@@ -13074,6 +13533,10 @@ function playHangarStandard(h, item) {
     setTimeout(() => {
       const btns = document.getElementById('sg-btns');
       if (btns) btns.style.opacity = '1';
+      // Insurance
+      if (hangarResult) {
+        showInsuranceBlock('hangar', 'hangarInsuranceBlock', 'hangarInsuranceTry', 'hangarInsuranceBtn', hangarResult.item.rarity);
+      }
       renderHangars();
     }, 2600);
   });
@@ -13156,7 +13619,7 @@ function playHangarLegendary(h, item) {
       <div style="font-size:80px;margin-bottom:12px;position:relative;">${item.emoji}</div>
       <div style="font-size:11px;font-weight:800;color:#f5c842;letter-spacing:3px;text-transform:uppercase;margin-bottom:7px;">⚡ LEGENDARY ⚡</div>
       <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:9px;line-height:1.3;">${item.name}</div>
-      <div style="font-size:26px;font-weight:800;color:#f5c842;">${fmtCapital(item.value)}</div>
+      <div style="font-size:26px;font-weight:800;color:#f5c842;">${fmtCapitalV(item)}</div>
       <div style="font-size:10px;color:var(--muted);margin:4px 0 18px;">ринкова вартість</div>
       <div id="lg-btns" style="display:flex;gap:10px;opacity:0;transition:opacity .7s;">
         <button onclick="keepHangarResult()" style="flex:1;padding:13px;border-radius:12px;
@@ -13224,7 +13687,7 @@ function keepHangarResult() {
     if (state.terminalFleet.length >= state.terminalFleetLimit) {
       // Fleet full — sell at market price
       state.balance += item.value; state.totalEarned += item.value; state.stats.itemsSold++;
-      showToast('⚠️ Ангарний парк повний! ' + item.name + ' продано за ' + fmtCapital(item.value));
+      showToast('⚠️ Ангарний парк повний! ' + item.name + ' продано за ' + fmtCapitalV(item));
     } else {
       state.terminalFleet.unshift({
         id: Date.now() + Math.random(),
@@ -13256,8 +13719,9 @@ function keepHangarResult() {
 function sellHangarResult() {
   if (!hangarResult) return;
   const { item } = hangarResult;
-  state.balance += item.value; state.totalEarned += item.value; state.stats.itemsSold++;
-  showToast('💸 Продано за ' + fmtCapital(item.value), 'gold');
+  const sv = getDisplayValue(item);
+  state.balance += sv; state.totalEarned += sv; state.stats.itemsSold++;
+  showToast('💸 Продано за ' + fmtCapitalV(item), 'gold');
   hangarResult = null;
   updateHUD(); saveState();
   closeHangarModal();
@@ -13442,7 +13906,7 @@ function renderTerminalFleet() {
       const canRent = getActiveRentals() < (state.terminalRentSlots || 1);
       actionHTML =
         '<div style="display:flex;gap:8px;margin-top:10px;">' +
-          '<button onclick="sellTerminalItem(\'' + it.id + '\')" style="flex:1;padding:10px;border-radius:9px;border:none;background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.04));color:var(--text);font-weight:700;font-size:13px;cursor:pointer;border:1px solid rgba(255,255,255,.1);">💸 Продати<br><span style="font-size:12px;color:var(--gold);">' + fmtCapital(it.value) + '</span></button>' +
+          '<button onclick="sellTerminalItem(\'' + it.id + '\')" style="flex:1;padding:10px;border-radius:9px;border:none;background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.04));color:var(--text);font-weight:700;font-size:13px;cursor:pointer;border:1px solid rgba(255,255,255,.1);">💸 Продати<br><span style="font-size:12px;color:var(--gold);">' + fmtCapitalV(it) + '</span></button>' +
           '<button onclick="rentTerminalItem(\'' + it.id + '\')" ' + (canRent ? '' : 'disabled') + ' style="flex:1;padding:10px;border-radius:9px;border:none;background:' + (canRent ? 'linear-gradient(135deg,#f5c842,#f97316);color:#000;cursor:pointer;' : 'rgba(255,255,255,.06);color:var(--muted);cursor:not-allowed;') + 'font-weight:800;font-size:13px;">🤝 Здати<br><span style="font-size:11px;">x2 за 24год</span></button>' +
         '</div>';
     }
@@ -13452,7 +13916,7 @@ function renderTerminalFleet() {
         '<span style="font-size:34px;flex-shrink:0;">' + it.emoji + '</span>' +
         '<div style="flex:1;min-width:0;">' +
           '<div style="font-size:13px;font-weight:800;color:' + rc + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + it.name + '</div>' +
-          '<div style="font-size:10px;color:var(--muted);">' + (it.fromHangar || '') + ' · ' + fmtCapital(it.value) + '</div>' +
+          '<div style="font-size:10px;color:var(--muted);">' + (it.fromHangar || '') + ' · ' + fmtCapitalV(it) + '</div>' +
           (it.renting ? '<div style="font-size:10px;color:#f5c842;font-weight:700;margin-top:2px;">🟡 В ОРЕНДІ</div>' : '') +
         '</div>' +
       '</div>' +
@@ -13469,17 +13933,13 @@ function sellTerminalItem(id) {
   const it  = state.terminalFleet[idx];
   const now = Date.now();
 
-  let price = it.value;
+  let price = getDisplayValue(it);
   let msg   = '💸 Продано за ' + fmtCapital(price);
 
   if (it.renting) {
-    // it.earned is already fully accumulated (tick adds each second, offline adds on load)
-    // it.condition is already updated by tick each second
     const earned    = Math.round(it.earned || 0);
     const condition = it.condition !== undefined ? it.condition : 100;
-    // Collect accumulated rent (already credited to balance via tick/offline — DON'T add again)
-    // Sell at condition price only
-    price = Math.round(it.value * (condition / 100));
+    price = Math.round(getDisplayValue(it) * (condition / 100));
     state.balance     += price;
     state.totalEarned += price;
     msg = '💸 Зароблено: ' + fmtCapital(earned) + ' + продаж: ' + fmtCapital(price);
@@ -13807,6 +14267,22 @@ function updateNameConfirmBtn(val) {
     bar.style.width = pct + '%';
     if (pctText) pctText.textContent = pct + '%';
     if (loaded >= total) {
+      // Preload відео контейнерів у фоні щоб не було затримки при відкритті
+      [
+        'https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/container_urban_micro.mp4',
+        'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_street_classics_video.mp4',
+        'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_hyper_track.mp4',
+        'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_ultimate_collection.mp4',
+        'https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/container_business_class.mp4',
+      ].forEach(function(src) {
+        var v = document.createElement('video');
+        v.preload = 'auto';
+        v.src = src;
+        v.muted = true;
+        v.style.display = 'none';
+        document.body.appendChild(v);
+        v.load();
+      });
       setTimeout(() => {
         splash.style.animation = 'splashFadeOut 0.7s ease-out forwards';
         setTimeout(() => { splash.style.display = 'none'; }, 720);
@@ -13838,6 +14314,410 @@ function updateNameConfirmBtn(val) {
 })();
 
 
+
+
+
+
+
+// ══════════════════════════════════════════════════════════
+// DONATE SHOP SYSTEM
+// ══════════════════════════════════════════════════════════
+
+const DONATE_PACKS = [
+  { id:'pouch',    name:'Pouch of Credits', icon:'👝', gc:250,  price:'1.99€',  badge:null },
+  { id:'box',      name:'Box of Credits',   icon:'📦', gc:750,  price:'4.99€',  badge:'ПОПУЛЯРНО', badgeCls:'badge-popular' },
+  { id:'suitcase', name:'Suitcase of Credits', icon:'🧳', gc:2000, price:'11.99€', badge:'ВИГІДНО',    badgeCls:'badge-value' },
+  { id:'vault',    name:'Vault of Credits', icon:'🏦', gc:5000, price:'24.99€', badge:'НАЙКРАЩА ЦІНА', badgeCls:'badge-best' },
+];
+
+const PREMIUM_ITEMS = [
+  { id:'noAds',    name:'NO ADS',       icon:'🚫',
+    desc:'Всі бонуси зараховуються миттєво — без реклами',
+    price:'9.99€',  owned: () => state.premiumOwned.noAds },
+  { id:'vip',      name:'VIP STATUS',   icon:'⭐',
+    desc:'+10% до кліків, пасиву та продажів назавжди',
+    price:'4.99€',  owned: () => state.premiumOwned.vip || state.premiumOwned.vipPlus },
+  { id:'vipPlus',  name:'VIP+ STATUS',  icon:'👑',
+    desc:'+30% до кліків, пасиву та продажів назавжди',
+    price:'12.99€', owned: () => state.premiumOwned.vipPlus },
+  { id:'ultimate', name:'ULTIMATE PACK', icon:'🔥',
+    desc:'No Ads + VIP+ Status — найкращий вибір!',
+    price:'19.99€', owned: () => state.premiumOwned.noAds && state.premiumOwned.vipPlus },
+];
+
+// VIP multiplier helper
+function getVipMult() {
+  if (!state.premiumOwned) return 1;
+  if (state.premiumOwned.vipPlus) return 1.3;
+  if (state.premiumOwned.vip)     return 1.1;
+  return 1;
+}
+// Full market value with all bonuses (VIP + collection sell bonuses)
+function getDisplayValue(item) {
+  return getSellValue(item);
+}
+// fmt + full market value (VIP + collection sell bonuses) — use for all price display
+function fmtV(item)        { return fmt(getSellValue(item)); }
+function fmtCapitalV(item) { return fmtCapital(getSellValue(item)); }
+
+// Pending purchase context
+let _dshopPending = null;
+let _dshopTimerInt = null;
+
+function openDonateShop() {
+  renderDonateShopPremium();
+  document.getElementById('donateShopModal').classList.add('open');
+}
+function closeDonateShop() {
+  document.getElementById('donateShopModal').classList.remove('open');
+}
+
+function renderDonateShopPremium() {
+  const list = document.getElementById('dshopPremiumList');
+  if (!list) return;
+  list.innerHTML = '';
+  PREMIUM_ITEMS.forEach(item => {
+    const owned = item.owned();
+    const div = document.createElement('div');
+    div.className = 'dshop-premium-item' + (owned ? ' owned' : '');
+    if (!owned) div.onclick = () => initiatePurchase(item.id);
+    div.innerHTML =
+      '<div class="dshop-prem-icon">' + item.icon + '</div>' +
+      '<div class="dshop-prem-info">' +
+        '<div class="dshop-prem-name">' + item.name + '</div>' +
+        '<div class="dshop-prem-desc">' + item.desc + '</div>' +
+      '</div>' +
+      (owned
+        ? '<div class="dshop-prem-owned">✅ Куплено</div>'
+        : '<div class="dshop-prem-price">' + item.price + '</div>');
+    list.appendChild(div);
+  });
+}
+
+function initiatePurchase(packId) {
+  // Find item across packs and premium
+  const pack = DONATE_PACKS.find(p => p.id === packId);
+  const prem = PREMIUM_ITEMS.find(p => p.id === packId);
+  const item = pack || prem;
+  if (!item) return;
+
+  // Check already owned
+  if (prem && prem.owned()) {
+    showToast('✅ Ви вже маєте ' + item.name + '!'); return;
+  }
+
+  _dshopPending = item;
+  const modal = document.getElementById('dshopPayModal');
+  document.getElementById('dshopPayTitle').textContent = pack ? '💳 ОПЛАТА' : '👑 ПРЕМІУМ ПОКУПКА';
+  document.getElementById('dshopPayItem').innerHTML =
+    '<b>' + item.icon + ' ' + item.name + '</b>' +
+    (pack ? '<br><span style="color:#fbbf24;font-family:\'Orbitron\',sans-serif;">' + pack.gc.toLocaleString() + ' 💎</span>' : '') +
+    '<br><span style="color:rgba(255,255,255,.5);">' + item.price + '</span>';
+
+  // Reset stages
+  document.getElementById('dshopPayStage1').style.display = 'block';
+  document.getElementById('dshopPayStage2').style.display = 'none';
+  document.getElementById('dshopPayYesBtn').disabled = true;
+  document.getElementById('dshopPayBarFill').style.width = '0%';
+  modal.classList.add('open');
+
+  // 5-second countdown before confirm available
+  let sec = 5;
+  document.getElementById('dshopPayTimer').textContent = sec;
+  if (_dshopTimerInt) clearInterval(_dshopTimerInt);
+  _dshopTimerInt = setInterval(() => {
+    sec--;
+    document.getElementById('dshopPayTimer').textContent = sec;
+    document.getElementById('dshopPayBarFill').style.width = ((5 - sec) / 5 * 100) + '%';
+    if (sec <= 0) {
+      clearInterval(_dshopTimerInt);
+      document.getElementById('dshopPayYesBtn').disabled = false;
+      document.getElementById('dshopPayYesBtn').textContent = '✓ Підтвердити платіж';
+    }
+  }, 1000);
+}
+
+function confirmDonatePayment() {
+  if (!_dshopPending) return;
+  clearInterval(_dshopTimerInt);
+  document.getElementById('dshopPayStage1').style.display = 'none';
+  document.getElementById('dshopPayStage2').style.display = 'block';
+  document.getElementById('dshopPayBarFill2').style.width = '0%';
+
+  let sec = 5;
+  document.getElementById('dshopPayTimer2').textContent = sec;
+  _dshopTimerInt = setInterval(() => {
+    sec--;
+    document.getElementById('dshopPayTimer2').textContent = sec;
+    document.getElementById('dshopPayBarFill2').style.width = ((5 - sec) / 5 * 100) + '%';
+    if (sec <= 0) {
+      clearInterval(_dshopTimerInt);
+      applyDonateReward(_dshopPending);
+    }
+  }, 1000);
+}
+
+function cancelDonatePayment() {
+  clearInterval(_dshopTimerInt);
+  _dshopPending = null;
+  document.getElementById('dshopPayModal').classList.remove('open');
+  showToast('❌ Транзакцію скасовано', '#ef4444', 2500);
+}
+
+function applyDonateReward(item) {
+  document.getElementById('dshopPayModal').classList.remove('open');
+  const pack = DONATE_PACKS.find(p => p.id === item.id);
+
+  if (pack) {
+    addGoldCredits(pack.gc);
+    showToast('💎 +' + pack.gc.toLocaleString() + ' Gold Credits зараховано!', '#fbbf24', 3500);
+  } else {
+    // Premium item
+    switch (item.id) {
+      case 'noAds':
+        state.premiumOwned.noAds = true;
+        showToast('🚫 No Ads активовано назавжди!', '#4ade80', 4000);
+        break;
+      case 'vip':
+        state.premiumOwned.vip = true;
+        showToast('⭐ VIP Status активовано! +10% до всіх доходів', '#fbbf24', 4000);
+        break;
+      case 'vipPlus':
+        state.premiumOwned.vipPlus = true;
+        showToast('👑 VIP+ Status активовано! +30% до всіх доходів', '#c084fc', 4000);
+        break;
+      case 'ultimate':
+        state.premiumOwned.noAds   = true;
+        state.premiumOwned.vipPlus = true;
+        showToast('🔥 Ultimate Pack активовано! No Ads + VIP+', '#f97316', 4000);
+        break;
+    }
+    saveState();
+    updateHUD();
+    renderDonateShopPremium();
+    spawnConfetti && spawnConfetti(50, ['#fbbf24','#c084fc','#4ade80','#fff']);
+  }
+  _dshopPending = null;
+}
+
+// ══════════════════════════════════════════════════════════
+// GOLD CREDITS SYSTEM
+// ══════════════════════════════════════════════════════════
+
+function addGoldCredits(amount) {
+  state.goldCredits = (state.goldCredits || 0) + amount;
+  updateGCHud();
+  saveState();
+}
+
+function updateGCHud() {
+  const el = document.getElementById('gcHudAmount');
+  if (el) {
+    el.textContent = (state.goldCredits || 0).toLocaleString();
+    const chip = document.getElementById('gcHudChip');
+    if (chip) {
+      chip.classList.remove('pop');
+      void chip.offsetWidth;
+      chip.classList.add('pop');
+      setTimeout(() => chip.classList.remove('pop'), 400);
+    }  }
+}
+
+// ── Daily Streak helpers ──────────────────────────────────
+function getTodayDateStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function canClaimToday() {
+  const ds = state.dailyStreak;
+  return ds.lastClaim !== getTodayDateStr();
+}
+
+function getNextClaimableDay() {
+  // Returns 0-indexed day (0=day1) that player should claim next
+  const ds = state.dailyStreak;
+  // Find first unclaimed day in 0..29
+  for (let i = 0; i < 30; i++) {
+    if (!ds.claimedDays[i]) return i;
+  }
+  return -1; // all claimed
+}
+
+function openDailyStreak() {
+  renderDailyStreakModal();
+  document.getElementById('dailyStreakModal').classList.add('open');
+}
+
+function closeDailyStreak() {
+  document.getElementById('dailyStreakModal').classList.remove('open');
+}
+
+function renderDailyStreakModal() {
+  const ds = state.dailyStreak;
+  const today = getTodayDateStr();
+  const alreadyClaimed = ds.lastClaim === today;
+  const nextIdx = getNextClaimableDay(); // 0-indexed
+
+  // Grid
+  const grid = document.getElementById('dsGrid');
+  grid.innerHTML = '';
+  DAILY_REWARDS.forEach((r, i) => {
+    const div = document.createElement('div');
+    const isClaimed = !!ds.claimedDays[i];
+    const isToday   = !alreadyClaimed && i === nextIdx;
+    let cls = 'ds-day';
+    if (isClaimed) cls += ' claimed';
+    else if (isToday) cls += ' today';
+    if (r.type === 'weekly') cls += ' bonus';
+    if (r.type === 'big')    cls += ' bonus';
+    if (r.type === 'elite')  cls += ' bonus';
+    if (r.type === 'jackpot') cls += ' jackpot';
+    div.className = cls;
+    div.innerHTML =
+      '<div class="ds-day-num">День ' + r.day + '</div>' +
+      '<div class="ds-day-icon">' + DAILY_TYPE_ICONS[r.type] + '</div>' +
+      '<div class="ds-day-amount">' + r.gc + '</div>';
+    grid.appendChild(div);
+  });
+
+  // Subtitle
+  const sub = document.getElementById('dsSubtitle');
+  if (nextIdx === -1) {
+    sub.textContent = '🎉 Всі 30 днів зібрано! Новий місяць скоро.';
+  } else if (alreadyClaimed) {
+    sub.textContent = '✅ Сьогодні вже отримано. Повертайся завтра!';
+  } else {
+    sub.textContent = 'День ' + (nextIdx+1) + ' з 30 · Твоя нагорода: ' + DAILY_REWARDS[nextIdx].gc + ' 💎';
+  }
+
+  // Buttons
+  const claimBtn = document.getElementById('dsClaimBtn');
+  const watchBtn = document.getElementById('dsWatchBtn');
+
+  if (!alreadyClaimed && nextIdx !== -1) {
+    claimBtn.disabled = false;
+    claimBtn.textContent = '💎 ЗАБРАТИ ' + DAILY_REWARDS[nextIdx].gc + ' GOLD CREDITS';
+    watchBtn.style.display = 'none';
+  } else if (alreadyClaimed) {
+    claimBtn.disabled = true;
+    claimBtn.textContent = '✅ Вже отримано сьогодні';
+    // Show watch-ad button for any missed days
+    const hasMissed = DAILY_REWARDS.some((r, i) => !ds.claimedDays[i] && i < nextIdx);
+    watchBtn.style.display = hasMissed ? 'block' : 'none';
+  } else {
+    claimBtn.disabled = true;
+    claimBtn.textContent = '✅ Всі 30 днів зібрано!';
+    watchBtn.style.display = 'none';
+  }
+}
+
+function claimDailyReward(watchAd) {
+  const ds = state.dailyStreak;
+
+  if (watchAd) {
+    // Find first missed day
+    const missedIdx = DAILY_REWARDS.findIndex((r, i) => !ds.claimedDays[i]);
+    if (missedIdx === -1) return;
+    // Simulate watching ad
+    showToast('📺 Дивимось рекламу...');
+    setTimeout(() => {
+      ds.claimedDays[missedIdx] = true;
+      addGoldCredits(DAILY_REWARDS[missedIdx].gc);
+      showToast('💎 +' + DAILY_REWARDS[missedIdx].gc + ' Gold Credits за перегляд!');
+      saveState();
+      renderDailyStreakModal();
+    }, 1500);
+    return;
+  }
+
+  if (ds.lastClaim === getTodayDateStr()) return;
+  const idx = getNextClaimableDay();
+  if (idx === -1) return;
+
+  ds.claimedDays[idx] = true;
+  ds.lastClaim = getTodayDateStr();
+  ds.day = idx + 1;
+  addGoldCredits(DAILY_REWARDS[idx].gc);
+  showToast('💎 +' + DAILY_REWARDS[idx].gc + ' Gold Credits! День ' + (idx+1) + ' з 30');
+  saveState();
+  renderDailyStreakModal();
+
+  // Спецефект для великих бонусів
+  if (DAILY_REWARDS[idx].gc >= 50) {
+    spawnConfetti && spawnConfetti(40, ['#fbbf24','#fde68a','#f59e0b','#fff']);
+  }
+}
+
+// ── Auto-show Daily Streak once after midnight ─────────────
+(function checkDailyStreakOnLoad() {
+  setTimeout(() => {
+    if (!state.dailyStreak) return;
+    if (canClaimToday() && getNextClaimableDay() !== -1) {
+      openDailyStreak();
+    }
+  }, 2000); // Показати через 2с після старту гри
+})();
+
+// ── Achievement Gold Credits rewards ─────────────────────
+function renderAchievementsWithGC() {
+  const container = document.getElementById('achievementsSection');
+  if (!container) return;
+  const cap = calcCapital();
+  container.innerHTML = '';
+
+  CAPITAL_ACHIEVEMENTS.forEach(ach => {
+    const done    = !!state.capitalAchievements[ach.id];
+    const pct     = Math.min(100, (cap.total / ach.threshold) * 100);
+    const gcReward = ACH_GC_REWARDS[ach.id] || 0;
+    const gcClaimed = !!(state.achGoldClaimed && state.achGoldClaimed[ach.id]);
+
+    const card = document.createElement('div');
+    card.className = 'ach-card' + (done ? ' ach-done' : '');
+    card.innerHTML =
+      '<div class="ach-icon' + (done ? ' ach-icon-done' : '') + '">' + ach.icon + '</div>' +
+      '<div class="ach-body">' +
+        '<div class="ach-title">' + ach.title + '</div>' +
+        '<div class="ach-desc">' + ach.desc + '</div>' +
+        (!done ?
+          '<div class="ach-progress-wrap">' +
+            '<div class="ach-progress-bar"><div class="ach-progress-fill" style="width:' + pct.toFixed(1) + '%"></div></div>' +
+            '<div class="ach-pct">' + fmtCapital(cap.total) + ' / ' + fmtCapital(ach.threshold) + '</div>' +
+          '</div>'
+        : '') +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">' +
+        '<div class="ach-badge' + (done ? ' ach-badge-done' : ' ach-badge-locked') + '">' +
+          (done ? '✅ Виконано' : '🔒 Заблоковано') +
+        '</div>' +
+        (done && gcReward > 0 ?
+          gcClaimed
+            ? '<div style="font-size:10px;color:rgba(251,191,36,.5);font-weight:700;">💎 ' + gcReward + ' GC отримано</div>'
+            : '<button onclick="claimAchGC(\'' + ach.id + '\')" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(251,191,36,.5);background:rgba(251,191,36,.12);color:#fbbf24;font-size:11px;font-weight:800;cursor:pointer;font-family:Rajdhani,sans-serif;">💎 +' + gcReward + ' GC</button>'
+          : '') +
+      '</div>';
+    container.appendChild(card);
+  });
+}
+
+function claimAchGC(achId) {
+  if (!state.capitalAchievements[achId]) return;
+  if (state.achGoldClaimed && state.achGoldClaimed[achId]) return;
+  if (!state.achGoldClaimed) state.achGoldClaimed = {};
+  const reward = ACH_GC_REWARDS[achId] || 0;
+  state.achGoldClaimed[achId] = true;
+  addGoldCredits(reward);
+  showToast('💎 +' + reward + ' Gold Credits!');
+  renderAchievementsWithGC();
+}
+
+function claimCollectionGC(caseId) {
+  if (state.collGoldClaimed && state.collGoldClaimed[caseId]) return;
+  if (!state.collGoldClaimed) state.collGoldClaimed = {};
+  state.collGoldClaimed[caseId] = true;
+  addGoldCredits(COLL_GC_REWARD);
+  showToast('💎 +' + COLL_GC_REWARD + ' Gold Credits за колекцію!');
+}
 
 function imgRetry(el) {
   el._retries = (el._retries || 0) + 1;
@@ -13938,6 +14818,12 @@ function imgRetry(el) {
 
     <!-- Collect all button (hidden until all 3 prizes revealed) -->
     <div id="mboxCollectWrap" style="display:none;width:100%;margin-top:16px;">
+      <!-- Insurance block for mbox -->
+      <div class="insurance-block" id="mboxInsuranceBlock" style="display:none;margin-bottom:10px;">
+        <div class="insurance-label">🛡️ Insurance</div>
+        <div class="insurance-counter">Залишилось: <span id="mboxInsuranceTry">3</span>/3</div>
+        <button class="btn-insurance" id="mboxInsuranceBtn" onclick="tryInsurance('mbox')"></button>
+      </div>
       <button onclick="collectAllMboxPrizes()" style="width:100%;padding:16px;border-radius:12px;border:none;cursor:pointer;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--gold),#f97316);color:#000;letter-spacing:1px;box-shadow:0 4px 20px rgba(245,200,66,0.3);">
         🎁 ЗАБРАТИ ВСІ НА СКЛАД
       </button>
@@ -14305,7 +15191,7 @@ function showBonusCard(bonus) {
     <div class="bonus-icon">${bonus.icon}</div>
     <div class="bonus-title">${bonus.title}</div>
     <div class="bonus-desc">${bonus.desc}</div>
-    <button class="bonus-watch" onclick="watchAdForBonus('${bonus.id}')">📺 Дивитись рекламу</button>
+    <button class="bonus-watch" onclick="watchAdForBonus('${bonus.id}')">${(state.premiumOwned && state.premiumOwned.noAds) ? '⚡ Забрати бонус' : '📺 Дивитись рекламу'}</button>
     <div class="bonus-timer" id="btimer_${bonus.id}" style="width:100%"></div>
   `;
   panel.appendChild(card);
@@ -14342,6 +15228,24 @@ function dismissBonusCard(bonusId) {
 
 // ── Перегляд реклами ──
 function watchAdForBonus(bonusId) {
+  // No Ads — миттєве отримання без реклами
+  if (state.premiumOwned && (state.premiumOwned.noAds || (state.premiumOwned.vipPlus && state.premiumOwned.noAds))) {
+    dismissBonusCard(bonusId);
+    const bonus = AD_BONUSES.find(b => b.id === bonusId);
+    if (!bonus) return;
+    adState.currentBonus = bonus;
+    if (bonus.id === 'x5case') {
+      adState.x5Uses = 3;
+      showToast('⚡ X5 активовано! (No Ads)', '#a78bfa', 3000);
+      updateAdHUD();
+      if (typeof renderCases === 'function') renderCases();
+    } else {
+      bonus.apply();
+      showToast(`${bonus.icon} ${bonus.title} — No Ads!`, bonus.accentColor, 3000);
+      startBonusCountdown(bonus);
+    }
+    return;
+  }
   dismissBonusCard(bonusId);
   const bonus = AD_BONUSES.find(b => b.id === bonusId);
   adState.currentBonus = bonus;
@@ -14532,5 +15436,89 @@ if (typeof showToast !== 'function') {
   };
 }
 </script>
+
+<!-- ===== DONATE SHOP MODAL ===== -->
+<div id="donateShopModal">
+  <div class="dshop-card">
+    <button class="ds-close-btn" onclick="closeDonateShop()">✕</button>
+    <div class="dshop-header">
+      <div style="font-size:36px;margin-bottom:6px;">💎</div>
+      <div class="dshop-title">GOLD CREDITS SHOP</div>
+      <div class="dshop-subtitle">Преміум валюта Mystery Boxes</div>
+    </div>
+
+    <!-- Credit Packs -->
+    <div class="dshop-section-label">💰 Набори Gold Credits</div>
+    <div class="dshop-packs">
+      <div class="dshop-pack" onclick="initiatePurchase('pouch')">
+        <div class="dshop-pack-icon">👝</div>
+        <div class="dshop-pack-name">Pouch of Credits</div>
+        <div class="dshop-pack-gc">250 💎</div>
+        <div class="dshop-pack-price">1.99€</div>
+      </div>
+      <div class="dshop-pack popular" onclick="initiatePurchase('box')">
+        <div class="dshop-pack-badge badge-popular">ПОПУЛЯРНО</div>
+        <div class="dshop-pack-icon">📦</div>
+        <div class="dshop-pack-name">Box of Credits</div>
+        <div class="dshop-pack-gc">750 💎</div>
+        <div class="dshop-pack-price">4.99€</div>
+      </div>
+      <div class="dshop-pack value" onclick="initiatePurchase('suitcase')">
+        <div class="dshop-pack-badge badge-value">ВИГІДНО</div>
+        <div class="dshop-pack-icon">🧳</div>
+        <div class="dshop-pack-name">Suitcase of Credits</div>
+        <div class="dshop-pack-gc">2,000 💎</div>
+        <div class="dshop-pack-price">11.99€</div>
+      </div>
+      <div class="dshop-pack best" onclick="initiatePurchase('vault')">
+        <div class="dshop-pack-badge badge-best">НАЙКРАЩА ЦІНА</div>
+        <div class="dshop-pack-icon">🏦</div>
+        <div class="dshop-pack-name">Vault of Credits</div>
+        <div class="dshop-pack-gc">5,000 💎</div>
+        <div class="dshop-pack-price">24.99€</div>
+      </div>
+    </div>
+
+    <!-- Premium -->
+    <div class="dshop-section-label">👑 Преміум статуси</div>
+    <div class="dshop-premium-list" id="dshopPremiumList"></div>
+  </div>
+</div>
+
+<!-- ===== PAYMENT CONFIRM MODAL ===== -->
+<div id="dshopPayModal">
+  <div class="dshop-pay-card">
+    <div class="dshop-pay-title" id="dshopPayTitle">ПІДТВЕРДЖЕННЯ ОПЛАТИ</div>
+    <div class="dshop-pay-item" id="dshopPayItem"></div>
+    <div id="dshopPayStage1">
+      <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:16px;">Підготовка платежу...</div>
+      <div class="dshop-pay-timer" id="dshopPayTimer">5</div>
+      <div class="dshop-pay-bar"><div class="dshop-pay-bar-fill" id="dshopPayBarFill" style="width:0%"></div></div>
+      <div class="dshop-pay-btns">
+        <button class="dshop-pay-yes" id="dshopPayYesBtn" disabled onclick="confirmDonatePayment()">✓ Підтвердити</button>
+        <button class="dshop-pay-no" onclick="cancelDonatePayment()">✕ Скасувати</button>
+      </div>
+    </div>
+    <div id="dshopPayStage2" style="display:none;">
+      <div style="font-size:32px;margin:10px 0;">⏳</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);">Обробка транзакції...</div>
+      <div class="dshop-pay-timer" id="dshopPayTimer2">5</div>
+      <div class="dshop-pay-bar"><div class="dshop-pay-bar-fill" id="dshopPayBarFill2" style="width:0%"></div></div>
+      <div class="dshop-pay-processing">Будь ласка, зачекайте</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DAILY STREAK MODAL ===== -->
+<div id="dailyStreakModal">
+  <div class="ds-card" style="position:relative;">
+    <button class="ds-close-btn" onclick="closeDailyStreak()">✕</button>
+    <div class="ds-title">💎 DAILY STREAK</div>
+    <div class="ds-subtitle" id="dsSubtitle">Заходь кожен день і збирай Gold Credits!</div>
+    <div class="ds-grid" id="dsGrid"></div>
+    <button class="ds-claim-btn" id="dsClaimBtn" onclick="claimDailyReward(false)">ЗАБРАТИ НАГОРОДУ</button>
+    <button class="ds-watch-btn" id="dsWatchBtn" onclick="claimDailyReward(true)" style="display:none;">📺 Дивитись рекламу → Забрати пропущений день</button>
+  </div>
+</div>
 
 </body></html>
