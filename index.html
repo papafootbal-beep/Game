@@ -9486,11 +9486,11 @@ function openContainer(containerId) {
 
   // ── Відео анімація перед результатом ──
   const CONTAINER_VIDEOS = {
-    urban_micro:          'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_urban_micro.mp4',
+    urban_micro:          'https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/container_urban_micro.mp4',
     street_classics:      'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_street_classics_video.mp4',
     hyper_track:          'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_hyper_track.mp4',
     ultimate_collection:  'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_ultimate_collection.mp4',
-    business_class:       'https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/container_business_class.mp4',
+    business_class:       'https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/container_business_class.mp4',
   };
 
   function showContainerResult() {
@@ -10230,7 +10230,9 @@ function startLuckySpin(id) {
   if (introImgL) introImgL.src = mboxImgL || '';
   if (introGlowL) introGlowL.style.background = 'radial-gradient(ellipse at center, ' + accL + '45 0%, ' + accL + '10 45%, transparent 70%)';
   const introScreenL = document.getElementById('mboxIntroScreen');
-  if (introScreenL) { introScreenL.style.display = 'flex'; introScreenL.style.opacity = '1'; introScreenL.classList.remove('hiding'); }
+  const subtitleL = document.getElementById('mboxSubtitle1');
+  if (subtitleL) subtitleL.textContent = 'Всередині — 5 унікальних призи';
+  if (introScreenL) { introScreenL.style.display = 'flex'; introScreenL.style.opacity = '1'; introScreenL.style.pointerEvents = ''; introScreenL.classList.remove('hiding'); }
   document.getElementById('mboxPrizesWon').innerHTML   = '';
   document.getElementById('mboxCollectWrap').style.display = 'none';
   document.getElementById('mboxWheelSection').style.opacity = '0';
@@ -10423,6 +10425,7 @@ function startMysteryBox(id) {
 }
 
 function dismissMboxIntro() {
+  if (mboxPhase !== 1) return;
   const introScreen = document.getElementById('mboxIntroScreen');
   if (!introScreen) return;
   introScreen.classList.add('hiding');
@@ -11001,10 +11004,10 @@ function closeMysteryModal() {
   const cb = document.getElementById('mboxPhase1Cancel');
   const is = document.getElementById('mboxIntroScreen');
   if (tl) tl.style.display = '';
-  if (bl) bl.style.display = '';
+  if (bl) { bl.style.display = ''; bl.textContent = 'Всередині — 3 унікальних призи'; }
   if (cb) cb.style.display = '';
   // Відновлюємо intro screen у початковий стан (видимий, без анімації hiding)
-  if (is) { is.style.display = 'flex'; is.style.opacity = '1'; is.classList.remove('hiding'); }
+  if (is) { is.style.display = 'flex'; is.style.opacity = '1'; is.style.pointerEvents = ''; is.classList.remove('hiding'); }
   updateAllLuckBars();
 }
 
