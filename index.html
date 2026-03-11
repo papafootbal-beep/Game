@@ -6787,8 +6787,6 @@ function spinCarousel() {
     spinning = false;
     hasSpunOnce = true;
 
-    // Update stats
-    state.stats.rarityCount[currentResult.rarity] = (state.stats.rarityCount[currentResult.rarity] || 0) + 1;
     // Memory recording
     maybeRecordFirstItem(currentResult.name, currentResult.value);
     if (currentResult.rarity === 'legendary') maybeRecordFirstLegendary(currentResult.name);
@@ -8406,8 +8404,6 @@ function openCaseMulti(caseId, count) {
     else { p.rare = +(p.rare + PITY_PER_SPIN.rare).toFixed(2); p.epic = +(p.epic + PITY_PER_SPIN.epic).toFixed(2); p.legendary = +(p.legendary + PITY_PER_SPIN.legendary).toFixed(2); }
     p.rare = Math.min(p.rare, 40); p.epic = Math.min(p.epic, 30); p.legendary = Math.min(p.legendary, 15);
     // Stats
-    if (!state.stats.rarityCount) state.stats.rarityCount = {common:0,rare:0,epic:0,legendary:0};
-    state.stats.rarityCount[r] = (state.stats.rarityCount[r] || 0) + 1;
     updateBestDrop(item);
   }
   saveState();
@@ -9890,13 +9886,15 @@ function switchCasesTab(tab) {
 }
 
 function hangarVideoControl(shouldPlay) {
-  const vid = document.getElementById('hangar1Video');
-  if (!vid) return;
-  if (shouldPlay && !document.hidden) {
-    vid.play().catch(() => {});
-  } else {
-    vid.pause();
-  }
+  ['hangar1Video', 'hangar2Video', 'hangar3Video', 'hangar4Video', 'hangar5Video'].forEach(id => {
+    const vid = document.getElementById(id);
+    if (!vid) return;
+    if (shouldPlay && !document.hidden) {
+      vid.play().catch(() => {});
+    } else {
+      vid.pause();
+    }
+  });
 }
 
 // Пауза коли браузер згорнутий
@@ -10755,6 +10753,7 @@ function spinForPrize() {
   // Roll the actual prize first
   const prize = rollPrize();
   mboxWonPrizes.push(prize);
+  updateBestDrop(prize);
 
   // ── Pity update (same logic as regular cases) ──
   if (state.pity && mboxCurrentId) {
@@ -10910,6 +10909,10 @@ function revealPrize(item, num) {
 
 function updateBestDrop(item) {
   if (!state.stats) return;
+  if (!state.stats.rarityCount) state.stats.rarityCount = {common:0,rare:0,epic:0,legendary:0};
+  if (item.rarity && state.stats.rarityCount[item.rarity] !== undefined) {
+    state.stats.rarityCount[item.rarity]++;
+  }
   if (!state.stats.bestDrop || item.value > state.stats.bestDrop.value) {
     state.stats.bestDrop = { name: item.name, emoji: item.emoji || '📦', rarity: item.rarity, value: item.value };
   }
@@ -10929,7 +10932,6 @@ function collectAllMboxPrizes() {
       value:    item.value,
       fromCase: mboxCurrentId,
     });
-    updateBestDrop(item);
   });
   if (toAdd.length < mboxWonPrizes.length) {
     showToast('⚠️ Склад заповнено — додано ' + toAdd.length + ' з ' + mboxWonPrizes.length);
@@ -12663,13 +12665,13 @@ function renderHangars() {
         (h.id === 'hangar1'
           ? '<video src="https://cdn.jsdelivr.net/gh/papafootbal-beep/mystery-boxes-assets@main/hangar_steel_legion_anim.mp4" class="hangar1-img" id="hangar1Video" autoplay loop muted playsinline></video><div class="h1-smoke"></div>'
           : h.id === 'hangar2'
-          ? '<img src="' + POSEIDON_HANGAR_IMG + '" class="hangar2-img" alt="Посейдон"><div class="h2-water"></div><div class="h2-ripple"></div>'
+          ? '<video src="https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/hangar_poseidon_anim.mp4" class="hangar2-img" id="hangar2Video" autoplay loop muted playsinline></video><div class="h2-water"></div><div class="h2-ripple"></div>'
           : h.id === 'hangar3'
-          ? '<img src="' + SKYLIMITS_HANGAR_IMG + '" class="hangar3-img" alt="Sky Limits"><div class="h3-sky"></div><div class="h3-runway"></div>'
+          ? '<video src="https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/hangar_sky_limits_anim.mp4" class="hangar3-img" id="hangar3Video" autoplay loop muted playsinline></video><div class="h3-sky"></div><div class="h3-runway"></div>'
           : h.id === 'hangar4'
-          ? '<img src="' + ATLANTIS_HANGAR_IMG + '" class="hangar4-img" alt="Атлантида"><div class="h4-globe"></div><div class="h4-fog"></div><div class="h4-ticker"><div class="h4-ticker-text">AAPL +1.5% &nbsp;•&nbsp; DJI -0.2% &nbsp;•&nbsp; BTC +3.8% &nbsp;•&nbsp; ETH +2.1% &nbsp;•&nbsp; €/$ 1.08 &nbsp;•&nbsp; ¥/$ 148.5 &nbsp;•&nbsp; £/$ 0.79 &nbsp;•&nbsp; GOLD +0.6% &nbsp;•&nbsp; OIL -1.2% &nbsp;•&nbsp; NASDAQ +0.9%</div></div>'
+          ? '<video src="https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/hangar_atlantida.mp4" class="hangar4-img" id="hangar4Video" autoplay loop muted playsinline></video><div class="h4-globe"></div><div class="h4-fog"></div><div class="h4-ticker"><div class="h4-ticker-text">AAPL +1.5% &nbsp;•&nbsp; DJI -0.2% &nbsp;•&nbsp; BTC +3.8% &nbsp;•&nbsp; ETH +2.1% &nbsp;•&nbsp; €/$ 1.08 &nbsp;•&nbsp; ¥/$ 148.5 &nbsp;•&nbsp; £/$ 0.79 &nbsp;•&nbsp; GOLD +0.6% &nbsp;•&nbsp; OIL -1.2% &nbsp;•&nbsp; NASDAQ +0.9%</div></div>'
           : h.id === 'hangar5'
-          ? '<img src="' + GALACTIC_HANGAR_IMG + '" class="hangar5-img" alt="Galactic Core"><div class="h5-portal"></div><div class="h5-scan"></div><div class="h5-fog"></div>'
+          ? '<video src="https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/hangar_galactic_core_anim.mp4" class="hangar5-img" id="hangar5Video" autoplay loop muted playsinline></video><div class="h5-portal"></div><div class="h5-scan"></div><div class="h5-fog"></div>'
           : buildHangarSVG(h.theme, h.accent, h.logo)) + '</div>' +
       '<div class="hangar-body">' +
         '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">' +
