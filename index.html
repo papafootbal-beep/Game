@@ -356,6 +356,35 @@ header::before {
 }
 /* Premium items */
 .dshop-premium-list { display: flex; flex-direction: column; gap: 10px; }
+/* Exclusive openings */
+.dshop-exclusives { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+.dshop-excl-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: 14px; cursor: pointer;
+  border: 1px solid rgba(245,200,66,.2);
+  background: linear-gradient(135deg, rgba(245,200,66,.06), rgba(245,200,66,.02));
+  transition: all .2s;
+}
+.dshop-excl-card:hover { border-color: rgba(245,200,66,.5); background: linear-gradient(135deg,rgba(245,200,66,.12),rgba(245,200,66,.05)); transform: translateX(3px); }
+.dshop-excl-icon { font-size: 32px; flex-shrink: 0; }
+.dshop-excl-info { flex: 1; }
+.dshop-excl-name { font-size: 14px; font-weight: 800; color: var(--text); font-family: 'Orbitron', sans-serif; }
+.dshop-excl-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.dshop-excl-desc { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 4px; line-height: 1.4; }
+.dshop-excl-price {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0;
+}
+.dshop-excl-gc { font-size: 16px; font-weight: 800; color: #f5c842; font-family: 'Orbitron', sans-serif; }
+.dshop-excl-gc-label { font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+.dshop-excl-card.type-case   { border-color: rgba(251,191,36,.25); }
+.dshop-excl-card.type-mbox   { border-color: rgba(168,85,247,.25); background: linear-gradient(135deg,rgba(168,85,247,.06),rgba(168,85,247,.02)); }
+.dshop-excl-card.type-mbox:hover { border-color: rgba(168,85,247,.6); background: linear-gradient(135deg,rgba(168,85,247,.12),rgba(168,85,247,.05)); }
+.dshop-excl-card.type-mbox .dshop-excl-gc { color: #c084fc; }
+.dshop-excl-card.type-container { border-color: rgba(56,189,248,.25); background: linear-gradient(135deg,rgba(56,189,248,.06),rgba(56,189,248,.02)); }
+.dshop-excl-card.type-container:hover { border-color: rgba(56,189,248,.6); background: linear-gradient(135deg,rgba(56,189,248,.12),rgba(56,189,248,.05)); }
+.dshop-excl-card.type-container .dshop-excl-gc { color: #38bdf8; }
+.dshop-excl-card.type-hangar { border-color: rgba(245,200,66,.35); background: linear-gradient(135deg,rgba(245,200,66,.08),rgba(245,200,66,.03)); }
+.dshop-excl-card.type-hangar:hover { border-color: rgba(245,200,66,.7); background: linear-gradient(135deg,rgba(245,200,66,.15),rgba(245,200,66,.06)); }
 .dshop-premium-item {
   display: flex; align-items: center; gap: 12px;
   background: linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
@@ -3173,6 +3202,10 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
   0%   { background-position:200% 0; }
   100% { background-position:-200% 0; }
 }
+@keyframes donateShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 </style>
 
 
@@ -4988,6 +5021,125 @@ const CONTAINERS = [
   },
 ];
 
+// =================== DONATE EXCLUSIVES ===================
+
+const DONATE_CASE = {
+  id: 'allstar', name: 'All-Star Case', subtitle: 'Кейс Легенд',
+  icon: '🌟', price: 250, currency: 'gold',
+  desc: 'Містить 20 легендарних предметів зібраних з усіх 10 кейсів',
+  color: '#f5c842',
+  items: [
+    // From street
+    {name:'Powerbank 30000mAh',        emoji:'🔋', rarity:'legendary', value:120},
+    {name:'Парасолька Xiaomi',          emoji:'☂️', rarity:'legendary', value:180},
+    // From office
+    {name:'Крісло Ergo',               emoji:'🪑', rarity:'legendary', value:400},
+    {name:'Лампа Dyson Morph',         emoji:'💡', rarity:'legendary', value:700},
+    // From chef
+    {name:'Кухонний комбайн',          emoji:'🤖', rarity:'legendary', value:1200},
+    {name:'Гриль Tefal',               emoji:'🔥', rarity:'legendary', value:2000},
+    // From gamer
+    {name:'Монітор LG Ultra',          emoji:'🖥️', rarity:'legendary', value:3500},
+    {name:'Відеокарта RTX 4060',       emoji:'💻', rarity:'legendary', value:6000},
+    // From fitness
+    {name:'Велотренажер',              emoji:'🚴', rarity:'legendary', value:8000},
+    {name:'Бігова доріжка',            emoji:'🏃', rarity:'legendary', value:14000},
+    // From apple
+    {name:'MacBook Air M3',            emoji:'💻', rarity:'legendary', value:20000},
+    {name:'Mac Pro',                   emoji:'🖥️', rarity:'legendary', value:35000},
+    // From photo
+    {name:'Hasselblad X2D',            emoji:'🏆', rarity:'legendary', value:44000},
+    {name:'Phase One IQ4',             emoji:'👑', rarity:'legendary', value:75000},
+    // From workshop
+    {name:'3D Принтер Bambu',          emoji:'🖨️', rarity:'legendary', value:80000},
+    {name:'Гравірувальний верстат',    emoji:'⚙️', rarity:'legendary', value:140000},
+    // From smart
+    {name:'Samsung TV 85"',            emoji:'📺', rarity:'legendary', value:120000},
+    {name:'Розумне ліжко',             emoji:'🛏️', rarity:'legendary', value:220000},
+    // From elite
+    {name:'Omega Seamaster',           emoji:'⌚', rarity:'legendary', value:170000},
+    {name:'Золота монета',             emoji:'🪙', rarity:'legendary', value:300000},
+  ],
+};
+
+const DONATE_MBOX = {
+  id: 'relic', name: 'Mystery Relic Box', subtitle: 'Містичний Реліквіум',
+  icon: '🏺', price: 600, currency: 'gold',
+  desc: 'Зібрання найдорожчих таємничих артефактів. Тільки легендарний рівень.',
+  color: '#a855f7',
+  prizesCount: 3,
+  items: [
+    // From mbox1
+    {name:'Круїз "Навколо світу"',              emoji:'🚢', rarity:'legendary', value:250000},
+    {name:'Політ у невагомості Zero-G',         emoji:'🛸', rarity:'legendary', value:275000},
+    {name:'Приватний переліт бізнес-джет',      emoji:'🛩️', rarity:'legendary', value:300000},
+    // From mbox2
+    {name:'Лазерний ТВ Hisense 150"',          emoji:'📺', rarity:'legendary', value:500000},
+    {name:'Робопес Unitree Go2 Pro',            emoji:'🐕', rarity:'legendary', value:550000},
+    {name:'Капсула для відновлення сил',        emoji:'🛸', rarity:'legendary', value:600000},
+    // From mbox3
+    {name:'Золотий статер Македонського',       emoji:'🪙', rarity:'legendary', value:750000},
+    {name:'Фрагмент справжнього метеорита',     emoji:'☄️', rarity:'legendary', value:825000},
+    {name:'Оригінальне "Математичні начала"',   emoji:'📜', rarity:'legendary', value:900000},
+    // From mbox4
+    {name:'Електробайк "Neo-Tokyo"',            emoji:'🏍️', rarity:'legendary', value:1000000},
+    {name:'Біонічний протез руки (декор)',      emoji:'🦾', rarity:'legendary', value:1100000},
+    {name:'Система VR повного занурення',       emoji:'🥽', rarity:'legendary', value:1200000},
+    // From mbox5
+    {name:'Золотий злиток 2.5кг',              emoji:'🥇', rarity:'legendary', value:1250000},
+    {name:'Блакитний діамант 3 карати',         emoji:'💎', rarity:'legendary', value:1375000},
+    {name:'Ключ VIP-ложі казино назавжди',      emoji:'🗝️', rarity:'legendary', value:1500000},
+  ],
+};
+
+const DONATE_CONTAINER = {
+  id: 'apex', name: 'Global Apex Container', subtitle: 'Контейнер «Апекс»',
+  icon: '🌐', price: 1200, currency: 'gold',
+  desc: 'Містить 10 легендарних транспортних засобів, по 2 з кожного контейнеру.',
+  accent: '#38bdf8',
+  items: [
+    // From urban_micro
+    {name:'Harley-Davidson CVO',           emoji:'🏍️', rarity:'legendary', value:1_500_000,   vehicleType:'moto'},
+    {name:'Ducati Panigale V4 R',          emoji:'🏍️', rarity:'legendary', value:1_800_000,   vehicleType:'moto'},
+    // From street_classics
+    {name:'Porsche 911 Singer',            emoji:'🏎️', rarity:'legendary', value:6_500_000,   vehicleType:'car'},
+    {name:'Ferrari F40',                   emoji:'🏎️', rarity:'legendary', value:9_000_000,   vehicleType:'car'},
+    // From business_class
+    {name:'Rolls-Royce Phantom',           emoji:'👑', rarity:'legendary', value:25_000_000,  vehicleType:'car'},
+    {name:'Mercedes-Maybach Pullman',      emoji:'👑', rarity:'legendary', value:35_000_000,  vehicleType:'car'},
+    // From hyper_track
+    {name:'Bugatti Chiron Super Sport',    emoji:'🏎️', rarity:'legendary', value:150_000_000, vehicleType:'car'},
+    {name:'Koenigsegg Jesko',              emoji:'🏎️', rarity:'legendary', value:180_000_000, vehicleType:'car'},
+    // From ultimate_collection
+    {name:'Bugatti La Voiture Noire',      emoji:'🏎️', rarity:'legendary', value:1_200_000_000, vehicleType:'car'},
+    {name:'Ferrari 250 GTO Original',      emoji:'🏆', rarity:'legendary', value:2_500_000_000, vehicleType:'car'},
+  ],
+};
+
+const DONATE_HANGAR = {
+  id: 'zenith', name: 'Zenith Hangar', subtitle: 'Ангар «Зеніт»',
+  icon: '🌠', price: 2500, currency: 'gold',
+  desc: 'Найпрестижніший лот у грі. 10 легендарних активів, по 2 з кожного ангару.',
+  accent: '#f5c842',
+  items: [
+    // From hangar1 (military)
+    {name:'Орбітальна лазерна установка',      emoji:'🔫', rarity:'legendary', value:5_000_000_000},
+    {name:'Приватна Військова Компанія',        emoji:'🎖️', rarity:'legendary', value:8_000_000_000},
+    // From hangar2 (maritime)
+    {name:'Лайнер "Freedom of Seas"',          emoji:'🚢', rarity:'legendary', value:20_000_000_000},
+    {name:'Нафтова платформа в океані',         emoji:'⛽', rarity:'legendary', value:35_000_000_000},
+    // From hangar3 (aviation)
+    {name:'Контрольний пакет Авіаліній',        emoji:'💼', rarity:'legendary', value:50_000_000_000},
+    {name:'Гіперзвуковий пасажирський лайнер', emoji:'🚀', rarity:'legendary', value:80_000_000_000},
+    // From hangar4 (territory)
+    {name:'Документи на Антарктиду',            emoji:'🗺️', rarity:'legendary', value:200_000_000_000},
+    {name:'Штучний острів "Нова Атлантида"',   emoji:'🌊', rarity:'legendary', value:350_000_000_000},
+    // From hangar5 (cosmos)
+    {name:'Сертифікат на Марс',                emoji:'📜', rarity:'legendary', value:800_000_000_000},
+    {name:'Квиток до Альфа Центавра',           emoji:'🌌', rarity:'legendary', value:1_500_000_000_000},
+  ],
+};
+
 // =================== LIFESHOP DATA ===================
 const FORBES_RIVALS = [
   { name:'Ілон Маск',         net:180_000_000_000, emoji:'🚀' },
@@ -5551,6 +5703,12 @@ function updateHUD() {
   const _adPassMult = (typeof adState !== 'undefined' && adState.passive2x) ? 2 : 1;
   const actualPassive = (state.passivePerSec > 0 || pfl > 0)
     ? Math.round((state.passivePerSec * pm * ps * _adPassMult + pfl) * (1 + dyn) * _vipMult) : 0;
+
+  // Add terminal rental passive income
+  const rentalPassive = (state.terminalFleet || [])
+    .filter(x => x.renting)
+    .reduce((sum, it) => sum + getTerminalEarnRate(it), 0);
+  const totalPassive = actualPassive + Math.round(rentalPassive);
   // П.11: Update clicker capital banner
   const _cc = calcCapital();
   const _cr = getForbesRank(_cc.total);
@@ -5575,8 +5733,8 @@ function updateHUD() {
     });
   }
     document.getElementById('passiveDisplay').textContent =
-    actualPassive > 0
-      ? '+' + actualPassive + '€/сек' + (_adPassMult > 1 ? ' ⚡x2' : (pm > 1 || ps > 1 ? ' ✨' : ''))
+    totalPassive > 0
+      ? '+' + totalPassive + '€/сек' + (_adPassMult > 1 ? ' ⚡x2' : (pm > 1 || ps > 1 ? ' ✨' : '') + (rentalPassive > 0 ? ' 🌐' : ''))
       : '';
 
   const inv = state.inventory.length;
@@ -6708,6 +6866,7 @@ function renderCases() {
     card.appendChild(btnRow);
     grid.appendChild(card);
   });
+  renderDonateExclCard(grid, 'case');
 }
 
 // =================== ITEMS PREVIEW MODAL ===================
@@ -6872,6 +7031,7 @@ const CASE_INTRO_IMGS = {
   workshop: { img: () => HOBBY_CASE_IMG,   glow: 'rgba(40,80,180,.35)',   size: '200px' },
   smart:    { img: () => SMART_CASE_IMG,   glow: 'rgba(180,20,60,.38)',   size: '200px' },
   elite:    { img: () => ELITE_CASE_IMG,   glow: 'rgba(245,200,66,.42)',  size: '200px' },
+  allstar:  { img: () => 'https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/all_star_case.png', glow: 'rgba(245,200,66,.55)', size: '210px' },
 };
 
 function openCaseModal(caseId) {
@@ -6988,6 +7148,10 @@ function getDisplayChances(caseId) {
 }
 
 function pickItem(c, useWeights) {
+  // Donate case: all items legendary — equal weight
+  if (c._isDonate) {
+    return c.items[Math.floor(Math.random() * c.items.length)];
+  }
   const w = useWeights || { common:60, rare:25, epic:12, legendary:3 };
   const pool = [];
   c.items.forEach(item => {
@@ -9840,6 +10004,7 @@ function renderContainers() {
       '</div>';
     grid.appendChild(card);
   });
+  renderDonateExclCard(grid, 'container');
 }
 
 // ── Roll a container item (uses pity system identical to cases) ──
@@ -10497,10 +10662,12 @@ function buildMboxSVG(mboxId, size) {
 
 // Helper: get mbox accent color
 function getMboxAccent(id) {
-  return {mbox1:'#60a5fa',mbox2:'#22d3ee',mbox3:'#d97706',mbox4:'#e879f9',mbox5:'#a78bfa'}[id]||'#f5c842';
+  return {mbox1:'#60a5fa',mbox2:'#22d3ee',mbox3:'#d97706',mbox4:'#e879f9',mbox5:'#a78bfa',
+          '__donate_relic__':'#c084fc'}[id]||'#f5c842';
 }
 function getMboxImg(id) {
-  return {mbox1:typeof MBOX1_IMG!=='undefined'?MBOX1_IMG:null, mbox2:typeof MBOX2_IMG!=='undefined'?MBOX2_IMG:null, mbox3:typeof MBOX3_IMG!=='undefined'?MBOX3_IMG:null, mbox4:typeof MBOX4_IMG!=='undefined'?MBOX4_IMG:null, mbox5:typeof MBOX5_IMG!=='undefined'?MBOX5_IMG:null}[id]||null;
+  return {mbox1:typeof MBOX1_IMG!=='undefined'?MBOX1_IMG:null, mbox2:typeof MBOX2_IMG!=='undefined'?MBOX2_IMG:null, mbox3:typeof MBOX3_IMG!=='undefined'?MBOX3_IMG:null, mbox4:typeof MBOX4_IMG!=='undefined'?MBOX4_IMG:null, mbox5:typeof MBOX5_IMG!=='undefined'?MBOX5_IMG:null,
+          '__donate_relic__':null}[id]||null;
 }
 
 
@@ -10824,6 +10991,7 @@ function renderMysteryBoxes() {
     grid.appendChild(card);
     renderLuckBar(mb.id);
   });
+  renderDonateExclCard(grid, 'mbox');
 }
 
 function startMysteryBox(id) {
@@ -10968,6 +11136,11 @@ const WHEEL_COLORS = {
 function getWheelItems() {
   const mb = MYSTERY_BOXES.find(x => x.id === mboxCurrentId);
   if (!mb) return [];
+  // If donate box (all legendary), just return shuffled slice of 15
+  if (mb._isDonate) {
+    const pool = [...mb.items].sort(() => Math.random() - 0.5);
+    return pool.slice(0, Math.min(15, pool.length));
+  }
   // Build representative 15-item wheel ensuring each rarity appears proportionally
   const byRarity = { legendary:[], epic:[], rare:[], common:[] };
   mb.items.forEach(x => { if (byRarity[x.rarity]) byRarity[x.rarity].push(x); });
@@ -13148,6 +13321,7 @@ function renderHangars() {
     const hBarEl = document.getElementById('rarity-bar-' + h.id);
     if (hBarEl) buildRarityBar(hBarEl, h.id);
   });
+  renderDonateExclCard(grid, 'hangar');
 }
 
 // ─── Preview modal ─────────────────────────────────────
@@ -14068,13 +14242,12 @@ function processTerminalOffline() {
       it.rentStart = null;
       it.earned    = 0;
       it.condition = 100;
-      // Don't reset rentStart — item is no longer renting
     } else {
-      // Still in progress — save real condition and keep rentStart as-is (don't reset!)
+      // Still in progress — update rentStart to NOW so tick doesn't double-count
       const cond = Math.max(0, Math.round(100 - (elapsed / cycSec) * 100));
-      it.condition = cond; // save real condition for sell price calculation
+      it.condition = cond;
+      it.rentStart = now; // ← key fix: tick now counts only from this moment forward
       lines.push('⏳ ' + it.name + ': +' + fmtCapital(earned) + ' (міцність ' + cond + '%)');
-      // Do NOT reset rentStart — tick will calculate remaining time correctly
     }
   });
 
@@ -14366,6 +14539,7 @@ let _dshopTimerInt = null;
 
 function openDonateShop() {
   renderDonateShopPremium();
+  renderDonateShopExclusives();
   document.getElementById('donateShopModal').classList.add('open');
 }
 function closeDonateShop() {
@@ -14435,6 +14609,408 @@ function initiatePurchase(packId) {
       document.getElementById('dshopPayYesBtn').textContent = '✓ Підтвердити платіж';
     }
   }, 1000);
+}
+
+// ─────────────────────────────────────────────────────
+// ── Renders a donate-exclusive card appended to a grid ──
+function renderDonateExclCard(grid, type) {
+  if (type === 'case') {
+    _renderDonateExclCase(grid);
+  } else {
+    _renderDonateExclGeneric(grid, type);
+  }
+}
+
+// ── All-Star Case card — same layout as street-case cards ──
+function _renderDonateExclCase(grid) {
+  const d = DONATE_CASE;
+  const IMG_URL = 'https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/all_star_case.png';
+
+  const card = document.createElement('div');
+  card.className = 'case-card street-case-card';
+  card.style.cssText = 'position:relative;overflow:hidden;background:linear-gradient(135deg,#111111 0%,#1a1a1a 40%,#0d0d0d 70%,#161410 100%);border:1px solid rgba(245,200,66,.35);cursor:pointer;';
+
+  const inner = document.createElement('div');
+  inner.className = 'street-case-inner';
+
+  // ── Left: image column ──
+  const imgCol = document.createElement('div');
+  imgCol.className = 'street-case-img-col';
+  imgCol.style.cssText = 'width:160px;height:170px;flex-shrink:0;cursor:pointer;background:linear-gradient(160deg,#1a1a1a 0%,#0a0a0a 100%);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;';
+  imgCol.innerHTML =
+    '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,rgba(245,200,66,.22) 0%,rgba(200,150,0,.10) 45%,transparent 75%);filter:blur(14px);"></div>' +
+    '<img src="' + IMG_URL + '" style="position:relative;width:152px;height:152px;object-fit:contain;z-index:1;filter:drop-shadow(0 4px 22px rgba(245,200,66,.50));animation:streetCaseFloat 3.6s ease-in-out infinite;">' +
+    '<div class="street-case-preview-hint">\u041D\u0430\u0442\u0438\u0441\u043D\u0438 \u0434\u043B\u044F \u043F\u0435\u0440\u0435\u0433\u043B\u044F\u0434\u0443</div>';
+  imgCol.addEventListener('click', () => openDonateExclPreview('case'));
+  inner.appendChild(imgCol);
+
+  // ── Right column ──
+  const rightCol = document.createElement('div');
+  rightCol.className = 'street-case-right';
+  rightCol.style.background = 'linear-gradient(160deg,#141414 0%,#0e0e0e 60%,#131108 100%)';
+
+  // Title block — centered
+  rightCol.innerHTML =
+    '<div class="street-case-top">' +
+      '<div style="font-size:9px;font-weight:800;color:#f5c842;letter-spacing:2px;' +
+        'background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.35);' +
+        'padding:2px 10px;border-radius:20px;margin-bottom:4px;">\uD83D\uDC51 \u0415\u041A\u0421\u041A\u041B\u042E\u0417\u0418\u0412</div>' +
+      '<div class="street-case-name" style="background:linear-gradient(90deg,#f5c842 0%,#fde68a 50%,#f5c842 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + d.name + '</div>' +
+      '<div class="street-case-desc">' + d.subtitle + '</div>' +
+    '</div>' +
+    '<div class="street-case-spacer"></div>';
+
+  // Bottom group: open button only (no x5, no rarity bar)
+  const bottomGroup = document.createElement('div');
+  bottomGroup.className = 'street-case-bottom-group';
+
+  // Price row
+  const priceRow = document.createElement('div');
+  priceRow.style.cssText = 'display:flex;align-items:center;justify-content:flex-end;padding-right:2px;';
+  priceRow.innerHTML = '<span style="font-family:Orbitron,sans-serif;font-size:14px;font-weight:800;color:#f5c842;">' + d.price.toLocaleString() + ' \uD83D\uDC8E</span>';
+  bottomGroup.appendChild(priceRow);
+
+  const openBtn = document.createElement('button');
+  openBtn.className = 'open-case-btn can';
+  openBtn.style.cssText = 'width:100%;margin:0;background:linear-gradient(135deg,#f5c842,#b8860b);color:#000;';
+  openBtn.innerHTML = '\uD83C\uDF1F \u0412\u0456\u0434\u043A\u0440\u0438\u0442\u0438 \u2014 ' + d.price.toLocaleString() + ' \uD83D\uDC8E';
+  openBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const gcNow = state.goldCredits || 0;
+    if (gcNow >= d.price) openDonateExclusive('case');
+    else { openDonateShop(); showToast('\uD83D\uDC8E \u041A\u0443\u043F\u0438 Gold Credits \u0449\u043E\u0431 \u0432\u0456\u0434\u043A\u0440\u0438\u0442\u0438 ' + d.name, 'gold'); }
+  });
+  bottomGroup.appendChild(openBtn);
+
+  rightCol.appendChild(bottomGroup);
+  inner.appendChild(rightCol);
+  card.appendChild(inner);
+
+  // Card click = preview
+  card.addEventListener('click', () => openDonateExclPreview('case'));
+
+  grid.appendChild(card);
+}
+
+// ── Generic donate card (mbox / container / hangar) ──
+function _renderDonateExclGeneric(grid, type) {
+  const dataMap = {
+    mbox:      { d: DONATE_MBOX,      color: '#c084fc', glow: 'rgba(168,85,247,.35)',  tag: '\uD83C\uDFBA \u0415\u041A\u0421\u041A\u041B\u042E\u0417\u0418\u0412', tagColor: '#c084fc' },
+    container: { d: DONATE_CONTAINER, color: '#38bdf8', glow: 'rgba(56,189,248,.35)',  tag: '\uD83C\uDF10 \u0415\u041A\u0421\u041A\u041B\u042E\u0417\u0418\u0412', tagColor: '#38bdf8' },
+    hangar:    { d: DONATE_HANGAR,    color: '#f5c842', glow: 'rgba(245,200,66,.45)',  tag: '\uD83C\uDF20 \u0415\u041A\u0421\u041A\u041B\u042E\u0417\u0418\u0412', tagColor: '#f5c842' },
+  };
+  const { d, color, glow, tag, tagColor } = dataMap[type];
+
+  const wrap = document.createElement('div');
+  wrap.className = 'donate-excl-inline-card';
+  wrap.style.cssText = [
+    'position:relative','width:100%','border-radius:18px','overflow:hidden','cursor:pointer',
+    'border:2px solid ' + color + '66',
+    'box-shadow:0 0 28px ' + glow + ',inset 0 0 40px rgba(0,0,0,.3)',
+    'background:linear-gradient(135deg,rgba(0,0,0,.88) 0%,rgba(20,14,4,.9) 100%)',
+    'margin-top:6px','transition:transform .18s,box-shadow .18s',
+  ].join(';');
+
+  const shimmer = document.createElement('div');
+  shimmer.style.cssText = 'position:absolute;inset:0;pointer-events:none;border-radius:16px;' +
+    'background:linear-gradient(105deg,transparent 30%,' + color + '18 50%,transparent 70%);' +
+    'background-size:200% 100%;animation:donateShimmer 2.8s linear infinite;';
+  wrap.appendChild(shimmer);
+
+  const inner = document.createElement('div');
+  inner.style.cssText = 'position:relative;z-index:2;display:flex;align-items:center;gap:16px;padding:18px 20px;';
+
+  const iconEl = document.createElement('div');
+  iconEl.style.cssText = 'font-size:52px;flex-shrink:0;filter:drop-shadow(0 0 10px ' + color + ');';
+  iconEl.textContent = d.icon;
+
+  const info = document.createElement('div');
+  info.style.cssText = 'flex:1;min-width:0;';
+  info.innerHTML =
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
+      '<span style="font-size:9px;font-weight:800;color:' + tagColor + ';letter-spacing:2px;' +
+        'background:' + color + '22;border:1px solid ' + color + '55;padding:2px 8px;border-radius:20px;">' + tag + '</span>' +
+    '</div>' +
+    '<div style="font-family:Orbitron,sans-serif;font-size:14px;font-weight:800;color:#fff;line-height:1.2;">' + d.name + '</div>' +
+    '<div style="font-size:11px;color:' + color + ';font-weight:600;margin-top:2px;">' + d.subtitle + '</div>' +
+    '<div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:5px;line-height:1.4;">' + d.desc + '</div>';
+
+  const priceCol = document.createElement('div');
+  priceCol.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;';
+
+  const priceEl = document.createElement('div');
+  priceEl.style.cssText = 'font-family:Orbitron,sans-serif;font-size:20px;font-weight:900;color:' + color + ';text-shadow:0 0 12px ' + color + ';';
+  priceEl.textContent = d.price.toLocaleString() + ' \uD83D\uDC8E';
+
+  const btn = document.createElement('button');
+  btn.style.cssText = 'padding:10px 18px;border-radius:12px;border:none;cursor:pointer;' +
+    'font-family:Rajdhani,sans-serif;font-size:13px;font-weight:800;letter-spacing:.5px;' +
+    'background:linear-gradient(135deg,' + color + ',' + color + 'aa);color:#000;' +
+    'box-shadow:0 4px 14px ' + glow + ';transition:transform .15s,box-shadow .15s;white-space:nowrap;';
+  btn.textContent = '\uD83D\uDD13 \u0412\u0456\u0434\u043A\u0440\u0438\u0442\u0438';
+
+  priceCol.appendChild(priceEl);
+  priceCol.appendChild(btn);
+  inner.appendChild(iconEl);
+  inner.appendChild(info);
+  inner.appendChild(priceCol);
+  wrap.appendChild(inner);
+
+  wrap.addEventListener('mouseenter', () => {
+    wrap.style.transform = 'translateY(-3px) scale(1.005)';
+    wrap.style.boxShadow = '0 0 42px ' + glow + ',0 8px 32px rgba(0,0,0,.5),inset 0 0 40px rgba(0,0,0,.3)';
+    btn.style.transform = 'scale(1.05)';
+  });
+  wrap.addEventListener('mouseleave', () => {
+    wrap.style.transform = '';
+    wrap.style.boxShadow = '0 0 28px ' + glow + ',inset 0 0 40px rgba(0,0,0,.3)';
+    btn.style.transform = '';
+  });
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const gcNow = state.goldCredits || 0;
+    if (gcNow >= d.price) openDonateExclusive(type);
+    else { openDonateShop(); showToast('\uD83D\uDC8E \u041A\u0443\u043F\u0438 Gold Credits \u0449\u043E\u0431 \u0432\u0456\u0434\u043A\u0440\u0438\u0442\u0438 ' + d.name, 'gold'); }
+  });
+  wrap.addEventListener('click', () => openDonateExclPreview(type));
+
+  grid.appendChild(wrap);
+}
+
+function renderDonateShopExclusives() {
+  const list = document.getElementById('dshopExclusivesList');
+  if (!list) return;
+  const items = [
+    { data: DONATE_CASE,      type: 'case',      label: 'Кейс · 20 легендарок' },
+    { data: DONATE_MBOX,      type: 'mbox',      label: 'Mystery Box · 3×15 легендарок' },
+    { data: DONATE_CONTAINER, type: 'container', label: 'Контейнер · 10 легендарних авто' },
+    { data: DONATE_HANGAR,    type: 'hangar',    label: 'Ангар · 10 легендарних активів' },
+  ];
+  list.innerHTML = items.map(({data, type, label}) => `
+    <div class="dshop-excl-card type-${type}" onclick="openDonateExclusive('${type}')">
+      <div class="dshop-excl-icon">${data.icon}</div>
+      <div class="dshop-excl-info">
+        <div class="dshop-excl-name">${data.name}</div>
+        <div class="dshop-excl-sub">${data.subtitle} · ${label}</div>
+        <div class="dshop-excl-desc">${data.desc}</div>
+      </div>
+      <div class="dshop-excl-price">
+        <div class="dshop-excl-gc">${data.price} 💎</div>
+        <div class="dshop-excl-gc-label">GOLD CREDITS</div>
+      </div>
+    </div>`).join('');
+}
+
+function openDonateExclusive(type) {
+  const gc = state.goldCredits || 0;
+  const dataMap = { case: DONATE_CASE, mbox: DONATE_MBOX, container: DONATE_CONTAINER, hangar: DONATE_HANGAR };
+  const data = dataMap[type];
+  if (!data) return;
+
+  if (gc < data.price) {
+    showToast('\u274C \u041D\u0435\u0434\u043E\u0441\u0442\u0430\u0442\u043D\u044C\u043E Gold Credits! \u041F\u043E\u0442\u0440\u0456\u0431\u043D\u043E ' + data.price + ' \uD83D\uDC8E, \u0443 \u0432\u0430\u0441 ' + gc + ' \uD83D\uDC8E');
+    return;
+  }
+
+  // Custom confirm modal (confirm() blocked on some mobile browsers)
+  const colorMap = { case:'#f5c842', mbox:'#c084fc', container:'#38bdf8', hangar:'#f5c842' };
+  const color = colorMap[type] || '#f5c842';
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML =
+    '<div style="background:var(--bg2);border-radius:18px;padding:24px;max-width:320px;width:100%;text-align:center;border:2px solid ' + color + '55;box-shadow:0 0 40px ' + color + '33;">' +
+      '<div style="font-size:36px;margin-bottom:10px;">' + data.icon + '</div>' +
+      '<div style="font-family:Orbitron,sans-serif;font-size:13px;font-weight:800;color:' + color + ';margin-bottom:6px;">' + data.name + '</div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:16px;">' +
+        '\u0412\u0438\u0442\u0440\u0430\u0442\u0438\u0442\u0438 <strong style="color:' + color + ';">' + data.price.toLocaleString() + ' \uD83D\uDC8E</strong>?' +
+        '<br><span style="font-size:11px;color:rgba(255,255,255,.4);">\u0411\u0430\u043B\u0430\u043D\u0441: ' + gc.toLocaleString() + ' \uD83D\uDC8E</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;">' +
+        '<button id="_donateConfirmNo" style="flex:1;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);font-family:Rajdhani,sans-serif;font-size:13px;font-weight:800;cursor:pointer;">\u2715 \u0421\u043A\u0430\u0441\u0443\u0432\u0430\u0442\u0438</button>' +
+        '<button id="_donateConfirmYes" style="flex:1;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,' + color + ',' + color + 'aa);color:#000;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:800;cursor:pointer;">\u2713 \u041A\u0443\u043F\u0438\u0442\u0438</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('#_donateConfirmNo').onclick = () => overlay.remove();
+  overlay.querySelector('#_donateConfirmYes').onclick = () => {
+    overlay.remove();
+    state.goldCredits -= data.price;
+    const gcEl = document.getElementById('gcHudAmount');
+    if (gcEl) gcEl.textContent = state.goldCredits.toLocaleString();
+    // Refresh all grids so balance updates
+    renderCases(); renderMysteryBoxes(); renderContainers(); renderHangars();
+    saveState();
+
+    if (type === 'case')           _donateOpenCase();
+    else if (type === 'mbox')      _donateOpenMbox();
+    else if (type === 'container') _donateOpenContainer();
+    else if (type === 'hangar')    _donateOpenHangar();
+  };
+}
+
+function _pickDonateItem(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function _addToInventoryOrSell(item) {
+  const invItem = { id: Date.now() + Math.random(), name: item.name, emoji: item.emoji,
+                    rarity: item.rarity, value: item.value, fromCase: 'donate' };
+  if (state.inventory.length < state.invLimit) {
+    state.inventory.unshift(invItem);
+    return null;
+  } else {
+    const sv = getSellValue(invItem);
+    state.balance += sv; state.totalEarned += sv;
+    return sv;
+  }
+}
+
+// ── Donate Case: uses real carousel ────────────────────
+function _donateOpenCase() {
+  // Inject into CASES so openCaseModal works (incl. intro image from CASE_INTRO_IMGS)
+  const synthId = DONATE_CASE.id; // 'allstar'
+  if (!CASES.find(c => c.id === synthId)) {
+    CASES.push({
+      id: synthId, name: DONATE_CASE.name, price: 0,
+      items: DONATE_CASE.items, _isDonate: true,
+      icon: '\uD83C\uDF1F', desc: DONATE_CASE.subtitle,
+    });
+  }
+  openCaseModal(synthId);
+  renderCases();
+}
+
+// ── Donate Mbox: uses real mystery box wheel ────────────
+function _donateOpenMbox() {
+  const synthId = '__donate_relic__';
+  // Inject synthetic mbox if not already there
+  if (!MYSTERY_BOXES.find(x => x.id === synthId)) {
+    MYSTERY_BOXES.push({
+      id: synthId,
+      name: DONATE_MBOX.name,
+      icon: DONATE_MBOX.icon,
+      price: 0,
+      desc: DONATE_MBOX.desc,
+      color: '#a855f7',
+      items: DONATE_MBOX.items,
+      _isDonate: true,
+      prizesCount: DONATE_MBOX.prizesCount,
+    });
+  }
+  startMysteryBox(synthId);
+  renderMysteryBoxes();
+}
+
+// ── Donate Container: uses real openContainer logic ─────
+function _donateOpenContainer() {
+  // Inject synthetic container temporarily
+  const synthId = '__donate_apex__';
+  let synth = CONTAINERS.find(x => x.id === synthId);
+  if (!synth) {
+    synth = {
+      id: synthId, name: DONATE_CONTAINER.name, subtitle: DONATE_CONTAINER.subtitle,
+      price: 0, accent: '#38bdf8', bg: '#001a2e', desc: DONATE_CONTAINER.desc,
+      items: DONATE_CONTAINER.items, _isDonate: true,
+    };
+    CONTAINERS.push(synth);
+  }
+
+  // Call real openContainer (price=0 so balance check passes)
+  openContainer(synthId);
+  renderContainers();
+}
+
+// ── Donate Hangar: uses real openHangar logic ───────────
+function _donateOpenHangar() {
+  // Inject synthetic hangar temporarily
+  const synthId = '__donate_zenith__';
+  let synth = HANGARS.find(x => x.id === synthId);
+  if (!synth) {
+    synth = {
+      id: synthId, name: DONATE_HANGAR.name, subtitle: DONATE_HANGAR.subtitle,
+      price: 0, accent: '#f5c842', bg: '#1c1200', theme: 'zenith', logo: '\uD83C\uDF20',
+      desc: DONATE_HANGAR.desc, items: DONATE_HANGAR.items, _isDonate: true,
+    };
+    HANGARS.push(synth);
+  }
+
+  openHangar(synthId);
+  renderHangars();
+}
+
+// ── Donate Exclusive Preview Modal ──────────────────────
+function openDonateExclPreview(type) {
+  const dataMap = { case: DONATE_CASE, mbox: DONATE_MBOX, container: DONATE_CONTAINER, hangar: DONATE_HANGAR };
+  const d = dataMap[type];
+  if (!d) return;
+
+  const colorMap = { case:'#f5c842', mbox:'#c084fc', container:'#38bdf8', hangar:'#f5c842' };
+  const color = colorMap[type];
+  const itemCount = d.items.length;
+  const chance = (100 / itemCount).toFixed(1);
+
+  // Build items grid HTML
+  const itemsHTML = d.items.map(it =>
+    '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;' +
+    'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);margin-bottom:5px;">' +
+      '<span style="font-size:22px;">' + it.emoji + '</span>' +
+      '<div style="flex:1;">' +
+        '<div style="font-size:12px;font-weight:700;color:#fff;">' + it.name + '</div>' +
+        '<div style="font-size:10px;color:' + color + ';">' + fmtCapital(it.value) + '</div>' +
+      '</div>' +
+      '<div style="font-size:10px;color:#f5c842;font-weight:800;">' + chance + '%</div>' +
+    '</div>'
+  ).join('');
+
+  const prizeNote = type === 'mbox' ? ' · 3 призи за відкриття' : '';
+
+  // Reuse existing previewModal or create our own
+  let modal = document.getElementById('donatePreviewModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'donatePreviewModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:16px;';
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML =
+    '<div style="background:var(--bg2);border-radius:20px;width:100%;max-width:400px;max-height:88vh;display:flex;flex-direction:column;' +
+    'border:2px solid ' + color + '55;box-shadow:0 0 40px ' + color + '33;overflow:hidden;">' +
+      // Header
+      '<div style="padding:20px 20px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;">' +
+        '<div style="display:flex;align-items:center;gap:12px;">' +
+          '<div style="font-size:40px;filter:drop-shadow(0 0 8px ' + color + ');">' + d.icon + '</div>' +
+          '<div style="flex:1;">' +
+            '<div style="font-family:Orbitron,sans-serif;font-size:13px;font-weight:800;color:' + color + ';letter-spacing:1px;">' + d.name + '</div>' +
+            '<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;">' + d.subtitle + prizeNote + '</div>' +
+          '</div>' +
+          '<button onclick="document.getElementById(\'donatePreviewModal\').remove()" ' +
+          'style="background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;padding:4px;">✕</button>' +
+        '</div>' +
+        '<div style="margin-top:10px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.04);' +
+        'font-size:10px;color:rgba(255,255,255,.5);line-height:1.5;">' +
+          '\u2696\uFE0F Рівна вірогідність для всіх ' + itemCount + ' легендарних предметів · ' + chance + '% кожен' +
+        '</div>' +
+      '</div>' +
+      // Items list (scrollable)
+      '<div style="overflow-y:auto;padding:14px 16px;flex:1;">' + itemsHTML + '</div>' +
+      // Footer with buy button
+      '<div style="padding:14px 16px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;display:flex;align-items:center;gap:12px;">' +
+        '<div>' +
+          '<div style="font-family:Orbitron,sans-serif;font-size:18px;font-weight:900;color:' + color + ';">' + d.price.toLocaleString() + ' \uD83D\uDC8E</div>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,.35);">Баланс: ' + (state.goldCredits||0).toLocaleString() + ' \uD83D\uDC8E</div>' +
+        '</div>' +
+        '<button onclick="document.getElementById(\'donatePreviewModal\').remove();openDonateExclusive(\'' + type + '\')" ' +
+        'style="flex:1;padding:12px;border-radius:12px;border:none;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;' +
+        'background:linear-gradient(135deg,' + color + ',' + color + 'aa);color:#000;">' +
+          '\uD83D\uDD13 \u0412\u0456\u0434\u043A\u0440\u0438\u0442\u0438 \u2014 ' + d.price.toLocaleString() + ' \uD83D\uDC8E' +
+        '</button>' +
+      '</div>' +
+    '</div>';
 }
 
 function confirmDonatePayment() {
@@ -15171,6 +15747,11 @@ function showRandomBonusCard() {
     if (b.id === 'click2x' && adState.click2x) return false;
     if (b.id === 'passive2x' && adState.passive2x) return false;
     if (b.id === 'x5case' && adState.x5Uses > 0) return false;
+    // Hide x5case offer if player already has x5 unlocked from any collection
+    if (b.id === 'x5case') {
+      const hasX5FromColl = Object.values(state.collectionBonuses || {}).some(cb => cb && cb.multiOpen);
+      if (hasX5FromColl) return false;
+    }
     if (adState.activeCards.find(c => c.bonusId === b.id)) return false;
     return true;
   });
