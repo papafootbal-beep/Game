@@ -5427,6 +5427,7 @@ function loadState() {
       if (!state.serviceItems)  state.serviceItems = [];
       if (!state.salonItems)    state.salonItems   = [];
       if (!state.serviceLimit)  state.serviceLimit = 10;
+      if (state.serviceLimit > 50) state.serviceLimit = 50; // clamp legacy 100-slot saves
       if (!state.garageUpgrades) state.garageUpgrades = { parts:0, speed:0, parking:0, bays:0, quality:0, salon:0, wholesaler:0 };
       if (!state.memories)        state.memories = {};
       if (!state.peakCapital)     state.peakCapital = 0;
@@ -7410,11 +7411,18 @@ function tryInsurance(type) {
   } else {
     if (btn) btn.textContent = '⏳ Завантаження реклами...';
     let sec = 3;
-    const iv = setInterval(() => {
+    if (_insurancePendingIv) clearInterval(_insurancePendingIv);
+    _insurancePendingIv = setInterval(() => {
+      // Abort if modal closed (currentContainerResult cleared means user closed)
+      if (type === 'container' && !document.getElementById('containerModal')?.innerHTML?.trim()) {
+        clearInterval(_insurancePendingIv); _insurancePendingIv = null;
+        insuranceState[type].tries = Math.max(0, insuranceState[type].tries - 1); // undo increment
+        return;
+      }
       sec--;
       if (btn) btn.textContent = '📺 ' + sec + '...';
       if (sec <= 0) {
-        clearInterval(iv);
+        clearInterval(_insurancePendingIv); _insurancePendingIv = null;
         executeInsuranceSpin(type);
       }
     }, 1000);
@@ -7422,6 +7430,7 @@ function tryInsurance(type) {
 }
 
 let _insuranceFreeSpin = false;
+let _insurancePendingIv = null; // pending countdown interval — cancel on modal close
 
 function executeInsuranceSpin(type) {
   _insuranceFreeSpin = true;
@@ -10466,6 +10475,11 @@ function sellContainerResult() {
 }
 
 function closeContainerModal() {
+  // Cancel any pending insurance ad countdown
+  if (_insurancePendingIv) {
+    clearInterval(_insurancePendingIv);
+    _insurancePendingIv = null;
+  }
   if (currentContainerResult) {
     if (state.garageUnlocked) {
       sendToService();
@@ -12432,16 +12446,16 @@ function renderGarageUpgrades() {
     },
     {
       key: 'parking', icon: '🅿️', title: 'Розширення парковки',
-      desc: 'Збільшує кількість місць у Сервісі',
+      desc: 'Збільшує кількість місць у Сервісі (макс 50)',
       maxLvl: 4,
       levels: [
-        { price: 5000000,    label: 'Рівень 1', bonus: '25 місць' },
-        { price: 20000000,   label: 'Рівень 2', bonus: '50 місць' },
-        { price: 100000000,  label: 'Рівень 3', bonus: '75 місць' },
-        { price: 300000000,  label: 'Рівень 4', bonus: '100 місць' },
+        { price: 5000000,    label: 'Етап 1', bonus: '20 місць' },
+        { price: 20000000,   label: 'Етап 2', bonus: '30 місць' },
+        { price: 100000000,  label: 'Етап 3', bonus: '40 місць' },
+        { price: 300000000,  label: 'Етап 4', bonus: '50 місць — максимум' },
       ],
       currentDesc: () => {
-        const sizes = [10, 25, 50, 75, 100];
+        const sizes = [10, 20, 30, 40, 50];
         return 'Поточно: ' + sizes[gu.parking] + ' місць';
       }
     },
@@ -12578,7 +12592,7 @@ function buyGarageUpgrade(key) {
 
   // Apply parking upgrade to serviceLimit
   if (key === 'parking') {
-    const sizes = [10, 25, 50, 75, 100];
+    const sizes = [10, 20, 30, 40, 50];
     state.serviceLimit = sizes[state.garageUpgrades.parking];
   }
   // Apply wholesaler level
@@ -13464,6 +13478,10 @@ function openHangarPreview(hangarId) {
 
 // ─── Roll item ─────────────────────────────────────────
 function rollHangarItem(h) {
+  // Donate hangars have curated items — skip weight system
+  if (h._isDonate && h.items && h.items.length > 0) {
+    return h.items[Math.floor(Math.random() * h.items.length)];
+  }
   const w = getCurrentWeights(h.id);
   // Dev boost: +50% legendary chance
   const legBonus = devHangarLegBoost ? w.legendary * 0.5 : 0;
@@ -14130,11 +14148,14 @@ function renderTerminalFleet() {
     let actionHTML = '';
     if (it.renting) {
       const cycSec    = getTerminalCycleSec();
-      const elapsed   = (now - it.rentStart) / 1000;
+      // Use rentEnd (absolute) if available, else fall back to rentStart offset
+      const remaining_ms = it.rentEnd ? Math.max(0, it.rentEnd - now) : Math.max(0, (it.rentStart + cycSec * 1000) - now);
+      const elapsed_ms   = it.rentEnd ? Math.max(0, it.rentEnd - it.rentStart - remaining_ms) : (now - it.rentStart);
+      const elapsed      = elapsed_ms / 1000;
       const pct       = Math.min(100, (elapsed / cycSec) * 100);
       const condition = Math.max(0, 100 - pct);
       const earned    = it.earned + Math.round(getTerminalEarnRate(it) * elapsed);
-      const remaining = Math.max(0, cycSec - elapsed);
+      const remaining = remaining_ms / 1000;
       const remStr    = remaining >= 3600 ? (remaining/3600).toFixed(1) + 'год' : remaining >= 60 ? Math.floor(remaining/60) + 'хв ' + Math.floor(remaining%60) + 'с' : Math.floor(remaining) + 'с';
       const sellNow   = Math.round(it.value * (condition / 100));
       const barColor  = condition > 60 ? '#4ade80' : condition > 30 ? '#f5c842' : '#ef4444';
@@ -14216,6 +14237,7 @@ function rentTerminalItem(id) {
   }
   it.renting   = true;
   it.rentStart = Date.now();
+  it.rentEnd   = Date.now() + getTerminalCycleSec() * 1000; // absolute end timestamp
   it.earned    = 0;
   it.condition = 100;
   saveState();
@@ -14254,6 +14276,7 @@ function startTerminalTick() {
       if (elapsed >= cycSec) {
         it.renting   = false;
         it.rentStart = null;
+        it.rentEnd   = null;
         it.earned    = 0;
         it.condition = 100;
         changed = true;
@@ -14308,7 +14331,9 @@ function processTerminalOffline() {
 
   fleet.forEach(it => {
     if (!it.renting) return;
-    const elapsed  = Math.max(0, (now - it.rentStart) / 1000);
+    // Use absolute rentEnd if available, else compute from rentStart
+    const rentEnd_abs = it.rentEnd || (it.rentStart + cycSec * 1000);
+    const elapsed  = Math.max(0, (now - (rentEnd_abs - cycSec * 1000)) / 1000);
     const rate     = getTerminalEarnRate(it);
     const actual   = Math.min(elapsed, cycSec);
     const earned   = Math.round(rate * actual);
@@ -14323,13 +14348,15 @@ function processTerminalOffline() {
       lines.push('✅ ' + it.name + ': цикл завершено, +' + fmtCapital(earned));
       it.renting   = false;
       it.rentStart = null;
+      it.rentEnd   = null;
       it.earned    = 0;
       it.condition = 100;
     } else {
-      // Still in progress — update rentStart to NOW so tick doesn't double-count
+      // Still in progress — accumulate earned, preserve rentStart/rentEnd
       const cond = Math.max(0, Math.round(100 - (elapsed / cycSec) * 100));
       it.condition = cond;
-      it.rentStart = now; // ← key fix: tick now counts only from this moment forward
+      it.earned = (it.earned || 0) + earned; // accumulate offline earnings
+      // rentStart and rentEnd stay unchanged — they mark the real window
       lines.push('⏳ ' + it.name + ': +' + fmtCapital(earned) + ' (міцність ' + cond + '%)');
     }
   });
@@ -15231,7 +15258,8 @@ function _donateOpenContainer() {
   }
   openContainer(synthId);
   window._donateContSynthId = alreadyIn ? null : synthId;
-  renderContainers();
+  // renderContainers() NOT called here — synth would appear as duplicate card
+  // Cleanup happens in closeContainerModal()
 }
 
 // ── Donate Hangar: uses real openHangar logic ───────────
