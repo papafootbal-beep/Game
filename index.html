@@ -3470,7 +3470,7 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
       <button class="click-btn" id="clickBtn" onclick="handleClick(event)"><img src="https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/screan_fon_clik.png" alt="" style="width:138px;height:138px;object-fit:cover;border-radius:50%;pointer-events:none;display:block;animation:clickImgPulse 2.8s ease-in-out infinite;"></button>
     </div>
     <div class="click-hint" id="clk-hint">ТАП ДЛЯ ЗАРОБІТКУ</div>
-    <div class="per-click">+<span id="clickValHint">1</span id="clk-per-click-lbl">€ за клік</div>
+    <div class="per-click">+<span id="clickValHint">1</span><span id="clk-per-click-lbl">€ за клік</span></div>
   </div>
 
   <div class="section-title" id="clk-upgrades-title">Покращення</div>
@@ -3873,25 +3873,25 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 <div class="screen" id="screen-lifeshop">
   <div id="capitalBanner" style="background:linear-gradient(135deg,#1a1209,#2d1f0e);border:1px solid rgba(245,200,66,.3);border-radius:14px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden;">
     <div style="position:absolute;inset:0;background:radial-gradient(circle at 80% 50%,rgba(245,200,66,.06),transparent 60%);pointer-events:none;"></div>
-    <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Ваш Капітал</div>
+    <div id="ls-capital-label" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Ваш Капітал</div>
     <div id="capitalAmount" style="font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;color:var(--gold);line-height:1;">0€</div>
     <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;">
-      <div style="font-size:11px;color:var(--muted);">💰 Готівка: <span id="capCash" style="color:var(--text)">0€</span></div>
-      <div style="font-size:11px;color:var(--muted);">📦 Склад: <span id="capInventory" style="color:var(--text)">0€</span></div>
-      <div style="font-size:11px;color:var(--muted);">💎 LifeShop: <span id="capLifeshop" style="color:var(--text)">0€</span></div>
+      <div style="font-size:11px;color:var(--muted);"><span id="ls-cash-label">💰 Готівка:</span> <span id="capCash" style="color:var(--text)">0€</span></div>
+      <div style="font-size:11px;color:var(--muted);"><span id="ls-inv-label">📦 Склад:</span> <span id="capInventory" style="color:var(--text)">0€</span></div>
+      <div style="font-size:11px;color:var(--muted);"><span id="ls-life-label">💎 LifeShop:</span> <span id="capLifeshop" style="color:var(--text)">0€</span></div>
     </div>
     <div id="forbesRankBadge" style="position:absolute;top:12px;right:14px;text-align:right;">
-      <div style="font-size:10px;color:var(--muted);">Forbes рейтинг</div>
+      <div id="ls-forbes-rank-label" style="font-size:10px;color:var(--muted);">Forbes рейтинг</div>
       <div id="forbesRankNum" style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:800;color:var(--gold);">#—</div>
     </div>
   </div>
 
   <!-- Tabs -->
   <div class="shop-tabs" id="lifeshopTabs">
-    <button class="shop-tab active" id="lstab-transport"   onclick="switchLifeTab('transport')">🚗 Транспорт</button>
-    <button class="shop-tab"        id="lstab-realestate"  onclick="switchLifeTab('realestate')">🏠 Нерухомість</button>
-    <button class="shop-tab"        id="lstab-luxury"      onclick="switchLifeTab('luxury')">💎 Розкіш</button>
-    <button class="shop-tab"        id="lstab-owned"       onclick="switchLifeTab('owned')">🏆 Forbes</button>
+    <button class="shop-tab active" id="lstab-transport"   onclick="switchLifeTab('transport')"><span id="lstab-transport-lbl">🚗 Транспорт</span></button>
+    <button class="shop-tab"        id="lstab-realestate"  onclick="switchLifeTab('realestate')"><span id="lstab-realestate-lbl">🏠 Нерухомість</span></button>
+    <button class="shop-tab"        id="lstab-luxury"      onclick="switchLifeTab('luxury')"><span id="lstab-luxury-lbl">💎 Розкіш</span></button>
+    <button class="shop-tab"        id="lstab-owned"       onclick="switchLifeTab('owned')"><span id="lstab-owned-lbl">🏆 Forbes</span></button>
   </div>
 
   <div id="lspane-transport"  class="lifeshop-pane"></div>
@@ -3909,27 +3909,27 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
   <div id="endgameLockedView" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:20px;padding:20px;text-align:center;">
     <div style="font-size:72px;filter:drop-shadow(0 0 24px #f5c84255);">👁️</div>
     <div style="font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:#f5c842;">???</div>
-    <div style="font-size:13px;color:var(--muted);max-width:320px;line-height:1.7;">Щоб відкрити цю вкладку, потрібно довести своє панування над цим світом.</div>
+    <div id="eg-locked-desc" style="font-size:13px;color:var(--muted);max-width:320px;line-height:1.7;">Щоб відкрити цю вкладку, потрібно довести своє панування над цим світом.</div>
     <div id="endgameCondList" style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px 24px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:12px;">
       <div style="display:flex;align-items:center;gap:12px;">
         <span id="eg-cond1-icon" style="font-size:20px;flex-shrink:0;">❌</span>
-        <div style="text-align:left;"><div style="font-size:13px;color:var(--text);font-weight:700;">🏆 Top 1 Forbes</div><div style="font-size:11px;color:var(--muted);">Обігнати Ілона Маска та стати №1</div></div>
+        <div style="text-align:left;"><div style="font-size:13px;color:var(--text);font-weight:700;">🏆 Top 1 Forbes</div><div id="eg-cond1-desc" style="font-size:11px;color:var(--muted);">Обігнати Ілона Маска та стати №1</div></div>
       </div>
       <div style="height:1px;background:rgba(255,255,255,.06);"></div>
       <div style="display:flex;align-items:center;gap:12px;">
         <span id="eg-cond2-icon" style="font-size:20px;flex-shrink:0;">❌</span>
-        <div style="text-align:left;"><div style="font-size:13px;color:var(--text);font-weight:700;">💎 LifeShop Complete</div><div style="font-size:11px;color:var(--muted);">Куплено абсолютно всі товари в LifeShop</div></div>
+        <div style="text-align:left;"><div style="font-size:13px;color:var(--text);font-weight:700;">💎 LifeShop Complete</div><div id="eg-cond2-desc" style="font-size:11px;color:var(--muted);">Куплено абсолютно всі товари в LifeShop</div></div>
       </div>
       <div style="height:1px;background:rgba(255,255,255,.06);"></div>
       <div style="display:flex;align-items:center;gap:12px;">
         <span id="eg-cond3-icon" style="font-size:20px;flex-shrink:0;">❌</span>
-        <div style="text-align:left;"><div style="font-size:13px;color:var(--text);font-weight:700;">📦 Collector Master</div><div style="font-size:11px;color:var(--muted);">Зібрано всі 10 колекцій кейсів</div></div>
+        <div style="text-align:left;"><div style="font-size:13px;color:var(--text);font-weight:700;">📦 Collector Master</div><div id="eg-cond3-desc" style="font-size:11px;color:var(--muted);">Зібрано всі 10 колекцій кейсів</div></div>
       </div>
     </div>
   </div>
   <div id="endgameUnlockedView" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;padding:30px 20px;">
     <div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:340px;">
-      <div style="font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:4px;color:#f5c84299;text-transform:uppercase;">Фінал Гри</div>
+      <div id="eg-unlocked-label" style="font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:4px;color:#f5c84299;text-transform:uppercase;">Фінал Гри</div>
       <div class="endgame-case-anim" onclick="openEndgameCase()" style="cursor:pointer;width:200px;height:200px;display:flex;align-items:center;justify-content:center;">
         <svg viewBox="0 0 200 200" width="200" height="200">
           <defs>
@@ -3954,10 +3954,10 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
         </svg>
       </div>
       <div style="text-align:center;">
-        <div style="font-family:'Orbitron',sans-serif;font-size:15px;font-weight:900;color:#f5c842;filter:drop-shadow(0 0 8px #f5c84277);">КЕЙС ІЛЮМІНАТІВ</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">Ціна: <span style="color:#f5c842;font-weight:800;">1€</span> — данина поваги першому кліку.</div>
+        <div id="eg-case-title" style="font-family:'Orbitron',sans-serif;font-size:15px;font-weight:900;color:#f5c842;filter:drop-shadow(0 0 8px #f5c84277);">КЕЙС ІЛЮМІНАТІВ</div>
+        <div id="eg-case-desc" style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">Ціна: <span style="color:#f5c842;font-weight:800;">1€</span> — данина поваги першому кліку.</div>
       </div>
-      <button onclick="openEndgameCase()" class="endgame-open-btn" style="padding:14px 40px;border-radius:14px;border:1px solid rgba(245,200,66,.5);background:linear-gradient(135deg,rgba(245,200,66,.15),rgba(146,64,14,.15));color:#f5c842;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:2px;">ВІДКРИТИ</button>
+      <button onclick="openEndgameCase()" id="eg-open-btn" class="endgame-open-btn" style="padding:14px 40px;border-radius:14px;border:1px solid rgba(245,200,66,.5);background:linear-gradient(135deg,rgba(245,200,66,.15),rgba(146,64,14,.15));color:#f5c842;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:2px;">ВІДКРИТИ</button>
     </div>
   </div>
 </div>
@@ -3966,12 +3966,12 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
   <!-- Capital summary banner -->
   <div id="statsCapitalBanner" style="background:linear-gradient(135deg,#1a1209,#2d1f0e);border:1px solid rgba(245,200,66,.3);border-radius:14px;padding:14px 16px;margin-bottom:14px;position:relative;overflow:hidden;">
     <div style="position:absolute;inset:0;background:radial-gradient(circle at 80% 50%,rgba(245,200,66,.06),transparent 60%);pointer-events:none;"></div>
-    <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2px;">Загальний Капітал</div>
+    <div id="stats-capital-label" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2px;">Загальний Капітал</div>
     <div id="statsCapitalAmount" style="font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--gold);">0€</div>
     <div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap;">
-      <div style="font-size:11px;color:var(--muted);">💰 <span id="statsCapCash">0€</span></div>
-      <div style="font-size:11px;color:var(--muted);">📦 <span id="statsCapInv">0€</span></div>
-      <div style="font-size:11px;color:var(--muted);">💎 <span id="statsCapLife">0€</span></div>
+      <div style="font-size:11px;color:var(--muted);"><span id="stats-cash-label">💰</span> <span id="statsCapCash">0€</span></div>
+      <div style="font-size:11px;color:var(--muted);"><span id="stats-inv-label">📦</span> <span id="statsCapInv">0€</span></div>
+      <div style="font-size:11px;color:var(--muted);"><span id="stats-life-label">💎</span> <span id="statsCapLife">0€</span></div>
     </div>
     <div style="position:absolute;top:10px;right:14px;text-align:right;">
       <div style="font-size:10px;color:var(--muted);">Forbes</div>
@@ -3981,29 +3981,29 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
   <div class="stats-big-grid">
     <div class="stats-big-card">
       <div class="sb-val" id="statCasesOpened">0</div>
-      <div class="sb-label">Кейсів відкрито</div>
+      <div class="sb-label" id="stats-lbl-cases-opened">Кейсів відкрито</div>
     </div>
     <div class="stats-big-card">
       <div class="sb-val" id="statTotalEarned">0€</div>
-      <div class="sb-label">Зароблено всього</div>
+      <div class="sb-label" id="stats-lbl-total-earned">Зароблено всього</div>
     </div>
     <div class="stats-big-card">
       <div class="sb-val" id="statItemsSold">0</div>
-      <div class="sb-label">Продано предметів</div>
+      <div class="sb-label" id="stats-lbl-items-sold">Продано предметів</div>
     </div>
     <div class="stats-big-card">
       <div class="sb-val" id="statInShop">0</div>
-      <div class="sb-label">В магазині</div>
+      <div class="sb-label" id="stats-lbl-in-shop">В магазині</div>
     </div>
   </div>
-  <!-- Daily Streak button — вгорі статистики -->
+  <!-- Daily Streak button -->
   <div style="margin:0 0 14px;">
     <button onclick="openDailyStreak()" style="width:100%;padding:14px;border-radius:14px;border:1px solid rgba(251,191,36,.4);background:linear-gradient(135deg,rgba(20,10,0,.9),rgba(40,20,0,.95));cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;">
       <div style="display:flex;align-items:center;gap:10px;">
         <span style="font-size:26px;">💎</span>
         <div style="text-align:left;">
           <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;color:#fbbf24;">DAILY STREAK</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;">Щоденні нагороди Gold Credits</div>
+          <div id="stats-daily-streak-desc" style="font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;">Щоденні нагороди Gold Credits</div>
         </div>
       </div>
       <div style="text-align:right;">
@@ -4016,7 +4016,6 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
   <!-- ??? Endgame Button -->
   <div style="margin:0 0 14px;">
     <button id="statsEndgameBtn" onclick="openEndgameFromStats()" style="width:100%;padding:0;border-radius:16px;border:1px solid rgba(245,200,66,.35);background:linear-gradient(135deg,#1a0e00,#2a1500);cursor:pointer;overflow:hidden;position:relative;">
-      <!-- Shimmer -->
       <div style="position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(245,200,66,.07) 50%,transparent 60%);animation:goldShine 3s linear infinite;pointer-events:none;"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -4025,7 +4024,7 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
             <span style="position:relative;font-size:26px;line-height:42px;display:block;text-align:center;filter:drop-shadow(0 0 6px #f5c84288);" id="statsEndgameIcon">👁️</span>
           </div>
           <div style="text-align:left;">
-            <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;color:#f5c842;letter-spacing:1.5px;">??? ТАЄМНИЦЯ</div>
+            <div id="stats-mystery-label" style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;color:#f5c842;letter-spacing:1.5px;">??? ТАЄМНИЦЯ</div>
             <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;" id="statsEndgameSubtitle">Виконай умови щоб відкрити</div>
           </div>
         </div>
@@ -4034,7 +4033,6 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
           <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:4px;" id="statsEndgameProgress">0 / 3</div>
         </div>
       </div>
-      <!-- Conditions mini-bar -->
       <div style="display:flex;gap:1px;padding:0 14px 12px;" id="statsEndgameCondBar">
         <div style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.08);" id="statsCond1Bar"></div>
         <div style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.08);" id="statsCond2Bar"></div>
@@ -4043,20 +4041,20 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
     </button>
   </div>
 
-  <div class="section-title">Найкращий дроп</div>
+  <div class="section-title" id="stats-best-drop-title">Найкращий дроп</div>
   <div class="best-drop-card" id="bestDropCard">
     <div class="best-drop-emoji">🎁</div>
     <div class="best-drop-info">
-      <div class="bd-label">Ще не відкривав кейсів</div>
+      <div class="bd-label" id="bestDropLabel">Ще не відкривав кейсів</div>
       <div class="bd-name" id="bestDropName">—</div>
       <div class="bd-val" id="bestDropVal"></div>
     </div>
   </div>
-  <div class="section-title" style="margin-top:20px;">Рідкість дропів</div>
+  <div class="section-title" id="stats-rarity-title" style="margin-top:20px;">Рідкість дропів</div>
   <div class="rarity-stats" id="rarityStats"></div>
-  <div class="section-title" style="margin-top:20px;">🏆 Досягнення</div>
+  <div class="section-title" id="stats-achievements-title" style="margin-top:20px;">🏆 Досягнення</div>
   <div id="achievementsSection"></div>
-  <button class="reset-btn" onclick="confirmReset()">🗑️ Скинути весь прогрес</button>
+  <button class="reset-btn" id="stats-reset-btn" onclick="confirmReset()">🗑️ Скинути весь прогрес</button>
 </div>
 
 <!-- ===== MODAL: Items Preview ===== -->
@@ -4251,10 +4249,68 @@ const LANG_DATA = {
 
     // STATS
     stats_title: 'Статистика',
+    stats_capital_label: 'Загальний Капітал',
+    stats_cash_label: '💰 Готівка:',
+    stats_inv_label: '📦 Склад:',
+    stats_life_label: '💎 LifeShop:',
     stats_cases_opened: 'Кейсів відкрито',
-    stats_items_sold: 'Предметів продано',
+    stats_total_earned: 'Зароблено всього',
+    stats_items_sold: 'Продано предметів',
+    stats_in_shop: 'В магазині',
     stats_best_drop: 'Найкращий дроп',
+    stats_no_drop_yet: 'Ще не відкривав кейсів',
+    stats_rarity_title: 'Рідкість дропів',
+    stats_achievements_title: '🏆 Досягнення',
+    stats_daily_streak_desc: 'Щоденні нагороди Gold Credits',
+    stats_mystery_label: '??? ТАЄМНИЦЯ',
+    stats_mystery_sub: 'Виконай умови щоб відкрити',
+    stats_reset_btn: '🗑️ Скинути весь прогрес',
+    stats_best_drop_prefix: 'Найкращий дроп · ',
+    stats_ach_done: '✅ Виконано',
+    stats_ach_locked: '🔒 Заблоковано',
+    stats_ach_claimed: 'GC отримано',
     stats_no_drop: '—',
+
+    // DAILY STREAK MODAL
+    ds_subtitle_default: 'Заходь кожен день і збирай Gold Credits!',
+    ds_all_claimed: '🎉 Всі 30 днів зібрано! Новий місяць скоро.',
+    ds_already_today: '✅ Сьогодні вже отримано. Повертайся завтра!',
+    ds_day_of: 'День {n} з 30 · Твоя нагорода: {gc} 💎',
+    ds_claim_btn: '💎 ЗАБРАТИ {gc} GOLD CREDITS',
+    ds_claimed_today: '✅ Вже отримано сьогодні',
+    ds_all_done_btn: '✅ Всі 30 днів зібрано!',
+    ds_watch_btn: '📺 Дивитись рекламу → Забрати пропущений день',
+    ds_day_label: 'День',
+    ds_watching: '📺 Дивимось рекламу...',
+    ds_reward_toast: '💎 +{gc} Gold Credits за перегляд!',
+    ds_day_toast: '💎 +{gc} Gold Credits! День {n} з 30',
+
+    // ENDGAME / ??? MYSTERY
+    eg_locked_desc: 'Щоб відкрити цю вкладку, потрібно довести своє панування над цим світом.',
+    eg_cond1_desc: 'Обігнати Ілона Маска та стати №1',
+    eg_cond2_desc: 'Куплено абсолютно всі товари в LifeShop',
+    eg_cond3_desc: 'Зібрано всі 10 колекцій кейсів',
+    eg_unlocked_label: 'Фінал Гри',
+    eg_case_title: 'КЕЙС ІЛЮМІНАТІВ',
+    eg_case_desc: 'Ціна: <span style="color:#f5c842;font-weight:800;">1€</span> — данина поваги першому кліку.',
+    eg_open_btn: 'ВІДКРИТИ',
+
+    // LIFESHOP
+    ls_capital_label: 'Ваш Капітал',
+    ls_cash_label: '💰 Готівка:',
+    ls_inv_label: '📦 Склад:',
+    ls_life_label: '💎 LifeShop:',
+    ls_forbes_rank_label: 'Forbes рейтинг',
+    ls_tab_transport: '🚗 Транспорт',
+    ls_tab_realestate: '🏠 Нерухомість',
+    ls_tab_luxury: '💎 Розкіш',
+    ls_tab_owned: '🏆 Forbes',
+    ls_owned_badge: '✅ В АКТИВІ',
+    ls_buy_btn: '🛒 Купити',
+    ls_forbes_title: '🏆 Forbes — Рейтинг мільярдерів',
+    ls_forbes_per_min: '%/хв',
+    ls_forbes_crisis_event: '⚠️ Подія:',
+    ls_sell_toast: '💸 Продано за',
 
     // GARAGE
     garage_title: 'Гараж',
@@ -4390,10 +4446,68 @@ const LANG_DATA = {
 
     // STATS
     stats_title: 'Statistics',
+    stats_capital_label: 'Total Capital',
+    stats_cash_label: '💰 Cash:',
+    stats_inv_label: '📦 Storage:',
+    stats_life_label: '💎 LifeShop:',
     stats_cases_opened: 'Cases opened',
+    stats_total_earned: 'Total earned',
     stats_items_sold: 'Items sold',
+    stats_in_shop: 'In market',
     stats_best_drop: 'Best drop',
+    stats_no_drop_yet: 'No cases opened yet',
+    stats_rarity_title: 'Drop rarity',
+    stats_achievements_title: '🏆 Achievements',
+    stats_daily_streak_desc: 'Daily Gold Credits rewards',
+    stats_mystery_label: '??? MYSTERY',
+    stats_mystery_sub: 'Complete conditions to unlock',
+    stats_reset_btn: '🗑️ Reset all progress',
+    stats_best_drop_prefix: 'Best drop · ',
+    stats_ach_done: '✅ Completed',
+    stats_ach_locked: '🔒 Locked',
+    stats_ach_claimed: 'GC claimed',
     stats_no_drop: '—',
+
+    // DAILY STREAK MODAL
+    ds_subtitle_default: 'Log in every day and collect Gold Credits!',
+    ds_all_claimed: '🎉 All 30 days collected! New month coming soon.',
+    ds_already_today: '✅ Already claimed today. Come back tomorrow!',
+    ds_day_of: 'Day {n} of 30 · Your reward: {gc} 💎',
+    ds_claim_btn: '💎 CLAIM {gc} GOLD CREDITS',
+    ds_claimed_today: '✅ Already claimed today',
+    ds_all_done_btn: '✅ All 30 days collected!',
+    ds_watch_btn: '📺 Watch ad → Claim missed day',
+    ds_day_label: 'Day',
+    ds_watching: '📺 Watching ad...',
+    ds_reward_toast: '💎 +{gc} Gold Credits for watching!',
+    ds_day_toast: '💎 +{gc} Gold Credits! Day {n} of 30',
+
+    // ENDGAME / ??? MYSTERY
+    eg_locked_desc: 'To unlock this tab, you must prove your dominance over this world.',
+    eg_cond1_desc: 'Surpass Elon Musk and become #1',
+    eg_cond2_desc: 'Purchase every item in the LifeShop',
+    eg_cond3_desc: 'Complete all 10 case collections',
+    eg_unlocked_label: 'End Game',
+    eg_case_title: 'ILLUMINATI CASE',
+    eg_case_desc: 'Price: <span style="color:#f5c842;font-weight:800;">1€</span> — a tribute to the very first click.',
+    eg_open_btn: 'OPEN',
+
+    // LIFESHOP
+    ls_capital_label: 'Your Capital',
+    ls_cash_label: '💰 Cash:',
+    ls_inv_label: '📦 Storage:',
+    ls_life_label: '💎 LifeShop:',
+    ls_forbes_rank_label: 'Forbes rank',
+    ls_tab_transport: '🚗 Transport',
+    ls_tab_realestate: '🏠 Real Estate',
+    ls_tab_luxury: '💎 Luxury',
+    ls_tab_owned: '🏆 Forbes',
+    ls_owned_badge: '✅ OWNED',
+    ls_buy_btn: '🛒 Buy',
+    ls_forbes_title: '🏆 Forbes — Billionaires Ranking',
+    ls_forbes_per_min: '%/min',
+    ls_forbes_crisis_event: '⚠️ Event:',
+    ls_sell_toast: '💸 Sold for',
 
     // GARAGE
     garage_title: 'Garage',
@@ -4684,6 +4798,40 @@ function applyLangToSettings() {
     ['clk-upgrades-title', 'clk_upgrades_title'],
     // Cases tabs
     ['tab-lbl-cases', 'tab_cases'], ['tab-lbl-mystery', 'tab_mystery'],
+    // Stats screen
+    ['stats-capital-label', 'stats_capital_label'],
+    ['stats-cash-label', 'stats_cash_label'],
+    ['stats-inv-label', 'stats_inv_label'],
+    ['stats-life-label', 'stats_life_label'],
+    ['stats-lbl-cases-opened', 'stats_cases_opened'],
+    ['stats-lbl-total-earned', 'stats_total_earned'],
+    ['stats-lbl-items-sold', 'stats_items_sold'],
+    ['stats-lbl-in-shop', 'stats_in_shop'],
+    ['stats-best-drop-title', 'stats_best_drop'],
+    ['stats-rarity-title', 'stats_rarity_title'],
+    ['stats-achievements-title', 'stats_achievements_title'],
+    ['stats-daily-streak-desc', 'stats_daily_streak_desc'],
+    ['stats-mystery-label', 'stats_mystery_label'],
+    ['statsEndgameSubtitle', 'stats_mystery_sub'],
+    ['stats-reset-btn', 'stats_reset_btn'],
+    // Endgame screen
+    ['eg-locked-desc',    'eg_locked_desc'],
+    ['eg-cond1-desc',     'eg_cond1_desc'],
+    ['eg-cond2-desc',     'eg_cond2_desc'],
+    ['eg-cond3-desc',     'eg_cond3_desc'],
+    ['eg-unlocked-label', 'eg_unlocked_label'],
+    ['eg-case-title',     'eg_case_title'],
+    ['eg-open-btn',       'eg_open_btn'],
+    // LifeShop HUD and tabs
+    ['ls-capital-label',    'ls_capital_label'],
+    ['ls-cash-label',       'ls_cash_label'],
+    ['ls-inv-label',        'ls_inv_label'],
+    ['ls-life-label',       'ls_life_label'],
+    ['ls-forbes-rank-label','ls_forbes_rank_label'],
+    ['lstab-transport-lbl', 'ls_tab_transport'],
+    ['lstab-realestate-lbl','ls_tab_realestate'],
+    ['lstab-luxury-lbl',    'ls_tab_luxury'],
+    ['lstab-owned-lbl',     'ls_tab_owned'],
   ];
   ids.forEach(([id, key]) => {
     const el = document.getElementById(id);
@@ -4692,7 +4840,12 @@ function applyLangToSettings() {
   // HUD balance label
   const hudBal = document.getElementById('hud-balance-label');
   if (hudBal) hudBal.textContent = (_currentLang === 'en' ? '♦ Balance' : '♦ Баланс');
-  // Result modal static labels
+  // eg-case-desc has innerHTML (span inside)
+  const egCaseDesc = document.getElementById('eg-case-desc');
+  if (egCaseDesc) egCaseDesc.innerHTML = t('eg_case_desc');
+  // Daily streak watch button (static label)
+  const dsWatchBtn = document.getElementById('dsWatchBtn');
+  if (dsWatchBtn) dsWatchBtn.textContent = t('ds_watch_btn');
   const spinBtn = document.getElementById('spinBtn');
   if (spinBtn && spinBtn.textContent.includes('ВІДКРИТИ')) spinBtn.textContent = _currentLang==='en' ? '🎲 OPEN' : '🎲 ВІДКРИТИ';
   const introHint = document.getElementById('caseIntroHint');
@@ -4722,6 +4875,7 @@ function setLanguage(lang) {
   if (typeof renderUpgrades === 'function') renderUpgrades();
   if (typeof renderCollections === 'function') renderCollections();
   if (typeof renderTerminalFleet === 'function') renderTerminalFleet();
+  if (typeof renderLifeShop === 'function') renderLifeShop();
   updateHUD();
   applyLangToSettings();
   showToast(lang === 'en' ? '🇬🇧 Language: English' : '🇺🇦 Мова: Українська', '#f5c842', 2000);
@@ -5892,96 +6046,96 @@ const DONATE_HANGAR = {
 
 // =================== LIFESHOP DATA ===================
 const FORBES_RIVALS = [
-  { name:'Ілон Маск',         net:180_000_000_000, emoji:'🚀' },
-  { name:'Джефф Безос',       net:120_000_000_000, emoji:'📦' },
-  { name:'Бернар Арно',       net:100_000_000_000, emoji:'👜' },
-  { name:'Білл Гейтс',        net: 85_000_000_000, emoji:'💻' },
-  { name:'Ларрі Еллісон',     net: 78_000_000_000, emoji:'☁️' },
-  { name:'Уоррен Баффет',     net: 65_000_000_000, emoji:'📈' },
-  { name:'Ларрі Пейдж',       net: 58_000_000_000, emoji:'🔍' },
-  { name:'Сергій Брін',       net: 55_000_000_000, emoji:'🌐' },
-  { name:'Марк Цукерберг',    net: 48_000_000_000, emoji:'👤' },
-  { name:'Стів Балмер',       net: 42_000_000_000, emoji:'🪟' },
-  { name:'Мукеш Амбані',      net: 35_000_000_000, emoji:'⛽' },
-  { name:'Карлос Слім',       net: 28_000_000_000, emoji:'📡' },
-  { name:'Франсуаза Меєр',    net: 20_000_000_000, emoji:'🛒' },
-  { name:'Джим Волтон',       net: 15_000_000_000, emoji:'🏪' },
-  { name:'Мішель Делор',      net:  8_000_000_000, emoji:'🏭' },
-  { name:'Роберт Арно',       net:  5_000_000_000, emoji:'🍾' },
-  { name:'Рей Даліо',         net:  3_000_000_000, emoji:'💹' },
-  { name:'Пітер Тіль',        net:  1_500_000_000, emoji:'🔐' },
-  { name:'Патрік Коллісон',   net:    700_000_000, emoji:'💳' },
-  { name:'Ти',               net:              0, emoji:'😎', isPlayer:true },
+  { name:{uk:'Ілон Маск',       en:'Elon Musk'},        net:180_000_000_000, emoji:'🚀' },
+  { name:{uk:'Джефф Безос',     en:'Jeff Bezos'},        net:120_000_000_000, emoji:'📦' },
+  { name:{uk:'Бернар Арно',     en:'Bernard Arnault'},   net:100_000_000_000, emoji:'👜' },
+  { name:{uk:'Білл Гейтс',      en:'Bill Gates'},         net: 85_000_000_000, emoji:'💻' },
+  { name:{uk:'Ларрі Еллісон',   en:'Larry Ellison'},     net: 78_000_000_000, emoji:'☁️' },
+  { name:{uk:'Уоррен Баффет',   en:'Warren Buffett'},    net: 65_000_000_000, emoji:'📈' },
+  { name:{uk:'Ларрі Пейдж',     en:'Larry Page'},        net: 58_000_000_000, emoji:'🔍' },
+  { name:{uk:'Сергій Брін',     en:'Sergey Brin'},       net: 55_000_000_000, emoji:'🌐' },
+  { name:{uk:'Марк Цукерберг',  en:'Mark Zuckerberg'},   net: 48_000_000_000, emoji:'👤' },
+  { name:{uk:'Стів Балмер',     en:'Steve Ballmer'},     net: 42_000_000_000, emoji:'🪟' },
+  { name:{uk:'Мукеш Амбані',    en:'Mukesh Ambani'},     net: 35_000_000_000, emoji:'⛽' },
+  { name:{uk:'Карлос Слім',     en:'Carlos Slim'},       net: 28_000_000_000, emoji:'📡' },
+  { name:{uk:'Франсуаза Меєр',  en:'Françoise Meyers'},  net: 20_000_000_000, emoji:'🛒' },
+  { name:{uk:'Джим Волтон',     en:'Jim Walton'},        net: 15_000_000_000, emoji:'🏪' },
+  { name:{uk:'Мішель Делор',    en:'Michel Delors'},     net:  8_000_000_000, emoji:'🏭' },
+  { name:{uk:'Роберт Арно',     en:'Robert Arnault'},    net:  5_000_000_000, emoji:'🍾' },
+  { name:{uk:'Рей Даліо',       en:'Ray Dalio'},         net:  3_000_000_000, emoji:'💹' },
+  { name:{uk:'Пітер Тіль',      en:'Peter Thiel'},       net:  1_500_000_000, emoji:'🔐' },
+  { name:{uk:'Патрік Коллісон', en:'Patrick Collison'},  net:    700_000_000, emoji:'💳' },
+  { name:{uk:'Ти',              en:'You'},               net:              0, emoji:'😎', isPlayer:true },
 ];
 
 
 
 const LIFESHOP_ITEMS = {
   transport: [
-    { id:'tr01', name:'Спортивний байк Ducati',         emoji:'🏍️', price:50_000,          category:'transport' },
-    { id:'tr02', name:'Тюнінгований Jeep Wrangler',     emoji:'🚙', price:85_000,          category:'transport' },
-    { id:'tr03', name:'Mercedes S-Class',               emoji:'🚘', price:130_000,         category:'transport' },
-    { id:'tr04', name:'Tesla Model S Plaid',            emoji:'⚡', price:160_000,         category:'transport' },
-    { id:'tr05', name:'Маслкар 1969 року',              emoji:'🚗', price:250_000,         category:'transport' },
-    { id:'tr06', name:'Lamborghini Huracán',            emoji:'🐂', price:350_000,         category:'transport' },
-    { id:'tr07', name:'Броньований лімузин',            emoji:'🚖', price:500_000,         category:'transport' },
-    { id:'tr08', name:'Ferrari Enzo (колекційний)',     emoji:'🏎️', price:1_200_000,       category:'transport' },
-    { id:'tr09', name:'Вертоліт Robinson R44',          emoji:'🚁', price:2_500_000,       category:'transport' },
-    { id:'tr10', name:'Приватний літак Cessna',         emoji:'✈️', price:5_000_000,       category:'transport' },
-    { id:'tr11', name:'Швидкісна яхта 15м',            emoji:'⛵', price:8_500_000,       category:'transport' },
-    { id:'tr12', name:'Вертоліт Bell 429',              emoji:'🚁', price:12_000_000,      category:'transport' },
-    { id:'tr13', name:'Bugatti Chiron',                 emoji:'🐛', price:18_000_000,      category:'transport' },
-    { id:'tr14', name:'Gulfstream G650',                emoji:'🛩️', price:45_000_000,      category:'transport' },
-    { id:'tr15', name:'Яхта Explorer (75м)',            emoji:'🛥️', price:75_000_000,      category:'transport' },
-    { id:'tr16', name:'Boeing 747 вантажний',           emoji:'✈️', price:120_000_000,     category:'transport' },
-    { id:'tr17', name:'Супер-яхта Eclipse (80м)',       emoji:'🚢', price:200_000_000,     category:'transport' },
-    { id:'tr18', name:'Особистий підводний човен',      emoji:'🤿', price:350_000_000,     category:'transport' },
-    { id:'tr19', name:'Приватний авіаносець',           emoji:'⚓', price:750_000_000,     category:'transport' },
-    { id:'tr20', name:'Космічний шаттл для туризму',    emoji:'🚀', price:1_500_000_000,   category:'transport' },
+    { id:'tr01', name:{uk:'Спортивний байк Ducati',       en:'Ducati Sport Bike'},              emoji:'🏍️', price:50_000,          category:'transport' },
+    { id:'tr02', name:{uk:'Тюнінгований Jeep Wrangler',   en:'Tuned Jeep Wrangler'},            emoji:'🚙', price:85_000,          category:'transport' },
+    { id:'tr03', name:{uk:'Mercedes S-Class',             en:'Mercedes S-Class'},               emoji:'🚘', price:130_000,         category:'transport' },
+    { id:'tr04', name:{uk:'Tesla Model S Plaid',          en:'Tesla Model S Plaid'},            emoji:'⚡', price:160_000,         category:'transport' },
+    { id:'tr05', name:{uk:'Маслкар 1969 року',            en:'1969 Muscle Car'},                emoji:'🚗', price:250_000,         category:'transport' },
+    { id:'tr06', name:{uk:'Lamborghini Huracán',          en:'Lamborghini Huracán'},            emoji:'🐂', price:350_000,         category:'transport' },
+    { id:'tr07', name:{uk:'Броньований лімузин',          en:'Armoured Limousine'},             emoji:'🚖', price:500_000,         category:'transport' },
+    { id:'tr08', name:{uk:'Ferrari Enzo (колекційний)',   en:'Ferrari Enzo (Collector\'s)'},    emoji:'🏎️', price:1_200_000,       category:'transport' },
+    { id:'tr09', name:{uk:'Вертоліт Robinson R44',        en:'Robinson R44 Helicopter'},        emoji:'🚁', price:2_500_000,       category:'transport' },
+    { id:'tr10', name:{uk:'Приватний літак Cessna',       en:'Cessna Private Jet'},             emoji:'✈️', price:5_000_000,       category:'transport' },
+    { id:'tr11', name:{uk:'Швидкісна яхта 15м',          en:'Speed Yacht 15m'},                emoji:'⛵', price:8_500_000,       category:'transport' },
+    { id:'tr12', name:{uk:'Вертоліт Bell 429',            en:'Bell 429 Helicopter'},            emoji:'🚁', price:12_000_000,      category:'transport' },
+    { id:'tr13', name:{uk:'Bugatti Chiron',               en:'Bugatti Chiron'},                 emoji:'🐛', price:18_000_000,      category:'transport' },
+    { id:'tr14', name:{uk:'Gulfstream G650',              en:'Gulfstream G650'},                emoji:'🛩️', price:45_000_000,      category:'transport' },
+    { id:'tr15', name:{uk:'Яхта Explorer (75м)',          en:'Explorer Yacht (75m)'},           emoji:'🛥️', price:75_000_000,      category:'transport' },
+    { id:'tr16', name:{uk:'Boeing 747 вантажний',         en:'Boeing 747 Cargo'},               emoji:'✈️', price:120_000_000,     category:'transport' },
+    { id:'tr17', name:{uk:'Супер-яхта Eclipse (80м)',     en:'Superyacht Eclipse (80m)'},       emoji:'🚢', price:200_000_000,     category:'transport' },
+    { id:'tr18', name:{uk:'Особистий підводний човен',    en:'Personal Submarine'},             emoji:'🤿', price:350_000_000,     category:'transport' },
+    { id:'tr19', name:{uk:'Приватний авіаносець',         en:'Private Aircraft Carrier'},       emoji:'⚓', price:750_000_000,     category:'transport' },
+    { id:'tr20', name:{uk:'Космічний шаттл для туризму',  en:'Space Tourism Shuttle'},          emoji:'🚀', price:1_500_000_000,   category:'transport' },
   ],
   realestate: [
-    { id:'re01', name:'Студія в центрі міста',          emoji:'🏠', price:150_000,         category:'realestate' },
-    { id:'re02', name:'Заміський будинок з басейном',   emoji:'🏡', price:350_000,         category:'realestate' },
-    { id:'re03', name:'Лофт у Нью-Йорку',              emoji:'🌆', price:750_000,         category:'realestate' },
-    { id:'re04', name:'Пентхаус у Дубаї',              emoji:'🏙️', price:1_500_000,       category:'realestate' },
-    { id:'re05', name:'Вілла на березі океану',         emoji:'🌊', price:3_000_000,       category:'realestate' },
-    { id:'re06', name:'Маєток у Лондоні',              emoji:'🏰', price:7_000_000,       category:'realestate' },
-    { id:'re07', name:'Виноробня в Тоскані',           emoji:'🍷', price:12_000_000,      category:'realestate' },
-    { id:'re08', name:'Замок у Франції',               emoji:'🏯', price:25_000_000,      category:'realestate' },
-    { id:'re09', name:'Шале в Куршевелі',              emoji:'⛷️', price:40_000_000,      category:'realestate' },
-    { id:'re10', name:'Ранчо в Техасі (1000га)',        emoji:'🤠', price:65_000_000,      category:'realestate' },
-    { id:'re11', name:'Хмарочос (офісний центр)',       emoji:'🏢', price:150_000_000,     category:'realestate' },
-    { id:'re12', name:'Тропічний острів',              emoji:'🏝️', price:280_000_000,     category:'realestate' },
-    { id:'re13', name:'Мережа готелів люкс',           emoji:'🛎️', price:500_000_000,     category:'realestate' },
-    { id:'re14', name:'Підводний готель',              emoji:'🐠', price:850_000_000,     category:'realestate' },
-    { id:'re15', name:'Місто-технопарк',               emoji:'🌐', price:1_200_000_000,   category:'realestate' },
-    { id:'re16', name:'Нафтова платформа',             emoji:'🛢️', price:2_500_000_000,   category:'realestate' },
-    { id:'re17', name:'Королівський палац',             emoji:'👑', price:5_000_000_000,   category:'realestate' },
-    { id:'re18', name:'Князівство',                    emoji:'🗺️', price:12_000_000_000,  category:'realestate' },
-    { id:'re19', name:'Плавуче місто',                 emoji:'🌍', price:50_000_000_000,  category:'realestate' },
-    { id:'re20', name:'Колонія на Марсі',              emoji:'🔴', price:250_000_000_000, category:'realestate' },
+    { id:'re01', name:{uk:'Студія в центрі міста',        en:'City Centre Studio'},             emoji:'🏠', price:150_000,         category:'realestate' },
+    { id:'re02', name:{uk:'Заміський будинок з басейном', en:'Country House with Pool'},        emoji:'🏡', price:350_000,         category:'realestate' },
+    { id:'re03', name:{uk:'Лофт у Нью-Йорку',            en:'New York Loft'},                  emoji:'🌆', price:750_000,         category:'realestate' },
+    { id:'re04', name:{uk:'Пентхаус у Дубаї',            en:'Dubai Penthouse'},                emoji:'🏙️', price:1_500_000,       category:'realestate' },
+    { id:'re05', name:{uk:'Вілла на березі океану',       en:'Oceanfront Villa'},               emoji:'🌊', price:3_000_000,       category:'realestate' },
+    { id:'re06', name:{uk:'Маєток у Лондоні',            en:'London Mansion'},                 emoji:'🏰', price:7_000_000,       category:'realestate' },
+    { id:'re07', name:{uk:'Виноробня в Тоскані',         en:'Tuscany Winery'},                 emoji:'🍷', price:12_000_000,      category:'realestate' },
+    { id:'re08', name:{uk:'Замок у Франції',             en:'French Castle'},                  emoji:'🏯', price:25_000_000,      category:'realestate' },
+    { id:'re09', name:{uk:'Шале в Куршевелі',            en:'Courchevel Chalet'},              emoji:'⛷️', price:40_000_000,      category:'realestate' },
+    { id:'re10', name:{uk:'Ранчо в Техасі (1000га)',     en:'Texas Ranch (1000ha)'},           emoji:'🤠', price:65_000_000,      category:'realestate' },
+    { id:'re11', name:{uk:'Хмарочос (офісний центр)',    en:'Skyscraper (Office Tower)'},      emoji:'🏢', price:150_000_000,     category:'realestate' },
+    { id:'re12', name:{uk:'Тропічний острів',            en:'Tropical Island'},                emoji:'🏝️', price:280_000_000,     category:'realestate' },
+    { id:'re13', name:{uk:'Мережа готелів люкс',         en:'Luxury Hotel Chain'},             emoji:'🛎️', price:500_000_000,     category:'realestate' },
+    { id:'re14', name:{uk:'Підводний готель',            en:'Underwater Hotel'},               emoji:'🐠', price:850_000_000,     category:'realestate' },
+    { id:'re15', name:{uk:'Місто-технопарк',             en:'Tech Park City'},                 emoji:'🌐', price:1_200_000_000,   category:'realestate' },
+    { id:'re16', name:{uk:'Нафтова платформа',           en:'Oil Platform'},                   emoji:'🛢️', price:2_500_000_000,   category:'realestate' },
+    { id:'re17', name:{uk:'Королівський палац',           en:'Royal Palace'},                   emoji:'👑', price:5_000_000_000,   category:'realestate' },
+    { id:'re18', name:{uk:'Князівство',                  en:'Principality'},                   emoji:'🗺️', price:12_000_000_000,  category:'realestate' },
+    { id:'re19', name:{uk:'Плавуче місто',               en:'Floating City'},                  emoji:'🌍', price:50_000_000_000,  category:'realestate' },
+    { id:'re20', name:{uk:'Колонія на Марсі',            en:'Mars Colony'},                    emoji:'🔴', price:250_000_000_000, category:'realestate' },
   ],
   luxury: [
-    { id:'lx01', name:'Rolex Daytona',                  emoji:'⌚', price:40_000,          category:'luxury' },
-    { id:'lx02', name:'Колекція рідкісних вин',         emoji:'🍾', price:75_000,          category:'luxury' },
-    { id:'lx03', name:'Золотий самородок (2кг)',         emoji:'🥇', price:120_000,         category:'luxury' },
-    { id:'lx04', name:'Скульптура сучасного мистецтва', emoji:'🗿', price:250_000,         category:'luxury' },
-    { id:'lx05', name:'Діамантове намисто',             emoji:'💎', price:450_000,         category:'luxury' },
-    { id:'lx06', name:'Рояль Steinway & Sons',          emoji:'🎹', price:600_000,         category:'luxury' },
-    { id:'lx07', name:'Раритетні комікси',              emoji:'📚', price:900_000,         category:'luxury' },
-    { id:'lx08', name:'Картина імпресіоніста',          emoji:'🖼️', price:2_500_000,       category:'luxury' },
-    { id:'lx09', name:'Корона XVIII століття',          emoji:'👑', price:5_000_000,       category:'luxury' },
-    { id:'lx10', name:'Скелет тиранозавра',             emoji:'🦖', price:12_000_000,      category:'luxury' },
-    { id:'lx11', name:'Яйце Фаберже (оригінал)',        emoji:'🥚', price:25_000_000,      category:'luxury' },
-    { id:'lx12', name:'Скрипка Страдіварі',             emoji:'🎻', price:45_000_000,      category:'luxury' },
-    { id:'lx13', name:'Колекція авто (20 штук)',         emoji:'🚗', price:80_000_000,      category:'luxury' },
-    { id:'lx14', name:'Золотий унітаз з діамантами',    emoji:'🚽', price:120_000_000,     category:'luxury' },
-    { id:'lx15', name:'Рукопис да Вінчі',              emoji:'📜', price:250_000_000,     category:'luxury' },
-    { id:'lx16', name:'Алмаз "Зірка Африки"',          emoji:'💠', price:500_000_000,     category:'luxury' },
-    { id:'lx17', name:'Особистий супутник',             emoji:'🛰️', price:1_500_000_000,   category:'luxury' },
-    { id:'lx18', name:'Футбольний клуб А-ліги',         emoji:'⚽', price:4_000_000_000,   category:'luxury' },
-    { id:'lx19', name:'Золотий запас банку',            emoji:'🏦', price:15_000_000_000,  category:'luxury' },
-    { id:'lx20', name:'Право на Місяць (сертифікат)',   emoji:'🌕', price:100_000_000_000, category:'luxury' },
+    { id:'lx01', name:{uk:'Rolex Daytona',                       en:'Rolex Daytona'},                         emoji:'⌚', price:40_000,          category:'luxury' },
+    { id:'lx02', name:{uk:'Колекція рідкісних вин',              en:'Rare Wine Collection'},                  emoji:'🍾', price:75_000,          category:'luxury' },
+    { id:'lx03', name:{uk:'Золотий самородок (2кг)',              en:'Gold Nugget (2kg)'},                     emoji:'🥇', price:120_000,         category:'luxury' },
+    { id:'lx04', name:{uk:'Скульптура сучасного мистецтва',      en:'Contemporary Art Sculpture'},            emoji:'🗿', price:250_000,         category:'luxury' },
+    { id:'lx05', name:{uk:'Діамантове намисто',                  en:'Diamond Necklace'},                      emoji:'💎', price:450_000,         category:'luxury' },
+    { id:'lx06', name:{uk:'Рояль Steinway & Sons',               en:'Steinway & Sons Grand Piano'},           emoji:'🎹', price:600_000,         category:'luxury' },
+    { id:'lx07', name:{uk:'Раритетні комікси',                   en:'Rare Comics Collection'},                emoji:'📚', price:900_000,         category:'luxury' },
+    { id:'lx08', name:{uk:'Картина імпресіоніста',               en:'Impressionist Painting'},                emoji:'🖼️', price:2_500_000,       category:'luxury' },
+    { id:'lx09', name:{uk:'Корона XVIII століття',               en:'18th Century Crown'},                    emoji:'👑', price:5_000_000,       category:'luxury' },
+    { id:'lx10', name:{uk:'Скелет тиранозавра',                  en:'T-Rex Skeleton'},                        emoji:'🦖', price:12_000_000,      category:'luxury' },
+    { id:'lx11', name:{uk:'Яйце Фаберже (оригінал)',             en:'Fabergé Egg (Original)'},                emoji:'🥚', price:25_000_000,      category:'luxury' },
+    { id:'lx12', name:{uk:'Скрипка Страдіварі',                  en:'Stradivarius Violin'},                   emoji:'🎻', price:45_000_000,      category:'luxury' },
+    { id:'lx13', name:{uk:'Колекція авто (20 штук)',              en:'Car Collection (20 pieces)'},            emoji:'🚗', price:80_000_000,      category:'luxury' },
+    { id:'lx14', name:{uk:'Золотий унітаз з діамантами',         en:'Diamond-Encrusted Golden Toilet'},       emoji:'🚽', price:120_000_000,     category:'luxury' },
+    { id:'lx15', name:{uk:'Рукопис да Вінчі',                    en:'Da Vinci Manuscript'},                   emoji:'📜', price:250_000_000,     category:'luxury' },
+    { id:'lx16', name:{uk:'Алмаз "Зірка Африки"',               en:'"Star of Africa" Diamond'},              emoji:'💠', price:500_000_000,     category:'luxury' },
+    { id:'lx17', name:{uk:'Особистий супутник',                  en:'Personal Satellite'},                    emoji:'🛰️', price:1_500_000_000,   category:'luxury' },
+    { id:'lx18', name:{uk:'Футбольний клуб А-ліги',              en:'Premier League Football Club'},          emoji:'⚽', price:4_000_000_000,   category:'luxury' },
+    { id:'lx19', name:{uk:'Золотий запас банку',                 en:'Bank Gold Reserve'},                     emoji:'🏦', price:15_000_000_000,  category:'luxury' },
+    { id:'lx20', name:{uk:'Право на Місяць (сертифікат)',        en:'Moon Rights (Certificate)'},             emoji:'🌕', price:100_000_000_000, category:'luxury' },
   ],
 };
 
@@ -6315,7 +6469,7 @@ function loadState() {
       if (!state.rivalNets) {
         // Init rival nets from base values
         state.rivalNets = {};
-        FORBES_RIVALS.forEach(r => { if (!r.isPlayer) state.rivalNets[r.name] = r.net; });
+        FORBES_RIVALS.forEach(r => { if (!r.isPlayer) state.rivalNets[rivalKey(r)] = r.net; });
       }
       // Re-apply collection bonuses immediately after load
       // (called inline so bonuses are ready before any render)
@@ -6682,15 +6836,15 @@ function updateHUD() {
     const playerCap = _cc.total;
     FORBES_RIVALS.forEach(function(r) {
       if (r.isPlayer) return;
-      const rNet = (state.rivalNets && state.rivalNets[r.name] != null) ? state.rivalNets[r.name] : r.net;
+      const rNet = (state.rivalNets && state.rivalNets[rivalKey(r)] != null) ? state.rivalNets[rivalKey(r)] : r.net;
       if (playerCap > rNet && typeof maybeRecordFirstDefeated === 'function') {
-        maybeRecordFirstDefeated(r.name);
+        maybeRecordFirstDefeated(rivalKey(r));
       }
     });
   }
     document.getElementById('passiveDisplay').textContent =
     totalPassive > 0
-      ? '+' + fmtCapital(totalPassive) + '/сек' + (_adPassMult > 1 ? ' ⚡x2' : (pm > 1 || ps > 1 ? ' ✨' : '') + (rentalPassive > 0 ? ' 🌐' : ''))
+      ? '+' + fmtCapital(totalPassive) + (_currentLang === 'en' ? '/sec' : '/сек') + (_adPassMult > 1 ? ' ⚡x2' : (pm > 1 || ps > 1 ? ' ✨' : '') + (rentalPassive > 0 ? ' 🌐' : ''))
       : '';
 
   const inv = state.inventory.length;
@@ -9864,20 +10018,23 @@ function renderStats() {
   document.getElementById('statInShop').textContent = state.shop.filter(x => !x.sold).length;
 
   const bd = state.stats.bestDrop;
+  const labelEl = document.getElementById('bestDropLabel');
   if (bd) {
     document.getElementById('bestDropCard').querySelector('.best-drop-emoji').innerHTML = itemDisplay(bd.emoji, 40);
-    document.getElementById('bestDropCard').querySelector('.bd-label').textContent = 'Найкращий дроп · ' + RARITY_LABELS[bd.rarity];
+    if (labelEl) labelEl.textContent = t('stats_best_drop_prefix') + RARITY_LABELS[bd.rarity];
     document.getElementById('bestDropName').textContent = bd.name;
     document.getElementById('bestDropVal').textContent = fmt(bd.value);
+  } else {
+    if (labelEl) labelEl.textContent = t('stats_no_drop_yet');
   }
 
   const rc = state.stats.rarityCount;
   const total = Object.values(rc).reduce((a,b) => a+b, 0) || 1;
   const rarityDef = [
-    { key:'legendary', label:'🟡 Legendary', color:'var(--legendary)' },
-    { key:'epic',      label:'🟣 Epic',      color:'var(--epic)' },
-    { key:'rare',      label:'🔵 Rare',      color:'var(--rare)' },
-    { key:'common',    label:'⚪ Common',    color:'var(--common)' },
+    { key:'legendary', label: RARITY_LABELS['legendary'], color:'var(--legendary)' },
+    { key:'epic',      label: RARITY_LABELS['epic'],      color:'var(--epic)' },
+    { key:'rare',      label: RARITY_LABELS['rare'],      color:'var(--rare)' },
+    { key:'common',    label: RARITY_LABELS['common'],    color:'var(--common)' },
   ];
   const container = document.getElementById('rarityStats');
   container.innerHTML = '';
@@ -9906,9 +10063,14 @@ function calcCapital() {
   return { cash, invVal, lifeVal, total: cash + invVal + lifeVal };
 }
 
+// Returns the stable Ukrainian string key for a rival (used for rivalNets/rivalLastChange dicts)
+function rivalKey(r) {
+  return typeof r.name === 'object' ? r.name.uk : r.name;
+}
+
 function getRivalNet(r) {
-  return (state.rivalNets && state.rivalNets[r.name] != null)
-    ? state.rivalNets[r.name]
+  return (state.rivalNets && state.rivalNets[rivalKey(r)] != null)
+    ? state.rivalNets[rivalKey(r)]
     : r.net;
 }
 
@@ -9988,7 +10150,7 @@ function sellLifeAsset(assetId) {
   state.balance += sellPrice;
   state.lifeAssets = state.lifeAssets.filter(x => x.id !== assetId);
   playSell();
-  showToast('💸 Продано за ' + fmtCapital(sellPrice) + ' (80% від ціни)');
+  showToast(t('ls_sell_toast') + ' ' + fmtCapital(sellPrice) + (_currentLang === 'en' ? ' (80% of price)' : ' (80% від ціни)'));
   updateHUD(); updateCapitalUI(); saveState();
   // Re-render the item's category tab so Buy button reappears
   renderLifeShopPane(asset.category);
@@ -10030,19 +10192,21 @@ function renderLifeShopPane(tab) {
     if (owned) {
       _btnHtml =
         '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">' +
-          '<span class="ls-owned-badge">✅ В АКТИВІ</span>' +
+          '<span class="ls-owned-badge">' + t('ls_owned_badge') + '</span>' +
           '<button class="ls-sell-btn" onclick="sellLifeAsset(' + ownedAsset.id + ')" style="font-size:11px;padding:5px 10px;">💸 ' + fmtCapital(sellPrice) + '</button>' +
         '</div>';
     } else if (canAfford) {
-      _btnHtml = '<button class="ls-buy-btn" onclick="buyLifeItem(\'' + item.id + '\')">🛒 Купити</button>';
+      _btnHtml = '<button class="ls-buy-btn" onclick="buyLifeItem(\'' + item.id + '\'">' + t('ls_buy_btn') + '</button>';
     } else {
       _btnHtml = '<button class="ls-buy-btn ls-cant">🔒 ' + fmtCapital(item.price) + '</button>';
     }
 
+    const itemName = typeof item.name === 'object' ? (item.name[_currentLang] || item.name.uk) : item.name;
+
     card.innerHTML =
       '<div class="ls-item-emoji">' + item.emoji + '</div>' +
       '<div class="ls-item-info">' +
-        '<div class="ls-item-name">' + item.name + '</div>' +
+        '<div class="ls-item-name">' + itemName + '</div>' +
         '<div class="ls-item-price">' + fmtCapital(item.price) + '</div>' +
       '</div>' +
       _btnHtml;
@@ -10061,50 +10225,50 @@ function renderForbesTable(container) {
   const title = document.createElement('div');
   title.className = 'section-title';
   title.style.marginTop = '16px';
-  title.textContent = '🏆 Forbes — Рейтинг мільярдерів';
+  title.textContent = t('ls_forbes_title');
   container.appendChild(title);
 
   const tableWrap = document.createElement('div');
   tableWrap.className = 'forbes-table';
 
-  // Build list with player inserted correctly
   const rivals = FORBES_RIVALS.filter(r => !r.isPlayer).map(r => ({
     ...r, net: getRivalNet(r)
   }));
-  const allInList = [...rivals, { name: state.playerName || 'Ти', net:cap.total, emoji:'😎', isPlayer:true }];
+  const playerLabel = state.playerName || (_currentLang === 'en' ? 'You' : 'Ти');
+  const allInList = [...rivals, { name: playerLabel, net:cap.total, emoji:'😎', isPlayer:true }];
   allInList.sort((a,b) => b.net - a.net);
 
   allInList.forEach((person, i) => {
-    const lastChange = !person.isPlayer ? (window.rivalLastChange?.[person.name] || null) : null;
+    const lastChange = !person.isPlayer ? (window.rivalLastChange?.[typeof person.name === 'object' ? person.name.uk : person.name] || null) : null;
     const hasCrisis  = lastChange?.crisis === true;
 
-    // Wrapper (row + optional event detail)
     const wrapper = document.createElement('div');
 
     const row = document.createElement('div');
     row.className = 'forbes-row' + (person.isPlayer ? ' player-row' : '') + (hasCrisis ? ' crisis-row' : '');
     const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i+1);
 
-    // Change indicator badge
     let changeBadge = '';
     if (!person.isPlayer) {
       if (lastChange === null) {
         const growthPct = (getRivalGrowthRate(person.net) * 100).toFixed(2);
-        changeBadge = '<span class="forbes-badge sleep">💤 +' + growthPct + '%/хв</span>';
+        changeBadge = '<span class="forbes-badge sleep">💤 +' + growthPct + t('ls_forbes_per_min') + '</span>';
       } else if (hasCrisis) {
         changeBadge = '<span class="forbes-badge crisis">📉 −' + fmtCapital(Math.abs(lastChange.delta)) + '</span>';
       } else if (lastChange?.delta > 0) {
         const growthPct = (getRivalGrowthRate(person.net) * 100).toFixed(2);
-        changeBadge = '<span class="forbes-badge grow">🟢 +' + growthPct + '%/хв</span>';
+        changeBadge = '<span class="forbes-badge grow">🟢 +' + growthPct + t('ls_forbes_per_min') + '</span>';
       }
     }
+
+    const displayName = typeof person.name === 'object' ? (person.name[_currentLang] || person.name.uk) : person.name;
 
     row.innerHTML =
       '<div class="forbes-rank">' + medal + '</div>' +
       '<div class="forbes-emoji">' + person.emoji + '</div>' +
       '<div style="flex:1;min-width:0;">' +
         '<div style="font-size:13px;font-weight:700;color:var(--text);">' +
-          person.name + (person.isPlayer ? ' 👈' : '') +
+          displayName + (person.isPlayer ? ' 👈' : '') +
         '</div>' +
         (changeBadge ? '<div style="margin-top:2px;">' + changeBadge + '</div>' : '') +
       '</div>' +
@@ -10112,12 +10276,10 @@ function renderForbesTable(container) {
 
     wrapper.appendChild(row);
 
-    // Crisis event detail row (expands below)
     if (hasCrisis && lastChange.text) {
       const detail = document.createElement('div');
       detail.className = 'forbes-crisis-detail';
-      detail.innerHTML =
-        '<span style="color:#ef4444;font-weight:700;">⚠️ Подія:</span> ' + lastChange.text;
+      detail.innerHTML = '<span style="color:#ef4444;font-weight:700;">' + t('ls_forbes_crisis_event') + '</span> ' + lastChange.text;
       wrapper.appendChild(detail);
     }
 
@@ -10141,16 +10303,46 @@ function renderLifeShop() {
 
 // =================== CAPITAL ACHIEVEMENTS ===================
 const CAPITAL_ACHIEVEMENTS = [
-  { id:'cap1k',    threshold:1_000,           icon:'🌱', title:'Перший крок',         desc:'Досягни капіталу 1,000€',       label:'Початківець' },
-  { id:'cap10k',   threshold:10_000,          icon:'💵', title:'Перші десятки тисяч', desc:'Досягни капіталу 10,000€',      label:'Дрібний інвестор' },
-  { id:'cap100k',  threshold:100_000,         icon:'🏅', title:'Успішний підприємець',desc:'Досягни капіталу 100,000€',     label:'Підприємець' },
-  { id:'cap1m',    threshold:1_000_000,       icon:'💰', title:'Мільйонер!',          desc:'Досягни капіталу 1,000,000€',   label:'Мільйонер' },
-  { id:'cap10m',   threshold:10_000_000,      icon:'🏆', title:'Великий гравець',     desc:'Досягни капіталу 10,000,000€',  label:'Великий гравець' },
-  { id:'cap100m',  threshold:100_000_000,     icon:'💎', title:'Магнат',              desc:'Досягни капіталу 100M€',        label:'Магнат' },
-  { id:'cap1b',    threshold:1_000_000_000,   icon:'🚀', title:'Мільярдер Forbes',    desc:'Досягни капіталу 1B€',          label:'Мільярдер' },
-  { id:'cap10b',   threshold:10_000_000_000,  icon:'🌍', title:'Мегабагатій',         desc:'Досягни капіталу 10B€',         label:'Мегабагатій' },
-  { id:'cap100b',  threshold:100_000_000_000, icon:'👑', title:'Король Forbes',       desc:'Досягни капіталу 100B€',        label:'Король Forbes' },
-  { id:'cap1t',    threshold:1_000_000_000_000,icon:'🌌',title:'Трильйонер',          desc:'Досягни капіталу 1T€',          label:'Трильйонер' },
+  { id:'cap1k',    threshold:1_000,            icon:'🌱',
+    title:{uk:'Перший крок',          en:'First Step'},
+    desc: {uk:'Досягни капіталу 1,000€',    en:'Reach a capital of 1,000€'},
+    label:{uk:'Початківець',          en:'Beginner'} },
+  { id:'cap10k',   threshold:10_000,           icon:'💵',
+    title:{uk:'Перші десятки тисяч',  en:'First Tens of Thousands'},
+    desc: {uk:'Досягни капіталу 10,000€',   en:'Reach a capital of 10,000€'},
+    label:{uk:'Дрібний інвестор',     en:'Small Investor'} },
+  { id:'cap100k',  threshold:100_000,          icon:'🏅',
+    title:{uk:'Успішний підприємець', en:'Successful Entrepreneur'},
+    desc: {uk:'Досягни капіталу 100,000€',  en:'Reach a capital of 100,000€'},
+    label:{uk:'Підприємець',          en:'Entrepreneur'} },
+  { id:'cap1m',    threshold:1_000_000,        icon:'💰',
+    title:{uk:'Мільйонер!',           en:'Millionaire!'},
+    desc: {uk:'Досягни капіталу 1,000,000€',en:'Reach a capital of 1,000,000€'},
+    label:{uk:'Мільйонер',            en:'Millionaire'} },
+  { id:'cap10m',   threshold:10_000_000,       icon:'🏆',
+    title:{uk:'Великий гравець',      en:'Big Player'},
+    desc: {uk:'Досягни капіталу 10,000,000€',en:'Reach a capital of 10,000,000€'},
+    label:{uk:'Великий гравець',      en:'Big Player'} },
+  { id:'cap100m',  threshold:100_000_000,      icon:'💎',
+    title:{uk:'Магнат',               en:'Magnate'},
+    desc: {uk:'Досягни капіталу 100M€',     en:'Reach a capital of 100M€'},
+    label:{uk:'Магнат',               en:'Magnate'} },
+  { id:'cap1b',    threshold:1_000_000_000,    icon:'🚀',
+    title:{uk:'Мільярдер Forbes',     en:'Forbes Billionaire'},
+    desc: {uk:'Досягни капіталу 1B€',       en:'Reach a capital of 1B€'},
+    label:{uk:'Мільярдер',            en:'Billionaire'} },
+  { id:'cap10b',   threshold:10_000_000_000,   icon:'🌍',
+    title:{uk:'Мегабагатій',          en:'Ultra-Wealthy'},
+    desc: {uk:'Досягни капіталу 10B€',      en:'Reach a capital of 10B€'},
+    label:{uk:'Мегабагатій',          en:'Ultra-Wealthy'} },
+  { id:'cap100b',  threshold:100_000_000_000,  icon:'👑',
+    title:{uk:'Король Forbes',        en:'Forbes King'},
+    desc: {uk:'Досягни капіталу 100B€',     en:'Reach a capital of 100B€'},
+    label:{uk:'Король Forbes',        en:'Forbes King'} },
+  { id:'cap1t',    threshold:1_000_000_000_000,icon:'🌌',
+    title:{uk:'Трильйонер',           en:'Trillionaire'},
+    desc: {uk:'Досягни капіталу 1T€',       en:'Reach a capital of 1T€'},
+    label:{uk:'Трильйонер',           en:'Trillionaire'} },
 ];
 
 // ── Gold Credits constants (must be before renderAchievements) ──
@@ -10188,12 +10380,12 @@ function showAchievementPopup(ach) {
   const el = document.createElement('div');
   el.id = 'achPopup';
   el.innerHTML =
-    '<div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,200,66,.7);margin-bottom:4px;">🏆 ДОСЯГНЕННЯ РОЗБЛОКОВАНО</div>' +
+    '<div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,200,66,.7);margin-bottom:4px;">🏆 ' + (_currentLang==='en' ? 'ACHIEVEMENT UNLOCKED' : 'ДОСЯГНЕННЯ РОЗБЛОКОВАНО') + '</div>' +
     '<div style="display:flex;align-items:center;gap:10px;">' +
       '<div style="font-size:28px;">' + ach.icon + '</div>' +
       '<div>' +
-        '<div style="font-size:14px;font-weight:800;color:#fff;font-family:\'Orbitron\',sans-serif;">' + ach.title + '</div>' +
-        '<div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:2px;">' + ach.desc + '</div>' +
+        '<div style="font-size:14px;font-weight:800;color:#fff;font-family:\'Orbitron\',sans-serif;">' + (ach.title[_currentLang] || ach.title.uk) + '</div>' +
+        '<div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:2px;">' + (ach.desc[_currentLang] || ach.desc.uk) + '</div>' +
       '</div>' +
     '</div>';
   document.body.appendChild(el);
@@ -10971,13 +11163,13 @@ function devTestCrisis() {
   if (!state.rivalNets) return;
   const top5 = FORBES_RIVALS.filter(r => !r.isPlayer).slice(0, 5);
   top5.forEach(r => {
-    const currentNet = state.rivalNets[r.name];
-    const events = RIVAL_CRISIS_EVENTS[r.name];
+    const currentNet = state.rivalNets[rivalKey(r)];
+    const events = RIVAL_CRISIS_EVENTS[rivalKey(r)];
     const ev = events ? events[Math.floor(Math.random() * events.length)] : null;
     const loss = currentNet * (ev ? ev.loss : 0.015);
-    state.rivalNets[r.name] = Math.round(currentNet - loss);
+    state.rivalNets[rivalKey(r)] = Math.round(currentNet - loss);
     if (!window.rivalLastChange) window.rivalLastChange = {};
-    window.rivalLastChange[r.name] = { delta: -loss, crisis: true, text: ev ? ev.text : null };
+    window.rivalLastChange[rivalKey(r)] = { delta: -loss, crisis: true, text: ev ? ev.text : null };
     showCrisisToast(r, loss, ev ? ev.text : null);
   });
   saveState(); updateCapitalUI();
@@ -11095,7 +11287,7 @@ function tickRivalGrowth() {
   let crisisVictim = null;
   if (doCrisisCheck) {
     const top10 = activeRivals.slice(0, 10).filter(r => {
-      const net = state.rivalNets[r.name];
+      const net = state.rivalNets[rivalKey(r)];
       return playerCapital >= net * 0.001; // only active rivals
     });
     if (top10.length && Math.random() < 0.15) {
@@ -11104,22 +11296,22 @@ function tickRivalGrowth() {
   }
 
   activeRivals.forEach(r => {
-    const currentNet = state.rivalNets[r.name];
+    const currentNet = state.rivalNets[rivalKey(r)];
 
     // ── Sleep check ──
     const threshold = currentNet * 0.001;
     if (playerCapital < threshold) {
-      window.rivalLastChange[r.name] = null;
+      window.rivalLastChange[rivalKey(r)] = null;
       return;
     }
 
     // ── Crisis (only pre-selected victim) ──
-    if (doCrisisCheck && crisisVictim && r.name === crisisVictim.name && !crisisHandledThisTick) {
-      const events = RIVAL_CRISIS_EVENTS[r.name];
+    if (doCrisisCheck && crisisVictim && rivalKey(r) === rivalKey(crisisVictim) && !crisisHandledThisTick) {
+      const events = RIVAL_CRISIS_EVENTS[rivalKey(r)];
       const ev     = events ? events[Math.floor(Math.random() * events.length)] : null;
       const loss   = currentNet * (ev ? ev.loss : (0.005 + Math.random() * 0.02));
-      state.rivalNets[r.name] = Math.round(currentNet - loss);
-      window.rivalLastChange[r.name] = { delta: -loss, crisis: true, text: ev?.text || 'Ринкова криза' };
+      state.rivalNets[rivalKey(r)] = Math.round(currentNet - loss);
+      window.rivalLastChange[rivalKey(r)] = { delta: -loss, crisis: true, text: ev?.text || 'Ринкова криза' };
       showCrisisToast(r, loss, ev?.text);
       crisisHandledThisTick = true;
       return;
@@ -11128,8 +11320,8 @@ function tickRivalGrowth() {
     // ── Phase-based growth ──
     const rate = getRivalGrowthRate(currentNet);
     const gain = Math.round(currentNet * rate);
-    state.rivalNets[r.name] = currentNet + gain;
-    window.rivalLastChange[r.name] = { delta: gain, crisis: false };
+    state.rivalNets[rivalKey(r)] = currentNet + gain;
+    window.rivalLastChange[rivalKey(r)] = { delta: gain, crisis: false };
   });
 
   saveState();
@@ -14317,11 +14509,11 @@ function updateStatsEndgameBtn() {
   if (!badge) return;
 
   if (done) {
-    badge.textContent = '✅ РОЗБЛОКОВАНО';
+    badge.textContent = _currentLang === 'en' ? '✅ UNLOCKED' : '✅ РОЗБЛОКОВАНО';
     badge.style.background = 'rgba(74,222,128,.15)';
     badge.style.borderColor = 'rgba(74,222,128,.4)';
     badge.style.color = '#4ade80';
-    if (subtitle) subtitle.textContent = 'Кейс Ілюмінатів чекає на тебе';
+    if (subtitle) subtitle.textContent = _currentLang === 'en' ? 'The Illuminati case awaits you' : 'Кейс Ілюмінатів чекає на тебе';
     if (icon) { icon.textContent = '✨'; icon.style.filter = 'drop-shadow(0 0 8px #f5c842)'; }
     if (btn)  { btn.style.borderColor = 'rgba(74,222,128,.5)'; }
   } else {
@@ -14329,7 +14521,7 @@ function updateStatsEndgameBtn() {
     badge.style.background = 'rgba(245,200,66,.12)';
     badge.style.borderColor = 'rgba(245,200,66,.3)';
     badge.style.color = '#f5c842';
-    if (subtitle) subtitle.textContent = count + ' з 3 умов виконано';
+    if (subtitle) subtitle.textContent = _currentLang === 'en' ? count + ' of 3 conditions met' : count + ' з 3 умов виконано';
     if (icon) { icon.textContent = '👁️'; icon.style.filter = 'drop-shadow(0 0 6px #f5c84288)'; }
     if (btn)  { btn.style.borderColor = 'rgba(245,200,66,.35)'; }
   }
@@ -14723,7 +14915,7 @@ if (typeof updateEndgameNavDot === 'function') updateEndgameNavDot();
 // Ensure rival nets initialized (in case loadState ran before FORBES_RIVALS defined)
 if (!state.rivalNets) {
   state.rivalNets = {};
-  FORBES_RIVALS.forEach(r => { if (!r.isPlayer) state.rivalNets[r.name] = r.net; });
+  FORBES_RIVALS.forEach(r => { if (!r.isPlayer) state.rivalNets[rivalKey(r)] = r.net; });
 }
 updateHUD();
 renderUpgrades();
@@ -17162,7 +17354,7 @@ function renderDailyStreakModal() {
     if (r.type === 'jackpot') cls += ' jackpot';
     div.className = cls;
     div.innerHTML =
-      '<div class="ds-day-num">День ' + r.day + '</div>' +
+      '<div class="ds-day-num">' + t('ds_day_label') + ' ' + r.day + '</div>' +
       '<div class="ds-day-icon">' + DAILY_TYPE_ICONS[r.type] + '</div>' +
       '<div class="ds-day-amount">' + r.gc + '</div>';
     grid.appendChild(div);
@@ -17171,11 +17363,11 @@ function renderDailyStreakModal() {
   // Subtitle
   const sub = document.getElementById('dsSubtitle');
   if (nextIdx === -1) {
-    sub.textContent = '🎉 Всі 30 днів зібрано! Новий місяць скоро.';
+    sub.textContent = t('ds_all_claimed');
   } else if (alreadyClaimed) {
-    sub.textContent = '✅ Сьогодні вже отримано. Повертайся завтра!';
+    sub.textContent = t('ds_already_today');
   } else {
-    sub.textContent = 'День ' + (nextIdx+1) + ' з 30 · Твоя нагорода: ' + DAILY_REWARDS[nextIdx].gc + ' 💎';
+    sub.textContent = t('ds_day_of').replace('{n}', nextIdx+1).replace('{gc}', DAILY_REWARDS[nextIdx].gc);
   }
 
   // Buttons
@@ -17184,17 +17376,17 @@ function renderDailyStreakModal() {
 
   if (!alreadyClaimed && nextIdx !== -1) {
     claimBtn.disabled = false;
-    claimBtn.textContent = '💎 ЗАБРАТИ ' + DAILY_REWARDS[nextIdx].gc + ' GOLD CREDITS';
+    claimBtn.textContent = t('ds_claim_btn').replace('{gc}', DAILY_REWARDS[nextIdx].gc);
     watchBtn.style.display = 'none';
   } else if (alreadyClaimed) {
     claimBtn.disabled = true;
-    claimBtn.textContent = '✅ Вже отримано сьогодні';
-    // Show watch-ad button for any missed days
+    claimBtn.textContent = t('ds_claimed_today');
     const hasMissed = DAILY_REWARDS.some((r, i) => !ds.claimedDays[i] && i < nextIdx);
     watchBtn.style.display = hasMissed ? 'block' : 'none';
+    watchBtn.textContent = t('ds_watch_btn');
   } else {
     claimBtn.disabled = true;
-    claimBtn.textContent = '✅ Всі 30 днів зібрано!';
+    claimBtn.textContent = t('ds_all_done_btn');
     watchBtn.style.display = 'none';
   }
 }
@@ -17207,11 +17399,11 @@ function claimDailyReward(watchAd) {
     const missedIdx = DAILY_REWARDS.findIndex((r, i) => !ds.claimedDays[i]);
     if (missedIdx === -1) return;
     // Simulate watching ad
-    showToast('📺 Дивимось рекламу...');
+    showToast(t('ds_watching'));
     setTimeout(() => {
       ds.claimedDays[missedIdx] = true;
       addGoldCredits(DAILY_REWARDS[missedIdx].gc);
-      showToast('💎 +' + DAILY_REWARDS[missedIdx].gc + ' Gold Credits за перегляд!');
+      showToast(t('ds_reward_toast').replace('{gc}', DAILY_REWARDS[missedIdx].gc));
       saveState();
       renderDailyStreakModal();
     }, 1500);
@@ -17226,7 +17418,7 @@ function claimDailyReward(watchAd) {
   ds.lastClaim = getTodayDateStr();
   ds.day = idx + 1;
   addGoldCredits(DAILY_REWARDS[idx].gc);
-  showToast('💎 +' + DAILY_REWARDS[idx].gc + ' Gold Credits! День ' + (idx+1) + ' з 30');
+  showToast(t('ds_day_toast').replace('{gc}', DAILY_REWARDS[idx].gc).replace('{n}', idx+1));
   saveState();
   renderDailyStreakModal();
 
@@ -17264,8 +17456,8 @@ function renderAchievementsWithGC() {
     card.innerHTML =
       '<div class="ach-icon' + (done ? ' ach-icon-done' : '') + '">' + ach.icon + '</div>' +
       '<div class="ach-body">' +
-        '<div class="ach-title">' + ach.title + '</div>' +
-        '<div class="ach-desc">' + ach.desc + '</div>' +
+        '<div class="ach-title">' + (ach.title[_currentLang] || ach.title.uk) + '</div>' +
+        '<div class="ach-desc">'  + (ach.desc[_currentLang]  || ach.desc.uk)  + '</div>' +
         (!done ?
           '<div class="ach-progress-wrap">' +
             '<div class="ach-progress-bar"><div class="ach-progress-fill" style="width:' + pct.toFixed(1) + '%"></div></div>' +
@@ -17275,11 +17467,11 @@ function renderAchievementsWithGC() {
       '</div>' +
       '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">' +
         '<div class="ach-badge' + (done ? ' ach-badge-done' : ' ach-badge-locked') + '">' +
-          (done ? '✅ Виконано' : '🔒 Заблоковано') +
+          (done ? t('stats_ach_done') : t('stats_ach_locked')) +
         '</div>' +
         (done && gcReward > 0 ?
           gcClaimed
-            ? '<div style="font-size:10px;color:rgba(251,191,36,.5);font-weight:700;">💎 ' + gcReward + ' GC отримано</div>'
+            ? '<div style="font-size:10px;color:rgba(251,191,36,.5);font-weight:700;">💎 ' + gcReward + ' ' + t('stats_ach_claimed') + '</div>'
             : '<button onclick="claimAchGC(\'' + ach.id + '\')" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(251,191,36,.5);background:rgba(251,191,36,.12);color:#fbbf24;font-size:11px;font-weight:800;cursor:pointer;font-family:Rajdhani,sans-serif;">💎 +' + gcReward + ' GC</button>'
           : '') +
       '</div>';
