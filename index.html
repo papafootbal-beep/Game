@@ -900,25 +900,26 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 @keyframes x5ToastOut { from { opacity:1; } to { opacity:0; } }
 .x5-locked-toast {
   position:fixed;
-  bottom:72px;
-  left:0;
-  right:0;
-  margin:0 auto;
-  width:fit-content;
-  max-width:80vw;
-  text-align:center;
-  background:rgba(20,20,35,.92);
-  border:1px solid rgba(245,200,66,.35);
+  bottom:80px;
+  left:50%;
+  transform:translateX(-50%);
+  width:290px;
+  max-width:90vw;
+  text-align:left;
+  background:rgba(14,12,28,.97);
+  border:1px solid rgba(245,200,66,.45);
   color:rgba(245,200,66,.9);
   font-size:13px;
   font-weight:600;
-  padding:8px 20px;
-  border-radius:20px;
-  white-space:nowrap;
-  z-index:9999;
-  pointer-events:none;
+  padding:14px 16px;
+  border-radius:16px;
+  white-space:normal;
+  z-index:99999;
+  pointer-events:all;
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
   animation: x5ToastIn .25s ease forwards;
 }
+.x5-locked-toast button { pointer-events:all; position:relative; z-index:100000; }
 .x5-locked-toast.hiding { animation: x5ToastOut .4s ease forwards; }
 
 .street-case-bar { margin: 0 !important; }
@@ -4107,6 +4108,12 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
           <button class="btn-sell" id="resultSellBtn" onclick="sellResult()">💸 Продати</button>
           <button class="btn-keep" id="resultKeepBtn" onclick="keepResult()">🎒 До складу</button>
         </div>
+        <div id="legendaryRerollBlock" style="display:none;margin-top:8px;">
+          <button id="legendaryRerollBtn" onclick="doLegendaryReroll()" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.08);color:#f5c842;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:800;cursor:pointer;">
+            <span id="legendaryRerollLbl">Перекрутити (реклама)</span>
+          </button>
+          <div id="legendaryRerollNote" style="font-size:10px;color:var(--muted);text-align:center;margin-top:3px;">Pity % зберігається</div>
+        </div>
         <div class="insurance-block" id="caseInsuranceBlock" style="display:none;">
           <div class="insurance-label">🛡️ Insurance</div>
           <div class="insurance-counter"><span id="ins-remaining-lbl">Залишилось:</span> <span id="caseInsuranceTry">3</span>/3</div>
@@ -6353,7 +6360,9 @@ function loadState() {
       if (state.terminalFleetLimit   === undefined)        state.terminalFleetLimit   = 10;
       if (state.terminalRentSlots    === undefined)        state.terminalRentSlots    = 1;
       if (state.terminalSpeedLvl     === undefined)        state.terminalSpeedLvl     = 0;
-      state.terminalOfflineShown = false; // always reset — processed fresh each session
+      state.terminalOfflineShown = false; // always reset
+      if (!state.unlockedDonateTypes) state.unlockedDonateTypes = {};
+      // processed fresh each session
 
       // Відновлюємо Gold Credits і premium після скидання прогресу
       const _persistRaw = localStorage.getItem('mbs_persist_gc');
@@ -6633,6 +6642,15 @@ function updateHUD() {
   // Gold Credits
   const gcEl = document.getElementById('gcHudAmount');
   if (gcEl) gcEl.textContent = (state.goldCredits || 0).toLocaleString();
+  // Trigger upgrade button update when on clicker screen
+  if (typeof _prevBalance === 'undefined') window._prevBalance = -1;
+  if (window._prevBalance !== state.balance) {
+    window._prevBalance = state.balance;
+    const scr = document.getElementById('screen-clicker');
+    if (scr && scr.classList.contains('active') && typeof renderUpgrades === 'function') {
+      renderUpgrades();
+    }
+  }
   const balLbl = document.getElementById('hud-balance-label');
   if (balLbl) balLbl.textContent = t('hud_balance');
   const gcStats = document.getElementById('gcStatsDisplay');
@@ -7256,19 +7274,80 @@ function updateAllRarityBars() {
 
 
 function showX5LockedToast() {
-  // Remove existing toast if any
+  // Show offer to watch ad for 3 x5 uses
+  const noAds = typeof hasNoAds === 'function' && hasNoAds();
+  const title = _currentLang==='en'
+    ? (noAds ? 'Get 3x X5 spins (free)' : 'Watch ad — get 3x X5 on any case!')
+    : (noAds ? 'Отримати 3 X5 кручення (безкоштовно)' : 'Переглянь рекламу — 3 рази X5 на будь-якому кейсі!');
+  const desc  = _currentLang==='en'
+    ? 'After 3 uses, X5 becomes inactive again on uncollected cases.'
+    : 'Після 3 використань X5 знову стає неактивним на незібраних кейсах.';
+
+  // Remove existing toast
   const existing = document.querySelector('.x5-locked-toast');
   if (existing) existing.remove();
 
   const toast = document.createElement('div');
   toast.className = 'x5-locked-toast';
-  toast.textContent = '🔒 Зберіть всю колекцію';
+  toast.style.cssText += ';cursor:pointer;padding:12px 16px;max-width:300px;text-align:left;';
+  toast.innerHTML =
+    '<div style="font-size:13px;font-weight:800;color:#f5c842;margin-bottom:4px;">' + title + '</div>' +
+    '<div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:8px;">' + desc + '</div>' +
+    '<button id="x5AdOfferBtn" style="width:100%;padding:8px;border-radius:8px;border:none;background:linear-gradient(135deg,#f5c842,#f97316);color:#000;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:800;cursor:pointer;">' +
+    (noAds ? (_currentLang==='en'?'Get free X5':'Отримати X5') : (_currentLang==='en'?'Watch ad':'Дивитись рекламу')) +
+    '</button>';
   document.body.appendChild(toast);
+
+  document.getElementById('x5AdOfferBtn').addEventListener('click', () => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 400);
+    watchAdForX5();
+  });
 
   setTimeout(() => {
     toast.classList.add('hiding');
-    setTimeout(() => toast.remove(), 400);
-  }, 2600); // 2.6s visible + 0.4s fade = 3s total
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 400);
+  }, 5000);
+}
+
+function watchAdForX5() {
+  const noAds = typeof hasNoAds === 'function' && hasNoAds();
+  const grantX5 = () => {
+    if (typeof adState !== 'undefined') {
+      adState.x5Uses = (adState.x5Uses || 0) + 3;
+      if (typeof updateAdHUD === 'function') updateAdHUD();
+      if (typeof renderCases === 'function') renderCases();
+    }
+    showToast(_currentLang==='en' ? '⚡ X5 activated! 3 uses on any case' : '⚡ X5 активовано! 3 кручення на будь-якому кейсі', '#f5c842', 3000);
+  };
+  if (noAds) { grantX5(); return; }
+  // Use the existing adModal flow with override
+  const modal = document.getElementById('adModal');
+  if (!modal) { grantX5(); return; }
+  const descEl = document.getElementById('adBonusDesc');
+  if (descEl) descEl.textContent = _currentLang==='en'
+    ? 'Watch ad — get 3× X5 on any case!'
+    : 'Переглянь рекламу — отримай 3 X5 на будь-якому кейсі!';
+  document.getElementById('adClaimBtn').style.display = 'none';
+  document.getElementById('adTimerText').style.display = 'block';
+  document.getElementById('adTimerBar').style.width = '0%';
+  modal.style.display = 'flex';
+  let sec = 5;
+  document.getElementById('adCountdown').textContent = sec;
+  if (typeof adState !== 'undefined') clearInterval(adState.adTimerInterval);
+  const iv = setInterval(() => {
+    sec--;
+    document.getElementById('adCountdown').textContent = sec;
+    document.getElementById('adTimerBar').style.width = ((5-sec)/5*100)+'%';
+    if (sec <= 0) {
+      clearInterval(iv);
+      document.getElementById('adTimerText').style.display = 'none';
+      const cb = document.getElementById('adClaimBtn');
+      cb.style.display = 'block';
+      window._adClaimOverride = () => { modal.style.display = 'none'; grantX5(); };
+    }
+  }, 1000);
+  if (typeof adState !== 'undefined') adState.adTimerInterval = iv;
 }
 
 function renderCases() {
@@ -8507,6 +8586,7 @@ const CASE_INTRO_IMGS = {
 };
 
 function openCaseModal(caseId) {
+  if (!state.unlockedDonateTypes) state.unlockedDonateTypes = {}; state.unlockedDonateTypes['cases'] = true;
   currentCase = CASES.find(c => c.id === caseId);
   if (!currentCase) return;
   currentCase._effectivePrice = getCaseOpenPrice(currentCase);
@@ -8830,6 +8910,70 @@ function showInsuranceBlock(type, elBlockId, elTryId, elBtnId, rarity) {
   }
 }
 
+// ─── Legendary Reroll (ad-based) ─────────────────────────────
+let _rerollSavedPity = null;
+
+function showLegendaryRerollBtn(show) {
+  const block = document.getElementById('legendaryRerollBlock');
+  if (!block) return;
+  block.style.display = show ? 'block' : 'none';
+  if (!show) return;
+  const noAds = typeof hasNoAds === 'function' && hasNoAds();
+  const lbl  = document.getElementById('legendaryRerollLbl');
+  const note = document.getElementById('legendaryRerollNote');
+  if (lbl)  lbl.textContent  = noAds
+    ? (_currentLang==='en' ? '🔄 Respin (free)' : '🔄 Перекрутити (безкоштовно)')
+    : (_currentLang==='en' ? '🔄 Respin — watch ad' : '🔄 Перекрутити — реклама');
+  if (note) note.textContent = _currentLang==='en' ? 'Pity % preserved' : 'Pity % зберігається';
+}
+
+function doLegendaryReroll() {
+  if (!currentCase) return;
+  const noAds = typeof hasNoAds === 'function' && hasNoAds();
+  // Snapshot pity BEFORE the reroll
+  _rerollSavedPity = JSON.parse(JSON.stringify(getPityForCase(currentCase.id)));
+
+  const go = () => {
+    showLegendaryRerollBtn(false);
+    // Restore pity right before spin so it isn't consumed
+    if (_rerollSavedPity) {
+      if (!state.pity) state.pity = {};
+      state.pity[currentCase.id] = JSON.parse(JSON.stringify(_rerollSavedPity));
+    }
+    spinCarousel();
+  };
+
+  if (noAds) { go(); return; }
+
+  // Simulate ad
+  const modal = document.getElementById('adModal');
+  if (!modal) { go(); return; }
+  const descEl = document.getElementById('adBonusDesc');
+  if (descEl) descEl.textContent = _currentLang==='en'
+    ? 'Watch ad to respin — Pity % stays!'
+    : 'Переглянь рекламу щоб перекрутити — Pity % зберігається!';
+  document.getElementById('adClaimBtn').style.display = 'none';
+  document.getElementById('adTimerText').style.display = 'block';
+  document.getElementById('adTimerBar').style.width = '0%';
+  modal.style.display = 'flex';
+  let sec = 5;
+  document.getElementById('adCountdown').textContent = sec;
+  if (typeof adState !== 'undefined') clearInterval(adState.adTimerInterval);
+  const iv = setInterval(() => {
+    sec--;
+    document.getElementById('adCountdown').textContent = sec;
+    document.getElementById('adTimerBar').style.width = ((5-sec)/5*100)+'%';
+    if (sec <= 0) {
+      clearInterval(iv);
+      document.getElementById('adTimerText').style.display = 'none';
+      const cb = document.getElementById('adClaimBtn');
+      cb.style.display = 'block';
+      window._adClaimOverride = () => { modal.style.display = 'none'; go(); };
+    }
+  }, 1000);
+  if (typeof adState !== 'undefined') adState.adTimerInterval = iv;
+}
+
 function tryInsurance(type) {
   const st = insuranceState[type];
   if (st.tries >= INSURANCE_MAX) return;
@@ -8929,6 +9073,8 @@ function showResult(item) {
   const res = document.getElementById('modalResult');
   res.style.display = 'block';
   document.getElementById('resultRarityBadge').textContent = RARITY_LABELS[item.rarity];
+  // Show legendary reroll button
+  showLegendaryRerollBtn(item.rarity === 'legendary');
   document.getElementById('resultRarityBadge').className = 'result-rarity bg-' + item.rarity;
   document.getElementById('resultEmoji').innerHTML = itemDisplay(item.emoji, 52);
   document.getElementById('resultName').textContent = getItemName(item);
@@ -8957,6 +9103,7 @@ function showResult(item) {
 }
 
 function sellResult() {
+  showLegendaryRerollBtn(false);
   if (!currentResult) return;
   const sellVal = getSellValue(currentResult);
   state.balance += sellVal;
@@ -8988,6 +9135,7 @@ function sellResult() {
 }
 
 function keepResult() {
+  showLegendaryRerollBtn(false);
   if (!currentResult) return;
   if (state.inventory.length >= state.invLimit) {
     showToast('❌ Склад повний! Розшир або продай предмети.'); return;
@@ -11523,6 +11671,7 @@ function rollContainerItem(c) {
 let currentContainerResult = null;
 
 function openContainer(containerId) {
+  if (!state.unlockedDonateTypes) state.unlockedDonateTypes = {}; state.unlockedDonateTypes['containers'] = true;
   const c = CONTAINERS.find(x => x.id === containerId);
   if (!c) return;
   window._lastContainerId = containerId;
@@ -12504,6 +12653,7 @@ function renderMysteryBoxes() {
 }
 
 function startMysteryBox(id) {
+  if (!state.unlockedDonateTypes) state.unlockedDonateTypes = {}; state.unlockedDonateTypes['mboxes'] = true;
   const mb = MYSTERY_BOXES.find(x => x.id === id);
   if (!mb) return;
   if (state.balance < mb.price) { showToast('Недостатньо коштів!'); return; }
@@ -15031,6 +15181,7 @@ function devAddCarSold() {
 let devHangarLegBoost = false; // +50% legendary chance toggle
 
 function openHangar(hangarId) {
+  if (!state.unlockedDonateTypes) state.unlockedDonateTypes = {}; state.unlockedDonateTypes['hangars'] = true;
   const h = HANGARS.find(x => x.id === hangarId);
   if (!h) return;
   if (!_insuranceFreeSpin && state.balance < h.price) { showToast(t('toast_not_enough')); return; }
@@ -16250,6 +16401,12 @@ function renderDonateExclCard(grid, type) {
 
 // ─── helper: check GC and open ───────────────────────
 function _donateExclOpen(type) {
+  const _typeKeys = { case:'cases', mbox:'mboxes', container:'containers', hangar:'hangars' };
+  if (!(state.unlockedDonateTypes||{})[_typeKeys[type]]) {
+    const _nm = { case:{uk:'звичайний кейс',en:'a case'}, mbox:{uk:'Mystery Box',en:'a Mystery Box'}, container:{uk:'контейнер',en:'a container'}, hangar:{uk:'ангар',en:'a hangar'} };
+    showToast(_currentLang==='en'?'Open '+_nm[type].en+' first!':'Спочатку відкрийте '+_nm[type].uk+'!', '#f59e0b', 3000);
+    return;
+  }
   const gc = state.goldCredits || 0;
   const dataMap = { case: DONATE_CASE, mbox: DONATE_MBOX, container: DONATE_CONTAINER, hangar: DONATE_HANGAR };
   const d = dataMap[type];
@@ -17434,7 +17591,7 @@ function imgRetry(el) {
       <div id="adTimerBar" style="height:100%;background:linear-gradient(90deg,#f5c842,#ff6b35);width:0%;transition:width .1s linear;border-radius:10px;"></div>
     </div>
     <div id="adTimerText" style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:16px;">Зачекайте <span id="adCountdown">5</span> сек...</div>
-    <button id="adClaimBtn" onclick="claimAdBonus()" style="
+    <button id="adClaimBtn" onclick="handleAdClaim()" style="
       display:none;width:100%;padding:12px;border:none;border-radius:12px;
       background:linear-gradient(135deg,#f5c842,#ff6b35);
       font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;
@@ -17774,6 +17931,18 @@ function watchAdForBonus(bonusId) {
   }, 1000);
 }
 
+// Unified ad claim handler — routes to custom override or default claimAdBonus
+window._adClaimOverride = null;
+function handleAdClaim() {
+  if (window._adClaimOverride) {
+    const fn = window._adClaimOverride;
+    window._adClaimOverride = null;
+    fn();
+  } else {
+    claimAdBonus();
+  }
+}
+
 function claimAdBonus() {
   const bonus = adState.currentBonus;
   if (!bonus) return;
@@ -17922,7 +18091,7 @@ document.addEventListener('DOMContentLoaded', function() {
 if (typeof state === 'undefined') return;
 Object.defineProperty(state, '_effectivePassive', {
   get() {
-    const base = this.passivePerSec;
+    const base = this.passivePerSec + (this._collBonus_passiveFlat || 0);
     return adState.passive2x ? base * 2 : base;
   }
 });
