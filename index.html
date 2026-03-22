@@ -5716,6 +5716,60 @@ function getRivalGrowthRate(net) {
   return 0.0002;                               // > 250B → +0.02%/хв
 }
 
+// ── Dynamic Forbes Competition ─────────────────────────────
+// Повертає sorted рейтинг всіх (rivals + player)
+function getForbesSorted() {
+  const playerCapital = calcCapital().total;
+  const all = FORBES_RIVALS.map(r => ({
+    r,
+    net: r.isPlayer ? playerCapital : (state.rivalNets[rivalKey(r)] || r.net),
+    isPlayer: !!r.isPlayer,
+  }));
+  return all.sort((a, b) => b.net - a.net);
+}
+
+// Скільки rivals гравець обігнав (нижче по рейтингу) та яке місце гравця
+function getPlayerRankInfo() {
+  const sorted = getForbesSorted();
+  const total  = sorted.length; // includes player
+  const playerIdx = sorted.findIndex(x => x.isPlayer);
+  // rivals below player (player has beaten them)
+  const beatenCount = total - 1 - playerIdx; // кількість обігнаних rivals
+  return { playerIdx, total, beatenCount, sorted };
+}
+
+// Бонус росту для rival залежно від ситуації:
+// Якщо гравець обігнав цього rival — rival отримує бонус росту
+// Чим нижче rival в рейтингу (більше обігнаних) — тим більший бонус
+// Якщо rival обігнав гравця — rival росте повільніше
+function getRivalDynamicRate(r, playerCapital) {
+  const rNet = state.rivalNets[rivalKey(r)] || r.net;
+  const baseRate = getRivalGrowthRate(rNet);
+
+  const sorted = getForbesSorted();
+  const playerIdx = sorted.findIndex(x => x.isPlayer);
+  const rivalIdx  = sorted.findIndex(x => !x.isPlayer && rivalKey(x.r) === rivalKey(r));
+  const totalRivals = FORBES_RIVALS.filter(x => !x.isPlayer).length;
+
+  if (rivalIdx === -1) return baseRate;
+
+  const playerBeatenThisRival = rivalIdx > playerIdx; // rival is below player
+
+  if (playerBeatenThisRival) {
+    // Гравець обігнав цього rival
+    // Чим нижче rival — тим сильніший comeback бонус
+    // rivalIdx іде від 0 (топ) до N (низ), нам потрібна позиція відносно гравця
+    const stepsBelow = rivalIdx - playerIdx; // скільки місць нижче гравця
+    const boostFactor = 1 + (stepsBelow * 0.08); // +8% до базової ставки за кожне місце нижче
+    return Math.min(baseRate * boostFactor, baseRate * 4); // макс х4 від базової
+  } else {
+    // Rival попереду гравця — росте повільніше (дає наздогнати)
+    const stepsAbove = playerIdx - rivalIdx;
+    const slowFactor = Math.max(0.3, 1 - (stepsAbove * 0.1)); // -10% за кожне місце вище, мін 30%
+    return baseRate * slowFactor;
+  }
+}
+
 // Персоналізовані кризові події для кожного мільярдера
 const RIVAL_CRISIS_EVENTS = {
   'Ілон Маск': [
@@ -6080,7 +6134,7 @@ const CONTAINERS = [
 
 const DONATE_CASE = {
   id: 'allstar', name: 'All-Star Case', subtitle: 'Кейс Легенд', subtitleEn: 'Legends Case',
-  icon: '🌟', price: 250, currency: 'gold',
+  icon: '🌟', price: 500, currency: 'gold',
   desc: 'Містить 20 легендарних предметів зібраних з усіх 10 кейсів',
   descEn: 'Contains 20 legendary items collected from all 10 cases',
   color: '#f5c842',
@@ -6120,7 +6174,7 @@ const DONATE_CASE = {
 
 const DONATE_MBOX = {
   id: 'relic', name: 'Mystery Relic Box', subtitle: 'Містичний Реліквіум', subtitleEn: 'Mystic Reliquary',
-  icon: '🏺', price: 600, currency: 'gold',
+  icon: '🏺', price: 1200, currency: 'gold',
   desc: 'Зібрання найдорожчих таємничих артефактів. Тільки легендарний рівень.',
   descEn: 'A collection of the most precious mysterious artefacts. Legendary tier only.',
   color: '#a855f7',
@@ -6146,7 +6200,7 @@ const DONATE_MBOX = {
 
 const DONATE_CONTAINER = {
   id: 'apex', name: 'Global Apex Container', subtitle: 'Контейнер «Апекс»', subtitleEn: 'Apex Container',
-  icon: '🌐', price: 1200, currency: 'gold',
+  icon: '🌐', price: 2400, currency: 'gold',
   desc: 'Містить 10 легендарних транспортних засобів, по 2 з кожного контейнеру.',
   descEn: 'Contains 10 legendary vehicles, 2 from each container.',
   accent: '#38bdf8',
@@ -6171,7 +6225,7 @@ const DONATE_CONTAINER = {
 
 const DONATE_HANGAR = {
   id: 'zenith', name: 'Zenith Hangar', subtitle: 'Ангар «Зеніт»', subtitleEn: 'Zenith Hangar',
-  icon: '🌠', price: 2500, currency: 'gold',
+  icon: '🌠', price: 5000, currency: 'gold',
   desc: 'Найпрестижніший лот у грі. 10 легендарних активів, по 2 з кожного ангару.',
   descEn: 'The most prestigious lot in the game. 10 legendary assets, 2 from each hangar.',
   accent: '#f5c842',
@@ -6237,6 +6291,11 @@ const LIFESHOP_ITEMS = {
     { id:'tr18', name:{uk:'Особистий підводний човен',    en:'Personal Submarine'},             emoji:'🤿', price:350_000_000,     category:'transport' },
     { id:'tr19', name:{uk:'Приватний авіаносець',         en:'Private Aircraft Carrier'},       emoji:'⚓', price:750_000_000,     category:'transport' },
     { id:'tr20', name:{uk:'Космічний шаттл для туризму',  en:'Space Tourism Shuttle'},          emoji:'🚀', price:1_500_000_000,   category:'transport' },
+    { id:'tr21', name:{uk:'Флот дронів-доставщиків',     en:'Drone Delivery Fleet'},           emoji:'🛸', price:8_000_000_000,   category:'transport' },
+    { id:'tr22', name:{uk:'Атомний криголам',             en:'Nuclear Icebreaker'},             emoji:'🧊', price:25_000_000_000,  category:'transport' },
+    { id:'tr23', name:{uk:'Орбітальна станція (приватна)',en:'Private Orbital Station'},        emoji:'🛰️', price:120_000_000_000, category:'transport' },
+    { id:'tr24', name:{uk:'Флот міжконтинентальних лайнерів', en:'Intercontinental Liner Fleet'}, emoji:'🌐', price:350_000_000_000, category:'transport' },
+    { id:'tr25', name:{uk:'Гіперзвуковий особистий флот', en:'Hypersonic Personal Fleet'},     emoji:'☄️', price:1_000_000_000_000, category:'transport' },
   ],
   realestate: [
     { id:'re01', name:{uk:'Студія в центрі міста',        en:'City Centre Studio'},             emoji:'🏠', price:150_000,         category:'realestate' },
@@ -6259,6 +6318,8 @@ const LIFESHOP_ITEMS = {
     { id:'re18', name:{uk:'Князівство',                  en:'Principality'},                   emoji:'🗺️', price:12_000_000_000,  category:'realestate' },
     { id:'re19', name:{uk:'Плавуче місто',               en:'Floating City'},                  emoji:'🌍', price:50_000_000_000,  category:'realestate' },
     { id:'re20', name:{uk:'Колонія на Марсі',            en:'Mars Colony'},                    emoji:'🔴', price:250_000_000_000, category:'realestate' },
+    { id:'re21', name:{uk:'Мережа космодромів',          en:'Spaceport Network'},              emoji:'🚀', price:600_000_000_000, category:'realestate' },
+    { id:'re22', name:{uk:'Підводне місто',              en:'Underwater City'},                emoji:'🌊', price:1_000_000_000_000, category:'realestate' },
   ],
   luxury: [
     { id:'lx01', name:{uk:'Rolex Daytona',                       en:'Rolex Daytona'},                         emoji:'⌚', price:40_000,          category:'luxury' },
@@ -6281,6 +6342,10 @@ const LIFESHOP_ITEMS = {
     { id:'lx18', name:{uk:'Футбольний клуб А-ліги',              en:'Premier League Football Club'},          emoji:'⚽', price:4_000_000_000,   category:'luxury' },
     { id:'lx19', name:{uk:'Золотий запас банку',                 en:'Bank Gold Reserve'},                     emoji:'🏦', price:15_000_000_000,  category:'luxury' },
     { id:'lx20', name:{uk:'Право на Місяць (сертифікат)',        en:'Moon Rights (Certificate)'},             emoji:'🌕', price:100_000_000_000, category:'luxury' },
+    { id:'lx21', name:{uk:'Колекція ядерних бункерів',          en:'Nuclear Bunker Collection'},             emoji:'☢️', price:250_000_000_000, category:'luxury' },
+    { id:'lx22', name:{uk:'Приватна армія (5000 бійців)',        en:'Private Army (5,000 troops)'},          emoji:'⚔️', price:500_000_000_000, category:'luxury' },
+    { id:'lx23', name:{uk:'Контроль над інтернетом країни',     en:'Country Internet Control'},              emoji:'🌐', price:750_000_000_000, category:'luxury' },
+    { id:'lx24', name:{uk:'Власна криптовалюта (глобальна)',    en:'Own Global Cryptocurrency'},             emoji:'₿',  price:1_000_000_000_000, category:'luxury' },
   ],
 };
 
@@ -7591,6 +7656,63 @@ function showX5LockedToast() {
     toast.classList.add('hiding');
     setTimeout(() => { if (toast.parentNode) toast.remove(); }, 400);
   }, 5000);
+}
+
+function watchAdForGC() {
+  const GC_AD_REWARD = 10;
+  const noAds = typeof hasNoAds === 'function' && hasNoAds();
+  const grantGC = () => {
+    addGoldCredits(GC_AD_REWARD);
+    showToast('💎 +' + GC_AD_REWARD + (_currentLang==='en'?' Gold Credits for watching!':' Gold Credits за перегляд!'), '#f5c842', 3000);
+    // Cooldown: disable button for 30 min
+    const btn = document.getElementById('dshopAdGcBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.style.opacity = '0.45';
+      btn.style.cursor = 'not-allowed';
+      const lbl = document.getElementById('dshop-ad-gc-btn-lbl');
+      let sec = 1800;
+      const iv = setInterval(() => {
+        sec--;
+        const m = Math.floor(sec/60), s = sec%60;
+        if (lbl) lbl.textContent = m + ':' + String(s).padStart(2,'0');
+        if (sec <= 0) {
+          clearInterval(iv);
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.style.cursor = 'pointer';
+          if (lbl) lbl.textContent = '+10 💎';
+        }
+      }, 1000);
+    }
+  };
+  if (noAds) { grantGC(); return; }
+  const modal = document.getElementById('adModal');
+  if (!modal) { grantGC(); return; }
+  const descEl = document.getElementById('adBonusDesc');
+  if (descEl) descEl.textContent = _currentLang==='en'
+    ? '📺 Watch ad — get +10 Gold Credits!'
+    : '📺 Переглянь рекламу — отримай +10 Gold Credits!';
+  document.getElementById('adClaimBtn').style.display = 'none';
+  document.getElementById('adTimerText').style.display = 'block';
+  document.getElementById('adTimerBar').style.width = '0%';
+  modal.style.display = 'flex';
+  let sec = 5;
+  document.getElementById('adCountdown').textContent = sec;
+  if (typeof adState !== 'undefined') clearInterval(adState.adTimerInterval);
+  const iv = setInterval(() => {
+    sec--;
+    document.getElementById('adCountdown').textContent = sec;
+    document.getElementById('adTimerBar').style.width = ((5-sec)/5*100)+'%';
+    if (sec <= 0) {
+      clearInterval(iv);
+      document.getElementById('adTimerText').style.display = 'none';
+      const cb = document.getElementById('adClaimBtn');
+      cb.style.display = 'block';
+      window._adClaimOverride = () => { modal.style.display = 'none'; grantGC(); };
+    }
+  }, 1000);
+  if (typeof adState !== 'undefined') adState.adTimerInterval = iv;
 }
 
 function watchAdForX5() {
@@ -10425,8 +10547,17 @@ function renderForbesTable(container) {
       } else if (hasCrisis) {
         changeBadge = '<span class="forbes-badge crisis">📉 −' + fmtCapital(Math.abs(lastChange.delta)) + '</span>';
       } else if (lastChange?.delta > 0) {
-        const growthPct = (getRivalGrowthRate(person.net) * 100).toFixed(2);
-        changeBadge = '<span class="forbes-badge grow">🟢 +' + growthPct + t('ls_forbes_per_min') + '</span>';
+        const actualRate = (lastChange.delta / (person.net - lastChange.delta) * 100).toFixed(2);
+        const baseRate   = (getRivalGrowthRate(person.net) * 100).toFixed(2);
+        if (lastChange.boosted) {
+          // Rival below player — comeback boost
+          changeBadge = '<span class="forbes-badge" style="background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3);">⚡ +' + actualRate + t('ls_forbes_per_min') + ' ↑</span>';
+        } else if (lastChange.slowed) {
+          // Rival above player — slowed
+          changeBadge = '<span class="forbes-badge grow" style="opacity:.7;">🐢 +' + actualRate + t('ls_forbes_per_min') + ' ↓</span>';
+        } else {
+          changeBadge = '<span class="forbes-badge grow">🟢 +' + actualRate + t('ls_forbes_per_min') + '</span>';
+        }
       }
     }
 
@@ -10520,7 +10651,7 @@ const ACH_GC_REWARDS = {
   cap10m:  200, cap100m: 350, cap1b:   500, cap10b:  650,
   cap100b: 800, cap1t:   1000,
 };
-const COLL_GC_REWARD = 250;
+const COLL_GC_REWARD = 50;
 const DAILY_REWARDS = [
   { day:1,  gc:5,   type:'normal'  }, { day:2,  gc:5,   type:'normal'  },
   { day:3,  gc:10,  type:'normal'  }, { day:4,  gc:10,  type:'normal'  },
@@ -10882,7 +11013,7 @@ function renderCollections() {
         return '<div class="coll-bonuses">' +
           '<span class="coll-bonus-badge' + (bonus.multiOpen ? '' : ' inactive') + '">⚡ ×5' + (bonus.multiOpen ? '' : ' 🔒') + '</span>' +
           '<span class="coll-bonus-badge' + (bonus.discount  ? '' : ' inactive') + '">💚 −20%' + (bonus.discount  ? '' : ' 🔒') + '</span>' +
-          '<span class="coll-bonus-badge" style="background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35);color:#fbbf24;font-weight:800;">💎 +250 GC</span>' +
+          '<span class="coll-bonus-badge" style="background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35);color:#fbbf24;font-weight:800;">💎 +50 GC</span>' +
           (ub ? '<span class="coll-bonus-badge' + (bonus.multiOpen ? '' : ' inactive') + '" style="font-size:9px;" title="' + (ub.descEn && _currentLang==='en' ? ub.descEn : ub.desc) + '">' + (bonus.multiOpen ? '' : '🔒 ') + (ub.descEn && _currentLang==='en' ? ub.descEn : ub.desc) + '</span>' : '') +
           (su3 && bonus.multiOpen ? '<span class="coll-bonus-badge" style="font-size:9px;background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);" title="' + (_currentLang==='en'?'Market upgrade':'Покращення магазину') + '">🏪 ' + upLvl3 + '/' + su3.steps + '</span>' : '') +
         '</div>';
@@ -11466,18 +11597,20 @@ function tickRivalGrowth() {
   if (!state.rivalNets) return;
   const playerCapital = calcCapital().total;
   crisisCheckCounter++;
-  const doCrisisCheck = (crisisCheckCounter % 2 === 0); // every 2 minutes
+  const doCrisisCheck = (crisisCheckCounter % 2 === 0);
 
-  // П.13: Pick at most ONE crisis victim per 2-min tick
   const activeRivals = FORBES_RIVALS.filter(r => !r.isPlayer);
   let crisisHandledThisTick = false;
 
-  // Pre-select a single random TOP-10 crisis candidate if check is due
+  // Snapshot рейтингу ДО тіку (для порівняння після)
+  const rankBefore = getForbesSorted().findIndex(x => x.isPlayer);
+
+  // Pre-select a single crisis victim
   let crisisVictim = null;
   if (doCrisisCheck) {
     const top10 = activeRivals.slice(0, 10).filter(r => {
       const net = state.rivalNets[rivalKey(r)];
-      return playerCapital >= net * 0.001; // only active rivals
+      return playerCapital >= net * 0.001;
     });
     if (top10.length && Math.random() < 0.15) {
       crisisVictim = top10[Math.floor(Math.random() * top10.length)];
@@ -11486,15 +11619,13 @@ function tickRivalGrowth() {
 
   activeRivals.forEach(r => {
     const currentNet = state.rivalNets[rivalKey(r)];
-
-    // ── Sleep check ──
-    const threshold = currentNet * 0.001;
+    const threshold  = currentNet * 0.001;
     if (playerCapital < threshold) {
       window.rivalLastChange[rivalKey(r)] = null;
       return;
     }
 
-    // ── Crisis (only pre-selected victim) ──
+    // ── Crisis ──
     if (doCrisisCheck && crisisVictim && rivalKey(r) === rivalKey(crisisVictim) && !crisisHandledThisTick) {
       const events = RIVAL_CRISIS_EVENTS[rivalKey(r)];
       const ev     = events ? events[Math.floor(Math.random() * events.length)] : null;
@@ -11506,18 +11637,73 @@ function tickRivalGrowth() {
       return;
     }
 
-    // ── Phase-based growth ──
-    const rate = getRivalGrowthRate(currentNet);
+    // ── Dynamic growth rate ──
+    const rate = getRivalDynamicRate(r, playerCapital);
     const gain = Math.round(currentNet * rate);
     state.rivalNets[rivalKey(r)] = currentNet + gain;
-    window.rivalLastChange[rivalKey(r)] = { delta: gain, crisis: false };
+
+    // Store rate info for UI display
+    const rNet = state.rivalNets[rivalKey(r)];
+    const sorted = getForbesSorted();
+    const playerIdx = sorted.findIndex(x => x.isPlayer);
+    const rivalIdx  = sorted.findIndex(x => !x.isPlayer && rivalKey(x.r) === rivalKey(r));
+    const isBelow   = rivalIdx > playerIdx;
+    window.rivalLastChange[rivalKey(r)] = {
+      delta: gain, crisis: false,
+      boosted: isBelow,   // rival is below player — comeback boost active
+      slowed:  !isBelow,  // rival is above player — slowed
+    };
   });
+
+  // Snapshot рейтингу ПІСЛЯ тіку — показати якщо позиція гравця змінилась
+  const rankAfter = getForbesSorted().findIndex(x => x.isPlayer);
+  if (rankAfter < rankBefore) {
+    // Гравець піднявся
+    const overtaken = getForbesSorted()[rankAfter + 1];
+    if (overtaken && !overtaken.isPlayer) {
+      const name = overtaken.r.name && typeof overtaken.r.name === 'object'
+        ? (_currentLang==='en' ? overtaken.r.name.en : overtaken.r.name.uk)
+        : overtaken.r.name;
+      showRankChangeToast('up', name, rankAfter + 1);
+    }
+  } else if (rankAfter > rankBefore) {
+    // Rival обігнав гравця
+    const overtaker = getForbesSorted()[rankAfter - 1];
+    if (overtaker && !overtaker.isPlayer) {
+      const name = overtaker.r.name && typeof overtaker.r.name === 'object'
+        ? (_currentLang==='en' ? overtaker.r.name.en : overtaker.r.name.uk)
+        : overtaker.r.name;
+      showRankChangeToast('down', name, rankAfter + 1);
+    }
+  }
 
   saveState();
   updateCapitalUI();
-  // Refresh Forbes table if visible
   const owned = document.getElementById('lspane-owned');
   if (owned && owned.style.display !== 'none') renderLifeShop();
+}
+
+function showRankChangeToast(direction, rivalName, newRank) {
+  const el = document.createElement('div');
+  const isUp = direction === 'up';
+  const color = isUp ? '#22c55e' : '#ef4444';
+  el.style.cssText = [
+    'position:fixed', 'bottom:90px', 'left:50%', 'transform:translateX(-50%)',
+    'z-index:9998', 'background:' + (isUp ? '#021a08' : '#1a0808'),
+    'border:1px solid ' + color + '55',
+    'border-radius:12px', 'padding:10px 16px', 'max-width:290px', 'text-align:center',
+    'box-shadow:0 4px 20px ' + color + '44', 'animation:fadeIn .3s ease',
+  ].join(';');
+  el.innerHTML = isUp
+    ? '<div style="font-size:11px;color:#22c55e;font-weight:700;letter-spacing:.5px;">📈 ' + (_currentLang==='en'?'RANK UP!':'ПІДЙОМ У РЕЙТИНГУ!') + '</div>' +
+      '<div style="font-size:12px;color:#fff;margin:3px 0;">' + (_currentLang==='en'?'You overtook ':'Ви обігнали ') + rivalName + '</div>' +
+      '<div style="font-size:11px;color:#4ade80;">' + (_currentLang==='en'?'🏆 Forbes rank #':'🏆 Forbes місце #') + newRank + '</div>'
+    : '<div style="font-size:11px;color:#ef4444;font-weight:700;letter-spacing:.5px;">📉 ' + (_currentLang==='en'?'RANK DOWN!':'ПАДІННЯ В РЕЙТИНГУ!') + '</div>' +
+      '<div style="font-size:12px;color:#fff;margin:3px 0;">' + rivalName + (_currentLang==='en'?' overtook you!':' обігнав вас!') + '</div>' +
+      '<div style="font-size:11px;color:#f87171;">' + (_currentLang==='en'?'📉 Forbes rank #':'📉 Forbes місце #') + newRank + (_currentLang==='en'?' — they grow slower now':' — тепер вони ростуть повільніше') + '</div>';
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.transition = 'opacity .5s'; el.style.opacity = '0'; }, 5000);
+  setTimeout(() => el.remove(), 5600);
 }
 
 function showCrisisToast(r, loss, ev) {
@@ -16743,6 +16929,9 @@ let _dshopTimerInt = null;
 
 function _applyDonateShopLang() {
   const _el = (id,uk,en) => { const e=document.getElementById(id); if(e) e.innerHTML=_currentLang==='en'?en:uk; };
+  _el('dshop-free-lbl',    '🎁 Безкоштовно',        '🎁 Free');
+  _el('dshop-ad-gc-title', 'Дивись рекламу',         'Watch an Ad');
+  _el('dshop-ad-gc-desc',  'Отримай +10 💎 за перегляд', 'Get +10 💎 per view');
   _el('dshop-packs-lbl',    '💰 Набори Gold Credits', '💰 Gold Credits Packs');
   _el('dshop-premium-lbl', '👑 Преміум статуси',     '👑 Premium Statuses');
   _el('dshop-subtitle-lbl','Преміум валюта Mystery Boxes','Premium Mystery Boxes currency');
@@ -18628,6 +18817,29 @@ if (typeof showToast !== 'function') {
     </div>
 
     <!-- Credit Packs -->
+    <div class="dshop-section-label" id="dshop-free-lbl">🎁 Безкоштовно</div>
+    <div id="dshopAdGcCard" style="
+      background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,197,94,.05));
+      border:1px solid rgba(34,197,94,.35);border-radius:12px;
+      padding:12px 14px;margin-bottom:14px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="font-size:28px;">📺</div>
+        <div>
+          <div style="font-weight:800;font-size:13px;color:#4ade80;" id="dshop-ad-gc-title">Дивись рекламу</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5);" id="dshop-ad-gc-desc">Отримай +10 💎 за перегляд</div>
+        </div>
+      </div>
+      <button id="dshopAdGcBtn" onclick="watchAdForGC()" style="
+        padding:10px 16px;border-radius:10px;border:none;
+        background:linear-gradient(135deg,#22c55e,#15803d);
+        color:#fff;font-weight:800;font-size:13px;cursor:pointer;
+        font-family:'Rajdhani',sans-serif;white-space:nowrap;
+        box-shadow:0 2px 12px rgba(34,197,94,.4);">
+        <span id="dshop-ad-gc-btn-lbl">+10 💎</span>
+      </button>
+    </div>
+
     <div class="dshop-section-label" id="dshop-packs-lbl">💰 Набори Gold Credits</div>
     <div class="dshop-packs">
       <div class="dshop-pack" onclick="initiatePurchase('pouch')">
