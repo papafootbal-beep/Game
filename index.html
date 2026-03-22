@@ -4212,6 +4212,9 @@ const LANG_DATA = {
     sett_theme_dark: 'Темна', sett_theme_light: 'Світла',
     sett_danger_title: '⚠️ Небезпечна зона', sett_danger_desc: 'Незворотні дії',
     sett_reset_btn: '🗑️ Скинути весь прогрес',
+    sett_tutorial_title: '🎓 Навчання',
+    sett_tutorial_desc: 'Пройти навчання по грі знову',
+    sett_tutorial_btn: 'Розпочати навчання',
     sett_version: 'Mystery Boxes Simulator · v2.0',
 
     // CLICKER SCREEN
@@ -4447,6 +4450,9 @@ const LANG_DATA = {
     sett_theme_dark: 'Dark', sett_theme_light: 'Light',
     sett_danger_title: '⚠️ Danger Zone', sett_danger_desc: 'Irreversible actions',
     sett_reset_btn: '🗑️ Reset all progress',
+    sett_tutorial_title: '🎓 Tutorial',
+    sett_tutorial_desc: 'Replay the game tutorial',
+    sett_tutorial_btn: 'Start Tutorial',
     sett_version: 'Mystery Boxes Simulator · v2.0',
 
     // CLICKER SCREEN
@@ -4862,6 +4868,9 @@ function applyLangToSettings() {
     ['sett-vib-title', 'sett_vib_title'], ['sett-vib-desc', 'sett_vib_desc'],
     ['sett-danger-title', 'sett_danger_title'], ['sett-danger-desc', 'sett_danger_desc'],
     ['sett-reset-btn', 'sett_reset_btn'], ['sett-version', 'sett_version'],
+    ['sett-tutorial-title', 'sett_tutorial_title'],
+    ['sett-tutorial-desc',  'sett_tutorial_desc'],
+    ['sett-tutorial-btn-lbl','sett_tutorial_btn'],
     // Nav labels
     ['nav-lbl-clicker', 'nav_clicker'], ['nav-lbl-cases', 'nav_cases'],
     ['nav-lbl-inventory', 'nav_inventory'], ['nav-lbl-shop', 'nav_shop'],
@@ -4977,6 +4986,11 @@ function applyLangToSettings() {
   // Terminal/Hangar labels
   const _tl = (id,uk,en) => { const e=document.getElementById(id); if(e) e.textContent=_currentLang==='en'?en:uk; };
   _tl('terminal-locked-title',  'ГЛОБАЛЬНИЙ ТЕРМІНАЛ',             'GLOBAL TERMINAL');
+  _tl('terminal-locked-title',  'ГЛОБАЛЬНИЙ ТЕРМІНАЛ',             'GLOBAL TERMINAL');
+  const _tdesc = document.getElementById('terminal-locked-desc');
+  if (_tdesc) _tdesc.innerHTML = _currentLang==='en'
+    ? 'Purchase a landlord license to unlock the logistics hub.<br>All hangar items will arrive here automatically.'
+    : 'Придбайте ліцензію орендодавця, щоб розблокувати логістичний хаб.<br>Всі предмети з ангарів потраплятимуть сюди автоматично.';
   _tl('terminal-license-title', 'Міжнародна ліцензія орендодавця','International Landlord License');
   _tl('terminal-license-desc',  'Відкриває Ангарний парк та 1 слот оренди','Unlocks Fleet Hangar and 1 rental slot');
   _tl('terminal-buy-lbl',       '🌐 ПРИДБАТИ ЛІЦЕНЗІЮ',            '🌐 PURCHASE LICENSE');
@@ -6734,6 +6748,7 @@ function loadState() {
         localStorage.removeItem('mbs_persist_gc');
       }
       if (state.totalCarsSold === undefined) state.totalCarsSold = 0;
+      if (state.tutorialDone  === undefined) state.tutorialDone  = false;
       if (state.wholesalerLvl === undefined) state.wholesalerLvl = 0;
       // Re-sync wholesalerLvl from garageUpgrades (single source of truth)
       state.wholesalerLvl = state.garageUpgrades.wholesaler || 0;
@@ -10231,6 +10246,8 @@ function completeSale(entry, listPrice) {
   playSell();
   showToast('🏪 ' + getItemName(entry) + (_currentLang==='en'?' sold for ':' продано за ') + fmt(listPrice) + '!', 'gold');
   updateHUD(); saveState();
+  // Tutorial hook: track shop sales
+  window._tutShopSalesTotal = (window._tutShopSalesTotal || 0) + 1;
 
   // Show sold badge in existing card, then fade out
   const card = document.getElementById('shop-entry-' + entry.id);
@@ -11740,8 +11757,462 @@ function showCrisisToast(r, loss, ev) {
   setTimeout(() => el.remove(), 5600);
 }
 
-// Tick every 60 seconds
-setInterval(tickRivalGrowth, 60_000);
+// =================== TUTORIAL SYSTEM ===================
+const TUTORIAL_STEPS = [
+  // 1. Welcome
+  {
+    id: 'welcome',
+    titleUk: '👋 Ласкаво просимо до Mystery Boxes!',
+    titleEn: '👋 Welcome to Mystery Boxes!',
+    textUk: 'Ти — починаючий підприємець. Твоя мета — стати найбагатшим і очолити рейтинг Forbes!\n\nПочнемо з базових механік. Це займе кілька хвилин.',
+    textEn: 'You\'re a starting entrepreneur. Your goal — become the richest and top the Forbes ranking!\n\nLet\'s cover the basics. It will only take a few minutes.',
+    screen: 'clicker', highlight: null,
+  },
+  // 2. Task: earn 50€
+  {
+    id: 'earn_50',
+    titleUk: '👆 Накопич 50€ для першого покращення!',
+    titleEn: '👆 Earn 50€ for your first upgrade!',
+    textUk: 'Натискай на монету щоб заробляти гроші.\n\nЗавдання: накопич 50€ — цього вистачить щоб купити перше покращення кліку "Рукавичка" (+2€ за клік)!',
+    textEn: 'Tap the coin to earn money.\n\nTask: earn 50€ — that\'s enough to buy your first click upgrade "Glove" (+2€ per click)!',
+    screen: 'clicker', highlight: '#clickZone',
+    task: { type: 'balance', value: 50, labelUk: 'Накопити 50€', labelEn: 'Earn 50€' },
+  },
+  // 3. Buy Glove upgrade
+  {
+    id: 'buy_upgrade',
+    titleUk: '⚡ Купи покращення "Рукавичка"!',
+    titleEn: '⚡ Buy the "Glove" upgrade!',
+    textUk: 'Покращення збільшують дохід з кожного кліку або пасивний дохід (автоматично).\n\nЗавдання: купи "Рукавичка" за 50€ — внизу екрану в розділі ПОКРАЩЕННЯ!\n\nПісля покупки заробляти стане більше з кожного кліку.',
+    textEn: 'Upgrades increase income per click or add passive income (automatic).\n\nTask: buy "Glove" for 50€ — in the UPGRADES section below!\n\nAfter purchase you\'ll earn more per click.',
+    screen: 'clicker', highlight: '#upgradeList',
+    task: { type: 'upgradeOwned', value: 'glove', labelUk: 'Купити "Рукавичка"', labelEn: 'Buy "Glove"' },
+  },
+  // 4. Task: earn 15€ for case
+  {
+    id: 'earn_15',
+    titleUk: '🎲 Накопич 15€ для першого кейсу!',
+    titleEn: '🎲 Earn 15€ for your first case!',
+    textUk: 'Чудово! Тепер накопич 15€ щоб відкрити перший кейс.\n\nКейс — це основа гри! Всередині — випадковий предмет різної рідкості.',
+    textEn: 'Great! Now earn 15€ to open your first case.\n\nCases are the core of the game! Inside — a random item of varying rarity.',
+    screen: 'clicker', highlight: '#clickZone',
+    task: { type: 'balance', value: 15, labelUk: 'Накопити 15€', labelEn: 'Earn 15€' },
+  },
+  // 5. Task: open first case
+  {
+    id: 'open_case',
+    titleUk: '🎲 Відкрий перший кейс!',
+    titleEn: '🎲 Open your first case!',
+    textUk: 'Перейди у вкладку CASES і відкрий кейс "Street Stuff" за 15€.\n\nВсередині — випадковий предмет:\n⚪ Common → 🔵 Rare → 🟣 Epic → 🟡 Legendary\n\nПіди в CASES і натисни "Open for 15€"!',
+    textEn: 'Go to the CASES tab and open "Street Stuff" for 15€.\n\nInside — a random item:\n⚪ Common → 🔵 Rare → 🟣 Epic → 🟡 Legendary\n\nGo to CASES and tap "Open for 15€"!',
+    screen: 'cases', highlight: '#casesGrid',
+    task: { type: 'caseResultShown', value: 1, labelUk: 'Відкрити кейс і отримати предмет', labelEn: 'Open case and receive item' },
+  },
+  // 6. Keep item to storage
+  {
+    id: 'keep_item',
+    titleUk: '🎒 Перемісти предмет на склад!',
+    titleEn: '🎒 Move item to storage!',
+    textUk: 'Ти отримав предмет! Є два варіанти:\n\n💸 <b>Продати зразу</b> — швидко, але дешевше.\n🎒 <b>На склад</b> — зберегти для магазину або колекції.\n\nНатисни "🎒 Keep" щоб перемістити на склад!',
+    textEn: 'You got an item! Two options:\n\n💸 <b>Sell now</b> — quick but cheaper.\n🎒 <b>Keep</b> — save for the Market or collection.\n\nTap "🎒 Keep" to move it to storage!',
+    screen: null, highlight: '#resultKeepBtn',
+    task: { type: 'itemKept', value: 1, labelUk: 'Натиснути "На склад"', labelEn: 'Tap "Keep"' },
+  },
+  // 7. Storage tour
+  {
+    id: 'storage',
+    titleUk: '📦 Склад — твоє сховище предметів',
+    titleEn: '📦 Storage — your item vault',
+    textUk: 'Відмінно! Предмет на складі.\n\nУ STORAGE ти бачиш всі свої предмети. Звідси можна:\n• 💸 Продати предмет зразу\n• 🏪 Перемістити в Магазин для кращої ціни\n• 📥 Додати в Колекцію для бонусів\n\nПеревіряй склад після кожного відкриття кейсу!',
+    textEn: 'Excellent! Item is in storage.\n\nIn STORAGE you see all your items. From here you can:\n• 💸 Sell item instantly\n• 🏪 Move to Market for a better price\n• 📥 Add to Collection for bonuses\n\nCheck storage after every case opening!',
+    screen: 'inventory', highlight: '#inventoryGrid',
+  },
+  // 8. Storage upgrades
+  {
+    id: 'storage_upgrades',
+    titleUk: '⬆️ Покращення складу',
+    titleEn: '⬆️ Storage Upgrades',
+    textUk: 'Спочатку склад вміщує лише 10 предметів. Це мало!\n\nПерейди у вкладку UPGRADES в Storage щоб розширити склад:\n• 10 → 15 → 25 → 40 → 60 → 100 місць\n\nЧим більший склад — тим більше предметів можеш зберігати перед продажем!',
+    textEn: 'Storage starts with only 10 slots. That\'s not much!\n\nGo to the UPGRADES tab in Storage to expand it:\n• 10 → 15 → 25 → 40 → 60 → 100 slots\n\nBigger storage = more items to sell at once!',
+    screen: 'inventory', highlight: '#invTab-upgrades',
+    action: () => { document.getElementById('invTab-upgrades')?.click(); },
+  },
+  // 9. Collections
+  {
+    id: 'collections',
+    titleUk: '🏅 Колекції — бонуси назавжди!',
+    titleEn: '🏅 Collections — permanent bonuses!',
+    textUk: 'Перейди у вкладку COLLECTIONS в Storage.\n\nКожен кейс має 15 унікальних предметів. Збери всі 15 і отримай постійний бонус назавжди:\n\n⚡ ×5 відкриттів за раз\n💚 −20% знижка на ціну кейсу\n🎯 Унікальний бонус (наприклад +25€ за клік)\n\nЧим більше колекцій — тим сильніший твій персонаж!',
+    textEn: 'Go to the COLLECTIONS tab in Storage.\n\nEach case has 15 unique items. Collect all 15 and get a permanent bonus forever:\n\n⚡ ×5 openings at once\n💚 −20% case price discount\n🎯 Unique bonus (e.g. +25€ per click)\n\nMore collections = stronger character!',
+    screen: 'inventory', highlight: '#invTab-collections',
+    action: () => { document.getElementById('invTab-collections')?.click(); },
+  },
+  // 10. Task: earn 500€ for market
+  {
+    id: 'earn_500',
+    titleUk: '🏪 Накопич 500€ для магазину!',
+    titleEn: '🏪 Earn 500€ to unlock the Market!',
+    textUk: 'Магазин — це де великі гроші! Ти виставляєш предмети за власною ціною і продаєш дорожче.\n\nЗавдання: накопич 500€ щоб розблокувати Онлайн-Магазин.',
+    textEn: 'The Market is where big money is! You list items at your own price and sell for more.\n\nTask: earn 500€ to unlock the Online Market.',
+    screen: 'clicker', highlight: '#clickZone',
+    task: { type: 'balance', value: 500, labelUk: 'Накопити 500€', labelEn: 'Earn 500€' },
+  },
+  // 11. Unlock market task
+  {
+    id: 'unlock_market',
+    titleUk: '🏪 Розблокуй магазин!',
+    titleEn: '🏪 Unlock the Market!',
+    textUk: 'Перейди у вкладку MARKET і натисни "Unlock for 500€".\n\nМагазин — твоє головне джерело доходу. Виставляй предмети, встановлюй ціну і чекай покупця!',
+    textEn: 'Go to the MARKET tab and tap "Unlock for 500€".\n\nThe Market is your main income source. List items, set your price and wait for a buyer!',
+    screen: 'shop', highlight: '#unlockShopBtn',
+    task: { type: 'shopUnlocked', value: 1, labelUk: 'Розблокувати магазин', labelEn: 'Unlock the Market' },
+  },
+  // 12. List item and sell — task: complete one shop sale
+  {
+    id: 'list_and_sell',
+    titleUk: '🏷️ Вистав і продай перший товар!',
+    titleEn: '🏷️ List and sell your first item!',
+    textUk: 'Магазин відкрито! Тепер вистав перший товар:\n\n1. Перейди у STORAGE → вибери предмет → "To Market"\n2. Встанови ціну або натисни MAX для максимальної\n3. Натисни "List for sale" — товар виставлено!\n4. Зачекай — чим дорожче, тим довше продається\n5. Гроші зараховуються автоматично після продажу\n\nЗавдання: продай 1 предмет у магазині!',
+    textEn: 'Market is open! Now list your first item:\n\n1. Go to STORAGE → pick item → "To Market"\n2. Set your price or tap MAX for maximum price\n3. Tap "List for sale" — item is listed!\n4. Wait — the pricier the item, the longer it takes\n5. Money is credited automatically after the sale\n\nTask: sell 1 item in the Market!',
+    screen: 'shop', highlight: null,
+    task: { type: 'shopSale', value: 1, labelUk: 'Продати 1 предмет в магазині', labelEn: 'Sell 1 item in Market' },
+  },
+  // 13. Market upgrades
+  {
+    id: 'market_upgrades',
+    titleUk: '⬆️ Покращення магазину',
+    titleEn: '⬆️ Market Upgrades',
+    textUk: 'Чудово — перший продаж! 🎉\n\nМАРКЕТ → вкладка UPGRADES:\n\n📦 Більше слотів — більше товарів одночасно\n💰 Вищий множник ціни — продаєш дорожче\n⚡ "List All at MAX" — виставляти все одним кліком\n\nВкладай у покращення — це повертається прибутком!',
+    textEn: 'Great — first sale! 🎉\n\nMARKET → UPGRADES tab:\n\n📦 More slots — more items at once\n💰 Higher price multiplier — sell for more\n⚡ "List All at MAX" — list everything with one click\n\nInvest in upgrades — it pays off!',
+    screen: 'shop', highlight: null,
+    action: () => { const b = document.getElementById('shopTab-upgrades'); if(b) b.click(); },
+  },
+  // 13. Final
+  {
+    id: 'forbes',
+    titleUk: '🏆 Основи пройдено — вперед до Forbes #1!',
+    titleEn: '🏆 Basics done — aim for Forbes #1!',
+    textUk: 'Ти знаєш основи! Далі тебе чекають:\n🔧 Гараж — ремонт і продаж авто\n🌐 Термінал — пасивна оренда\n💎 LifeShop — витрачай капітал з розумом\n\nОбжени всіх у Forbes і розблокуй секретну вкладку ???\n\nУдачі! 🚀',
+    textEn: 'You know the basics! Next awaits:\n🔧 Garage — repair and sell vehicles\n🌐 Terminal — passive rentals\n💎 LifeShop — spend capital wisely\n\nOvertake everyone in Forbes and unlock the secret ??? tab!\n\nGood luck! 🚀',
+    screen: null, highlight: null, last: true,
+  },
+];
+
+let _tutStep = 0;
+let _tutActive = false;
+let _tutTaskInterval = null;
+
+function startTutorial(fromSettings = false) {
+  if (fromSettings) showScreen('clicker', document.querySelector('.nav-btn'));
+  _tutStep = 0;
+  _tutActive = true;
+  _tutHighlighted = [];
+  window._tutShopSalesTotal = 0;
+  state.tutorialDone = false;
+  saveState();
+  _showTutStep();
+}
+
+function _showTutStep() {
+  _clearTutTask();
+  _clearHighlights(); // always clear before showing new step
+  const step = TUTORIAL_STEPS[_tutStep];
+  if (!step) { _endTutorial(); return; }
+
+  // Navigate to correct screen
+  if (step.screen) {
+    const btn = document.querySelector('[onclick*="' + step.screen + '"]') ||
+                document.getElementById('nav-' + step.screen + '-btn');
+    showScreen(step.screen, btn);
+  }
+
+  // Run optional action (e.g. switch tab)
+  if (step.action) setTimeout(step.action, 150);
+
+  // Build overlay
+  const existing = document.getElementById('tutOverlay');
+  if (existing) existing.remove();
+
+  const isLast  = !!step.last;
+  const isFirst = _tutStep === 0;
+  const en = _currentLang === 'en';
+
+  const overlay = document.createElement('div');
+  overlay.id = 'tutOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;pointer-events:none;';
+
+  // Dim background — only shown when card is visible (not during task play)
+  const dim = document.createElement('div');
+  dim.id = 'tutDim';
+  dim.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.7);pointer-events:all;';
+  overlay.appendChild(dim);
+
+  // Card
+  const card = document.createElement('div');
+  card.id = 'tutCard';
+  card.style.cssText = [
+    'position:absolute','bottom:80px','left:50%','transform:translateX(-50%)',
+    'width:calc(100% - 32px)','max-width:400px',
+    'background:linear-gradient(160deg,#0d1117,#161b22)',
+    'border:1.5px solid rgba(56,189,248,.5)',
+    'border-radius:18px','padding:20px',
+    'box-shadow:0 8px 40px rgba(0,0,0,.8),0 0 0 1px rgba(56,189,248,.1)',
+    'pointer-events:all',
+    'animation:fadeIn .3s ease',
+  ].join(';');
+
+  const progress = TUTORIAL_STEPS.map((_, i) =>
+    '<div style="flex:1;height:3px;border-radius:2px;background:' +
+    (i < _tutStep ? '#38bdf8' : i === _tutStep ? 'rgba(56,189,248,.5)' : 'rgba(255,255,255,.1)') +
+    ';"></div>'
+  ).join('');
+
+  const title = en ? step.titleEn : step.titleUk;
+  const text  = (en ? step.textEn : step.textUk).replace(/\n/g, '<br>');
+
+  // For task steps: "Start" button instead of "Next"
+  const isTask = !!step.task;
+  const nextBtnLabel = isTask
+    ? (en ? '▶ Start task' : '▶ Почати завдання')
+    : (isLast ? (en ? '🚀 Let\'s go!' : '🚀 Почати!') : (en ? 'Next →' : 'Далі →'));
+
+  card.innerHTML =
+    '<div style="display:flex;gap:3px;margin-bottom:14px;">' + progress + '</div>' +
+    '<div style="font-size:10px;color:rgba(56,189,248,.6);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">' +
+      (en ? 'STEP ' : 'КРОК ') + (_tutStep + 1) + ' / ' + TUTORIAL_STEPS.length +
+    '</div>' +
+    '<div style="font-family:Orbitron,sans-serif;font-size:15px;font-weight:800;color:#38bdf8;margin-bottom:10px;line-height:1.3;">' +
+      title + '</div>' +
+    '<div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:16px;">' +
+      text + '</div>' +
+    '<div id="tutTaskBar" style="margin-bottom:12px;"></div>' +
+    '<div style="display:flex;gap:10px;">' +
+      (!isFirst ? '<button id="tutBtnPrev" style="padding:10px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Rajdhani,sans-serif;font-size:13px;font-weight:800;cursor:pointer;">' +
+        (en ? '← Back' : '← Назад') + '</button>' : '') +
+      '<button id="tutBtnSkip" style="padding:10px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.35);font-family:Rajdhani,sans-serif;font-size:12px;cursor:pointer;margin-left:auto;">' +
+        (en ? 'Skip tutorial' : 'Пропустити') + '</button>' +
+      '<button id="tutBtnNext" style="padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#000;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:900;cursor:pointer;">' +
+        nextBtnLabel +
+      '</button>' +
+    '</div>';
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  // Button events
+  const btnNext = document.getElementById('tutBtnNext');
+  const btnPrev = document.getElementById('tutBtnPrev');
+  const btnSkip = document.getElementById('tutBtnSkip');
+
+  if (btnNext) btnNext.onclick = () => {
+    if (isTask) {
+      // Hide overlay — let player play freely
+      _hideTutCardForTask(step, en);
+    } else {
+      _tutStep++;
+      _showTutStep();
+    }
+  };
+  if (btnPrev) btnPrev.onclick = () => { _tutStep = Math.max(0, _tutStep - 1); _showTutStep(); };
+  if (btnSkip) btnSkip.onclick = () => _endTutorial();
+
+  // Highlight element
+  if (step.highlight) _highlightTutEl(step.highlight);
+}
+
+// Hide tutorial card while player does the task — show floating mini-tracker
+function _hideTutCardForTask(step, en) {
+  _clearTutTask();
+  _clearHighlights(); // clear previous highlights before setting new ones
+
+  const ov = document.getElementById('tutOverlay');
+  if (ov) ov.remove();
+
+  // For itemKept: highlight the Keep button immediately
+  if (step.highlight) _highlightTutEl(step.highlight);
+
+  // Show small floating tracker
+  const tracker = document.createElement('div');
+  tracker.id = 'tutTracker';
+  tracker.style.cssText = [
+    'position:fixed','bottom:90px','left:50%','transform:translateX(-50%)',
+    'z-index:10000',
+    'background:linear-gradient(135deg,#0d1117,#161b22)',
+    'border:1.5px solid rgba(56,189,248,.5)',
+    'border-radius:14px','padding:10px 16px',
+    'display:flex','align-items:center','gap:12px',
+    'box-shadow:0 4px 20px rgba(0,0,0,.7)',
+    'animation:fadeIn .3s ease',
+    'min-width:220px','max-width:320px',
+    'pointer-events:none',
+  ].join(';');
+
+  const label = en ? step.task.labelEn : step.task.labelUk;
+
+  tracker.innerHTML =
+    '<div style="font-size:20px;">🎯</div>' +
+    '<div style="flex:1;">' +
+      '<div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:4px;">' + label + '</div>' +
+      '<div style="height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;">' +
+        '<div id="tutTrackerBar" style="height:100%;width:0%;background:linear-gradient(90deg,#22c55e,#4ade80);border-radius:3px;transition:width .3s;"></div>' +
+      '</div>' +
+      '<div id="tutTrackerText" style="font-size:11px;color:rgba(255,255,255,.5);margin-top:3px;">' + _getTutTaskLabel(step.task, 0, en) + '</div>' +
+    '</div>';
+
+  document.body.appendChild(tracker);
+
+  // Poll for task completion
+  _tutTaskInterval = setInterval(() => {
+    const cur    = _getTutTaskValue(step.task);
+    const maxVal = _getTutTaskMax(step.task);
+    const pct    = Math.min(100, Math.round((cur / maxVal) * 100));
+    const bar    = document.getElementById('tutTrackerBar');
+    const txt    = document.getElementById('tutTrackerText');
+    if (bar) bar.style.width = pct + '%';
+    if (txt) txt.textContent = _getTutTaskLabel(step.task, cur, en);
+
+    if (cur >= maxVal) {
+      _clearTutTask();
+      _clearHighlights();
+      const tr = document.getElementById('tutTracker');
+      if (tr) {
+        tr.innerHTML = '<div style="font-size:20px;">✅</div><div style="font-size:13px;font-weight:800;color:#4ade80;">' +
+          (en ? 'Task complete!' : 'Завдання виконано!') + '</div>';
+        tr.style.borderColor = 'rgba(34,197,94,.6)';
+        setTimeout(() => {
+          if (tr.parentNode) tr.remove();
+          _tutStep++;
+          _showTutStep();
+        }, 1200);
+      }
+    }
+  }, 300);
+}
+
+function _getTutTaskValue(task) {
+  if (task.type === 'balance')        return state.balance;
+  if (task.type === 'casesOpened')    return state.stats ? state.stats.casesOpened : 0;
+  if (task.type === 'shopUnlocked')   return state.shopUnlocked ? 1 : 0;
+  if (task.type === 'upgradeOwned')   return state.owned && state.owned[task.value] ? 1 : 0;
+  if (task.type === 'caseResultShown') {
+    // True when case modal is open AND result is visible AND has spun
+    const modalResult = document.getElementById('modalResult');
+    return (modalResult && modalResult.style.display !== 'none' && hasSpunOnce) ? 1 : 0;
+  }
+  if (task.type === 'itemKept') {
+    const modal = document.getElementById('caseModal');
+    return (modal && !modal.classList.contains('show')) ? 1 : 0;
+  }
+  if (task.type === 'shopSale') return window._tutShopSalesTotal || 0;
+  return 0;
+}
+
+function _getTutTaskMax(task) {
+  if (task.type === 'casesOpened')     return 1;
+  if (task.type === 'shopUnlocked')    return 1;
+  if (task.type === 'upgradeOwned')    return 1;
+  if (task.type === 'caseResultShown') return 1;
+  if (task.type === 'itemKept')        return 1;
+  if (task.type === 'shopSale')        return 1;
+  return task.value;
+}
+
+function _getTutTaskLabel(task, cur, en) {
+  if (task.type === 'casesOpened')     return cur >= 1 ? (en?'✅ Done!':'✅ Виконано!') : (en?'0 / 1 cases':'0 / 1 кейс');
+  if (task.type === 'shopUnlocked')    return cur >= 1 ? (en?'✅ Done!':'✅ Виконано!') : (en?'Not unlocked yet':'Ще не розблоковано');
+  if (task.type === 'upgradeOwned')    return cur >= 1 ? (en?'✅ Done!':'✅ Виконано!') : (en?'Not purchased yet':'Ще не куплено');
+  if (task.type === 'caseResultShown') return cur >= 1 ? (en?'✅ Item received!':'✅ Предмет отримано!') : (en?'Waiting for result…':'Чекаємо результат…');
+  if (task.type === 'itemKept')        return cur >= 1 ? (en?'✅ Done!':'✅ Виконано!') : (en?'Tap "Keep" in the case modal':'Натисни "Keep" у вікні кейсу');
+  if (task.type === 'shopSale')        return cur >= 1 ? (en?'✅ Sale complete!':'✅ Продаж виконано!') : (en?'Waiting for sale to complete…':'Чекаємо завершення продажу…');
+  return Math.min(Math.round(cur), task.value) + ' / ' + task.value + '€';
+}
+
+function _clearTutTask() {
+  if (_tutTaskInterval) { clearInterval(_tutTaskInterval); _tutTaskInterval = null; }
+}
+
+// Track all highlighted elements explicitly
+let _tutHighlighted = [];
+
+function _highlightTutEl(selector) {
+  try {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    el.style.outline = '2px solid #38bdf8';
+    el.style.outlineOffset = '3px';
+    el.style.boxShadow = '0 0 18px rgba(56,189,248,.5)';
+    el.dataset._tutHL = '1';
+    _tutHighlighted.push(el);
+  } catch(e){}
+}
+
+function _clearHighlights() {
+  // Clear by tracked list
+  _tutHighlighted.forEach(el => {
+    if (el) {
+      el.style.outline = '';
+      el.style.outlineOffset = '';
+      el.style.boxShadow = '';
+      delete el.dataset._tutHL;
+    }
+  });
+  _tutHighlighted = [];
+  // Also clear any remaining by attribute (safety net)
+  document.querySelectorAll('[data-_tutHL]').forEach(el => {
+    el.style.outline = '';
+    el.style.outlineOffset = '';
+    el.style.boxShadow = '';
+    delete el.dataset._tutHL;
+  });
+}
+
+function _shakeTutCard(card) {
+  card.style.animation = 'none';
+  card.style.transform = 'translateX(-50%) translateX(-6px)';
+  setTimeout(() => card.style.transform = 'translateX(-50%) translateX(6px)', 80);
+  setTimeout(() => card.style.transform = 'translateX(-50%)', 160);
+}
+
+function _endTutorial() {
+  _clearTutTask();
+  _clearHighlights();
+  const ov = document.getElementById('tutOverlay');
+  if (ov) { ov.style.opacity = '0'; ov.style.transition = 'opacity .3s'; setTimeout(() => ov.remove(), 300); }
+  const tr = document.getElementById('tutTracker');
+  if (tr) tr.remove();
+  _tutActive = false;
+  state.tutorialDone = true;
+  saveState();
+  showToast(_currentLang==='en' ? '✅ Tutorial complete! Good luck 🚀' : '✅ Навчання завершено! Удачі 🚀', '#38bdf8', 3000);
+}
+
+// Called after name confirmed — offer tutorial to new players
+function maybeOfferTutorial() {
+  if (state.tutorialDone) return;
+  setTimeout(() => {
+    const en = _currentLang === 'en';
+    const el = document.createElement('div');
+    el.id = 'tutOfferOverlay';
+    el.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .3s ease;';
+    el.innerHTML =
+      '<div style="background:linear-gradient(160deg,#0d1117,#161b22);border:1.5px solid rgba(56,189,248,.4);border-radius:20px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8);">' +
+        '<div style="font-size:48px;margin-bottom:12px;">🎓</div>' +
+        '<div style="font-family:Orbitron,sans-serif;font-size:17px;font-weight:800;color:#38bdf8;margin-bottom:8px;">' +
+          (en ? 'New here?' : 'Перший раз?') + '</div>' +
+        '<div style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.6;margin-bottom:24px;">' +
+          (en ? 'Would you like a quick tour of the game? We\'ll show you how to earn, open cases, and grow your empire!' :
+                'Хочеш пройти коротке навчання? Покажемо як заробляти, відкривати кейси та будувати свою імперію!') +
+        '</div>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<button onclick="document.getElementById(\'tutOfferOverlay\').remove(); state.tutorialDone=true; saveState();" style="flex:1;padding:12px;border-radius:11px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);font-family:Rajdhani,sans-serif;font-size:13px;font-weight:800;cursor:pointer;">' +
+            (en ? 'Skip' : 'Пропустити') + '</button>' +
+          '<button onclick="document.getElementById(\'tutOfferOverlay\').remove(); startTutorial();" style="flex:1;padding:12px;border-radius:11px;border:none;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#000;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:900;cursor:pointer;">' +
+            '🎓 ' + (en ? 'Start Tour!' : 'Почати!') + '</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(el);
+  }, 800);
+}
 
 
 // =================== CONTAINERS SYSTEM ===================
@@ -12691,6 +13162,7 @@ function doReset() {
   const savedPremium = state.premiumOwned ? JSON.parse(JSON.stringify(state.premiumOwned)) : {};
   localStorage.removeItem('mbs_save2');
   localStorage.removeItem('mbs_player_name');
+  localStorage.removeItem('mbs_x5uses'); // reset X5 bonus
   // Записуємо GC і premium у тимчасове сховище щоб відновити після перезавантаження
   if (savedGC > 0 || Object.keys(savedPremium).length > 0) {
     localStorage.setItem('mbs_persist_gc', JSON.stringify({ gc: savedGC, premium: savedPremium }));
@@ -16785,6 +17257,22 @@ function confirmPlayerName() {
   if (m) m.style.display = 'none';
   // Refresh Forbes if open
   if (document.getElementById('screen-lifeshop').classList.contains('active')) renderLifeShop();
+
+  // Determine what to show next:
+  // 1. If daily streak available → show streak first, tutorial offered on streak close
+  // 2. If no streak → show tutorial offer directly
+  const streakAvailable = state.dailyStreak
+    && typeof canClaimToday === 'function' && canClaimToday()
+    && typeof getNextClaimableDay === 'function' && getNextClaimableDay() !== -1;
+
+  if (streakAvailable) {
+    setTimeout(() => openDailyStreak(), 400);
+    // Tutorial will be triggered by closeDailyStreak()
+  } else {
+    setTimeout(() => {
+      if (typeof maybeOfferTutorial === 'function') maybeOfferTutorial();
+    }, 500);
+  }
 }
 
 // Also allow button enable state reactively
@@ -17795,6 +18283,10 @@ function openDailyStreak() {
 
 function closeDailyStreak() {
   document.getElementById('dailyStreakModal').classList.remove('open');
+  // If tutorial hasn't been offered yet — offer it now (after daily bonus)
+  if (!state.tutorialDone && !document.getElementById('tutOfferOverlay') && !document.getElementById('tutOverlay')) {
+    setTimeout(maybeOfferTutorial, 400);
+  }
 }
 
 function renderDailyStreakModal() {
@@ -17897,10 +18389,15 @@ function claimDailyReward(watchAd) {
 (function checkDailyStreakOnLoad() {
   setTimeout(() => {
     if (!state.dailyStreak) return;
+    // Skip if name modal is visible — confirmPlayerName() will handle it
+    const nameModal = document.getElementById('nameModal');
+    if (nameModal && nameModal.style.display !== 'none') return;
+    // Skip if tutorial offer is showing
+    if (document.getElementById('tutOfferOverlay')) return;
     if (canClaimToday() && getNextClaimableDay() !== -1) {
       openDailyStreak();
     }
-  }, 2000); // Показати через 2с після старту гри
+  }, 2500);
 })();
 
 // ── Achievement Gold Credits rewards ─────────────────────
@@ -18975,6 +19472,15 @@ if (typeof showToast !== 'function') {
         <span class="sett-toggle-slider"></span>
       </label>
     </div>
+  </div>
+
+  <!-- TUTORIAL -->
+  <div class="sett-card" style="margin-bottom:12px;border-color:rgba(56,189,248,.2);">
+    <div class="sett-card-title" style="color:#38bdf8;" id="sett-tutorial-title">🎓 Tutorial</div>
+    <div class="sett-card-desc" style="margin-bottom:10px;" id="sett-tutorial-desc">Replay the game tutorial</div>
+    <button onclick="startTutorial(true)" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#38bdf8;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:800;cursor:pointer;" id="sett-tutorial-btn">
+      🎓 <span id="sett-tutorial-btn-lbl">Start Tutorial</span>
+    </button>
   </div>
 
   <!-- RESET -->
