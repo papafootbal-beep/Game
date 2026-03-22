@@ -6759,6 +6759,13 @@ function loadState() {
       if (state.goldCredits    === undefined) state.goldCredits    = 0;
       if (!state.dailyStreak)  state.dailyStreak  = { day:0, lastClaim:null, claimedDays:{} };
       if (!state.dailyStreak.claimedDays) state.dailyStreak.claimedDays = {};
+      // Sync lastClaim from persistent key (survives reset)
+      try {
+        const _persisted = localStorage.getItem('mbs_daily_claimed');
+        if (_persisted && (!state.dailyStreak.lastClaim || _persisted > state.dailyStreak.lastClaim)) {
+          state.dailyStreak.lastClaim = _persisted;
+        }
+      } catch(e) {}
       if (!state.achGoldClaimed)  state.achGoldClaimed  = {};
       if (!state.collGoldClaimed) state.collGoldClaimed = {};
       if (!state.premiumOwned) state.premiumOwned = { noAds:false, vip:false, vipPlus:false };
@@ -9677,6 +9684,7 @@ function renderInventory() {
 
     const shopBtn = document.createElement('button');
     shopBtn.className = 'sell-instant-btn';
+    shopBtn.dataset.tutToMarket = '1';
     shopBtn.style.cssText = 'background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3);';
     shopBtn.textContent = '🏪 ' + t('inv_to_shop');
     shopBtn.addEventListener('click', () => listInShop(item.id));
@@ -11847,13 +11855,33 @@ const TUTORIAL_STEPS = [
     screen: 'inventory', highlight: '#invTab-collections',
     action: () => { document.getElementById('invTab-collections')?.click(); },
   },
-  // 10. Task: earn 500€ for market
+  // 10. Task: earn 500€ for market (stops at 100 for ad bonus intro)
   {
-    id: 'earn_500',
+    id: 'earn_100',
     titleUk: '🏪 Накопич 500€ для магазину!',
     titleEn: '🏪 Earn 500€ to unlock the Market!',
-    textUk: 'Магазин — це де великі гроші! Ти виставляєш предмети за власною ціною і продаєш дорожче.\n\nЗавдання: накопич 500€ щоб розблокувати Онлайн-Магазин.',
-    textEn: 'The Market is where big money is! You list items at your own price and sell for more.\n\nTask: earn 500€ to unlock the Online Market.',
+    textUk: 'Магазин — це де великі гроші! Виставляєш предмети за власною ціною і продаєш дорожче.\n\nЦіль — накопич 500€ щоб розблокувати Онлайн-Магазин.\n\nПочинай клікати! По дорозі покажемо один корисний трюк 😉',
+    textEn: 'The Market is where big money is! List items at your own price and sell for more.\n\nGoal — earn 500€ to unlock the Online Market.\n\nStart clicking! Along the way we\'ll show you a useful trick 😉',
+    screen: 'clicker', highlight: '#clickZone',
+    task: { type: 'balance', value: 100, labelUk: 'Накопити 100€ (перший етап)', labelEn: 'Earn 100€ (first milestone)' },
+  },
+  // 11. Ad bonus explanation — triggered at 100€ as a surprise on the way to 500€
+  {
+    id: 'ad_bonus',
+    titleUk: '⚡ Стоп! Спеціальна пропозиція!',
+    titleEn: '⚡ Wait! Special Offer!',
+    textUk: 'Непогано! А тепер — приємний сюрприз 🎁\n\nІноді в грі зʼявляються <b>спеціальні пропозиції</b> — тимчасові бонуси за перегляд реклами.\n\nОт наприклад: <b>×2 дохід за клік</b> на 60 секунд! З ним ти зберешся до 500€ набагато швидше.\n\nДля першого разу — без реклами. Натисни "⚡ Активувати" і спробуй!',
+    textEn: 'Nice! Now — a pleasant surprise 🎁\n\nSometimes <b>special offers</b> appear in the game — temporary bonuses for watching ads.\n\nFor example: <b>×2 click income</b> for 60 seconds! With it you\'ll reach 500€ much faster.\n\nFirst time — no ad required. Tap "⚡ Activate" and try it!',
+    screen: 'clicker', highlight: null,
+    adBonus: true,
+  },
+  // 12. Task: continue to 500€ with x2 boost active
+  {
+    id: 'earn_500',
+    titleUk: '💨 Тепер швидше — добери до 500€!',
+    titleEn: '💨 Now faster — reach 500€!',
+    textUk: '×2 активовано! Ти вже на шляху — продовжуй клікати і добери до 500€.\n\nЯк тільки набереш — одразу можна купити Онлайн-Магазин!',
+    textEn: '×2 activated! You\'re on your way — keep clicking and reach 500€.\n\nOnce you hit it — you can buy the Online Market right away!',
     screen: 'clicker', highlight: '#clickZone',
     task: { type: 'balance', value: 500, labelUk: 'Накопити 500€', labelEn: 'Earn 500€' },
   },
@@ -11867,15 +11895,16 @@ const TUTORIAL_STEPS = [
     screen: 'shop', highlight: '#unlockShopBtn',
     task: { type: 'shopUnlocked', value: 1, labelUk: 'Розблокувати магазин', labelEn: 'Unlock the Market' },
   },
-  // 12. List item and sell — task: complete one shop sale
+  // 14. Guided: list item step by step with spotlight
   {
     id: 'list_and_sell',
-    titleUk: '🏷️ Вистав і продай перший товар!',
-    titleEn: '🏷️ List and sell your first item!',
-    textUk: 'Магазин відкрито! Тепер вистав перший товар:\n\n1. Перейди у STORAGE → вибери предмет → "To Market"\n2. Встанови ціну або натисни MAX для максимальної\n3. Натисни "List for sale" — товар виставлено!\n4. Зачекай — чим дорожче, тим довше продається\n5. Гроші зараховуються автоматично після продажу\n\nЗавдання: продай 1 предмет у магазині!',
-    textEn: 'Market is open! Now list your first item:\n\n1. Go to STORAGE → pick item → "To Market"\n2. Set your price or tap MAX for maximum price\n3. Tap "List for sale" — item is listed!\n4. Wait — the pricier the item, the longer it takes\n5. Money is credited automatically after the sale\n\nTask: sell 1 item in the Market!',
-    screen: 'shop', highlight: null,
+    titleUk: '🏷️ Вистав перший товар — крок за кроком!',
+    titleEn: '🏷️ List your first item — step by step!',
+    textUk: 'Зараз я проведу тебе по кожному кроку.\n\nПідсвічуватиметься кнопка — <b>просто натисни на неї</b>!\n\nЗавдання: продай 1 предмет у магазині.',
+    textEn: 'I\'ll guide you through each step.\n\nA button will be highlighted — <b>just tap it</b>!\n\nTask: sell 1 item in the Market.',
+    screen: 'inventory', highlight: null,
     task: { type: 'shopSale', value: 1, labelUk: 'Продати 1 предмет в магазині', labelEn: 'Sell 1 item in Market' },
+    onStart: () => _startGuidedListFlow(),
   },
   // 13. Market upgrades
   {
@@ -11887,14 +11916,24 @@ const TUTORIAL_STEPS = [
     screen: 'shop', highlight: null,
     action: () => { const b = document.getElementById('shopTab-upgrades'); if(b) b.click(); },
   },
-  // 13. Final
+  // 16. LifeShop + ??? goal (combined)
+  {
+    id: 'lifeshop',
+    titleUk: '💎 LifeShop та головна ціль гри!',
+    titleEn: '💎 LifeShop and the main goal!',
+    textUk: 'Вкладка 💎 LIFESHOP — тут витрачаєш капітал на предмети розкоші:\n\n🚗 Транспорт — авто, яхти, ракети\n🏠 Нерухомість — вілли, замки, острови, міста\n💎 Розкіш — діаманти, армії, криптовалюта\n\nКожна покупка збільшує загальний капітал у Forbes!\n\n🎯 У STATS внизу є кнопка <b style="color:#f5c842;">??? MYSTERY</b> — це головна ціль гри. Виконай умови щоб відкрити фінал!',
+    textEn: 'The 💎 LIFESHOP tab — spend your capital on luxury:\n\n🚗 Transport — cars, yachts, rockets\n🏠 Real Estate — villas, castles, islands, cities\n💎 Luxury — diamonds, armies, cryptocurrency\n\nEvery purchase grows your total Forbes capital!\n\n🎯 In STATS at the bottom is the <b style="color:#f5c842;">??? MYSTERY</b> button — the main goal of the game. Complete the conditions to unlock the ending!',
+    screen: 'lifeshop', highlight: '#statsEndgameBtn',
+    action: () => { showScreen('lifeshop', document.querySelector('[onclick*="lifeshop"]')); setTimeout(() => _highlightTutEl('#statsEndgameBtn'), 800); },
+  },
+  // 17. Final — good luck
   {
     id: 'forbes',
-    titleUk: '🏆 Основи пройдено — вперед до Forbes #1!',
-    titleEn: '🏆 Basics done — aim for Forbes #1!',
-    textUk: 'Ти знаєш основи! Далі тебе чекають:\n🔧 Гараж — ремонт і продаж авто\n🌐 Термінал — пасивна оренда\n💎 LifeShop — витрачай капітал з розумом\n\nОбжени всіх у Forbes і розблокуй секретну вкладку ???\n\nУдачі! 🚀',
-    textEn: 'You know the basics! Next awaits:\n🔧 Garage — repair and sell vehicles\n🌐 Terminal — passive rentals\n💎 LifeShop — spend capital wisely\n\nOvertake everyone in Forbes and unlock the secret ??? tab!\n\nGood luck! 🚀',
-    screen: null, highlight: null, last: true,
+    titleUk: '🎮 Все готово — гарної гри!',
+    titleEn: '🎮 All set — enjoy the game!',
+    textUk: 'Ти пройшов навчання і знаєш всі основи!\n\nПам\'ятай:\n🎲 Відкривай кейси → збирай колекції\n🏪 Продавай в магазині за максимальною ціною\n🔧 Гараж і 🌐 Термінал — пасивний дохід\n💎 LifeShop — купуй і зростай у Forbes\n🏆 Очоль першу сходинку рейтингу Forbes і відкрий таємничу <b style="color:#f5c842;">???</b>!\n\nВ налаштуваннях можна повторити навчання.\n\n<b style="color:#f5c842;font-size:15px;">Успіхів і нехай щастить! 🚀</b>',
+    textEn: 'You\'ve completed the tutorial and know all the basics!\n\nRemember:\n🎲 Open cases → collect collections\n🏪 Sell in Market at maximum price\n🔧 Garage & 🌐 Terminal — passive income\n💎 LifeShop — buy and climb Forbes\n🏆 Claim the #1 spot in Forbes and unlock the mysterious <b style="color:#f5c842;">???</b>!\n\nYou can replay the tutorial in Settings.\n\n<b style="color:#f5c842;font-size:15px;">Good luck and have fun! 🚀</b>',
+    screen: 'clicker', highlight: null, last: true,
   },
 ];
 
@@ -11908,6 +11947,8 @@ function startTutorial(fromSettings = false) {
   _tutActive = true;
   _tutHighlighted = [];
   window._tutShopSalesTotal = 0;
+  _guidedFlowActive = false;
+  _guidedFlowStep = 0;
   state.tutorialDone = false;
   saveState();
   _showTutStep();
@@ -11915,7 +11956,10 @@ function startTutorial(fromSettings = false) {
 
 function _showTutStep() {
   _clearTutTask();
-  _clearHighlights(); // always clear before showing new step
+  _clearHighlights();
+  _guidedFlowActive = false;
+  _stopSpotlightRAF();
+  _clearSpotlight();
   const step = TUTORIAL_STEPS[_tutStep];
   if (!step) { _endTutorial(); return; }
 
@@ -11972,9 +12016,22 @@ function _showTutStep() {
 
   // For task steps: "Start" button instead of "Next"
   const isTask = !!step.task;
+  const isAdBonus = !!step.adBonus;
   const nextBtnLabel = isTask
     ? (en ? '▶ Start task' : '▶ Почати завдання')
-    : (isLast ? (en ? '🚀 Let\'s go!' : '🚀 Почати!') : (en ? 'Next →' : 'Далі →'));
+    : (isLast ? (en ? '🎮 Start Playing!' : '🎮 Почати гру!') : (en ? 'Next →' : 'Далі →'));
+
+  // adBonus step: inject fake click2x card + hidden Next (shown after activation)
+  const adBonusBlock = isAdBonus ? (
+    '<div id="tutAdBonusCard" style="margin:12px 0;background:linear-gradient(135deg,rgba(245,200,66,.12),rgba(245,200,66,.05));border:1.5px solid rgba(245,200,66,.5);border-radius:14px;padding:14px 16px;text-align:center;">' +
+      '<div style="font-size:28px;margin-bottom:4px;">👆</div>' +
+      '<div style="font-family:Orbitron,sans-serif;font-size:13px;font-weight:800;color:#f5c842;margin-bottom:4px;">' + (en ? '×2 CLICK INCOME' : '×2 ДОХІД ЗА КЛІК') + '</div>' +
+      '<div style="font-size:11px;color:rgba(255,255,255,.55);margin-bottom:12px;">' + (en ? 'Click income doubled for 60 seconds!' : 'Дохід за клік збільшується вдвічі на 60 секунд!') + '</div>' +
+      '<button id="tutAdActivateBtn" onclick="_tutActivateAdBonus()" style="padding:10px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,#f5c842,#f97316);color:#000;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:900;cursor:pointer;width:100%;">' +
+        (en ? '⚡ Activate (free)' : '⚡ Активувати (безкоштовно)') +
+      '</button>' +
+    '</div>'
+  ) : '';
 
   card.innerHTML =
     '<div style="display:flex;gap:3px;margin-bottom:14px;">' + progress + '</div>' +
@@ -11985,13 +12042,14 @@ function _showTutStep() {
       title + '</div>' +
     '<div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:16px;">' +
       text + '</div>' +
+    adBonusBlock +
     '<div id="tutTaskBar" style="margin-bottom:12px;"></div>' +
     '<div style="display:flex;gap:10px;">' +
       (!isFirst ? '<button id="tutBtnPrev" style="padding:10px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);font-family:Rajdhani,sans-serif;font-size:13px;font-weight:800;cursor:pointer;">' +
         (en ? '← Back' : '← Назад') + '</button>' : '') +
       '<button id="tutBtnSkip" style="padding:10px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.35);font-family:Rajdhani,sans-serif;font-size:12px;cursor:pointer;margin-left:auto;">' +
         (en ? 'Skip tutorial' : 'Пропустити') + '</button>' +
-      '<button id="tutBtnNext" style="padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#000;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:900;cursor:pointer;">' +
+      '<button id="tutBtnNext" style="padding:10px 20px;border-radius:10px;border:none;background:' + (isLast ? 'linear-gradient(135deg,#22c55e,#16a34a)' : 'linear-gradient(135deg,#38bdf8,#0ea5e9)') + ';color:#000;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:900;cursor:pointer;' + (isAdBonus ? 'display:none;' : '') + '">' +
         nextBtnLabel +
       '</button>' +
     '</div>';
@@ -12030,6 +12088,8 @@ function _hideTutCardForTask(step, en) {
 
   // For itemKept: highlight the Keep button immediately
   if (step.highlight) _highlightTutEl(step.highlight);
+  // Run step-specific start action (e.g. sequential highlights)
+  if (step.onStart) setTimeout(step.onStart, 200);
 
   // Show small floating tracker
   const tracker = document.createElement('div');
@@ -12166,16 +12226,278 @@ function _clearHighlights() {
   });
 }
 
+function _tutActivateAdBonus() {
+  const en = _currentLang === 'en';
+  // Activate click2x for real
+  const bonus = AD_BONUSES.find(b => b.id === 'click2x');
+  if (bonus) bonus.apply();
+
+  // Update the card to show activated state
+  const bonusCard = document.getElementById('tutAdBonusCard');
+  if (bonusCard) {
+    bonusCard.style.background = 'linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.05))';
+    bonusCard.style.borderColor = 'rgba(34,197,94,.6)';
+    bonusCard.innerHTML =
+      '<div style="font-size:28px;margin-bottom:4px;">✅</div>' +
+      '<div style="font-family:Orbitron,sans-serif;font-size:13px;font-weight:800;color:#4ade80;margin-bottom:4px;">' +
+        (en ? '×2 CLICK INCOME ACTIVE!' : '×2 ДОХІД ЗА КЛІК АКТИВОВАНО!') +
+      '</div>' +
+      '<div style="font-size:11px;color:rgba(255,255,255,.55);">' +
+        (en ? 'Earn double for 60 seconds — tap fast!' : 'Заробляй вдвічі більше 60 секунд — натискай швидше!') +
+      '</div>';
+  }
+
+  // Show the Next button
+  const btnNext = document.getElementById('tutBtnNext');
+  if (btnNext) {
+    btnNext.style.display = 'block';
+    btnNext.style.animation = 'saleReady 1s ease-in-out infinite';
+    btnNext.textContent = en ? 'Next →' : 'Далі →';
+    btnNext.onclick = () => { _tutStep++; _showTutStep(); };
+  }
+
+  showToast(en ? '⚡ ×2 Click Income activated! Tap fast!' : '⚡ ×2 Дохід за клік активовано! Натискай швидше!', '#f5c842', 3000);
+}
+
 function _shakeTutCard(card) {
-  card.style.animation = 'none';
   card.style.transform = 'translateX(-50%) translateX(-6px)';
   setTimeout(() => card.style.transform = 'translateX(-50%) translateX(6px)', 80);
   setTimeout(() => card.style.transform = 'translateX(-50%)', 160);
 }
 
+// ── Guided spotlight for list_and_sell step ──────────────────
+let _guidedFlowActive = false;
+let _guidedFlowStep = 0;
+let _spotlightRAF = null; // requestAnimationFrame id for live tracking
+
+function _startGuidedListFlow() {
+  _guidedFlowActive = true;
+  _guidedFlowStep = 0;
+  _showGuidedSpotlight();
+}
+
+function _showGuidedSpotlight() {
+  if (!_guidedFlowActive) return;
+  const en = _currentLang === 'en';
+
+  const GUIDED_STEPS = [
+    {
+      sel: '[onclick*="showScreen(\'inventory\'"]',
+      labelUk: '① Натисни STORAGE у меню',
+      labelEn: '① Tap STORAGE in the menu',
+      waitFor: () => document.getElementById('screen-inventory')?.classList.contains('active'),
+    },
+    {
+      sel: '#invTab-items',
+      labelUk: '② Перейди на вкладку Items',
+      labelEn: '② Go to the Items tab',
+      waitFor: () => document.getElementById('invPane-items')?.style.display !== 'none',
+    },
+    {
+      // "To Market" — identified by data attribute added at render time
+      sel: '[data-tut-to-market="1"]',
+      fallbackSel: '.sell-instant-btn',
+      labelUk: '③ Натисни 🏪 To Market на предметі',
+      labelEn: '③ Tap 🏪 To Market on any item',
+      waitFor: () => state.shop && state.shop.some(x => !x.sold && !x.timerActive),
+    },
+    {
+      sel: '[onclick*="showScreen(\'shop\'"]',
+      labelUk: '④ Перейди до вкладки MARKET',
+      labelEn: '④ Go to the MARKET tab',
+      waitFor: () => document.getElementById('screen-shop')?.classList.contains('active'),
+    },
+    {
+      sel: '#shopTab-listings',
+      labelUk: '⑤ Відкрий вкладку Listings',
+      labelEn: '⑤ Open the Listings tab',
+      waitFor: () => document.getElementById('shopPane-listings')?.style.display !== 'none',
+    },
+    {
+      sel: '.max-btn',
+      labelUk: '⑥ Натисни MAX для максимальної ціни',
+      labelEn: '⑥ Tap MAX for maximum price',
+      waitFor: () => {
+        const input = document.querySelector('.price-input');
+        const entry = state.shop && state.shop.find(x => !x.sold && !x.timerActive);
+        return input && entry && Number(input.value) >= entry.maxPrice;
+      },
+    },
+    {
+      sel: '.list-btn',
+      labelUk: '⑦ Натисни 📢 List — товар виставлено!',
+      labelEn: '⑦ Tap 📢 List — item listed!',
+      waitFor: () => state.shop && state.shop.some(x => x.timerActive),
+    },
+  ];
+
+  if (_guidedFlowStep >= GUIDED_STEPS.length) {
+    _guidedFlowActive = false;
+    _stopSpotlightRAF();
+    _clearSpotlight();
+    _clearHighlights();
+    return;
+  }
+
+  const gs = GUIDED_STEPS[_guidedFlowStep];
+  const label = en ? gs.labelEn : gs.labelUk;
+
+  // Stop previous RAF
+  _stopSpotlightRAF();
+  _clearSpotlight();
+  _clearHighlights();
+
+  // Create overlay once — RAF will continuously update hole position
+  _buildSpotlightOverlay(label);
+
+  // RAF loop: find element, update hole position every frame
+  const updatePosition = () => {
+    if (!_guidedFlowActive) return;
+
+    let el = document.querySelector(gs.sel);
+    if (!el && gs.fallbackSel) el = document.querySelector(gs.fallbackSel);
+
+    const hole   = document.getElementById('tutSpotlightHole');
+    const bubble = document.getElementById('tutSpotlightLabel');
+
+    if (el && hole) {
+      const r = el.getBoundingClientRect();
+      // Only update if position actually changed (avoid layout thrash)
+      const newLeft = Math.round(r.left - 6);
+      const newTop  = Math.round(r.top  - 6);
+      const newW    = Math.round(r.width  + 12);
+      const newH    = Math.round(r.height + 12);
+
+      if (hole.dataset.l !== String(newLeft) || hole.dataset.t !== String(newTop)) {
+        hole.style.left   = newLeft + 'px';
+        hole.style.top    = newTop  + 'px';
+        hole.style.width  = newW    + 'px';
+        hole.style.height = newH    + 'px';
+        hole.style.opacity = '1';
+        hole.dataset.l = newLeft;
+        hole.dataset.t = newTop;
+
+        if (bubble) {
+          const bt = r.bottom + 12 < window.innerHeight - 60
+            ? (r.bottom + 12)
+            : (r.top - 52);
+          bubble.style.top = bt + 'px';
+        }
+      }
+    } else if (hole) {
+      hole.style.opacity = '0'; // element not found — hide hole
+    }
+
+    _spotlightRAF = requestAnimationFrame(updatePosition);
+  };
+  _spotlightRAF = requestAnimationFrame(updatePosition);
+
+  // Poll for step completion
+  const poll = setInterval(() => {
+    if (!_guidedFlowActive) { clearInterval(poll); return; }
+    if (gs.waitFor()) {
+      clearInterval(poll);
+      _guidedFlowStep++;
+      _stopSpotlightRAF();
+      _clearSpotlight();
+      _clearHighlights();
+      // No delay — immediately show next step
+      _showGuidedSpotlight();
+    }
+  }, 150);
+}
+
+function _stopSpotlightRAF() {
+  if (_spotlightRAF) {
+    cancelAnimationFrame(_spotlightRAF);
+    _spotlightRAF = null;
+  }
+}
+
+function _buildSpotlightOverlay(label) {
+  const overlay = document.createElement('div');
+  overlay.id = 'tutSpotlightOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;pointer-events:none;';
+
+  // Dark dim
+  const dim = document.createElement('div');
+  dim.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.65);pointer-events:none;';
+  overlay.appendChild(dim);
+
+  // Hole — starts invisible, RAF will position it
+  const hole = document.createElement('div');
+  hole.id = 'tutSpotlightHole';
+  hole.style.cssText = [
+    'position:absolute',
+    'left:0', 'top:0', 'width:0', 'height:0',
+    'opacity:0',
+    'border-radius:10px',
+    'box-shadow:0 0 0 9999px rgba(0,0,0,.65)',
+    'border:2.5px solid #38bdf8',
+    'transition:left .12s ease, top .12s ease, width .12s ease, height .12s ease, opacity .15s ease',
+    'pointer-events:none',
+  ].join(';');
+  overlay.appendChild(hole);
+
+  // Label bubble
+  const bubble = document.createElement('div');
+  bubble.id = 'tutSpotlightLabel';
+  bubble.style.cssText = [
+    'position:absolute',
+    'left:50%', 'transform:translateX(-50%)',
+    'top:50%',
+    'background:linear-gradient(135deg,#0d1117,#161b22)',
+    'border:1.5px solid rgba(56,189,248,.6)',
+    'border-radius:10px', 'padding:8px 16px',
+    'font-size:13px', 'font-weight:700',
+    'color:#38bdf8', 'white-space:nowrap',
+    'box-shadow:0 4px 20px rgba(0,0,0,.7)',
+    'pointer-events:none',
+    'transition:top .12s ease',
+  ].join(';');
+  bubble.textContent = label;
+  overlay.appendChild(bubble);
+
+  document.body.appendChild(overlay);
+}
+
+function _applySpotlightHint(label) {
+  const existing = document.getElementById('tutSpotlightOverlay');
+  if (existing) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'tutSpotlightOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;pointer-events:none;';
+  const bubble = document.createElement('div');
+  bubble.style.cssText = [
+    'position:absolute','bottom:90px','left:50%','transform:translateX(-50%)',
+    'background:linear-gradient(135deg,#0d1117,#161b22)',
+    'border:1.5px solid rgba(56,189,248,.6)',
+    'border-radius:10px','padding:10px 18px',
+    'font-size:13px','font-weight:700','color:#38bdf8','white-space:nowrap',
+    'box-shadow:0 4px 20px rgba(0,0,0,.7)','pointer-events:none',
+  ].join(';');
+  bubble.textContent = label;
+  overlay.appendChild(bubble);
+  document.body.appendChild(overlay);
+}
+
+function _clearSpotlight() {
+  _stopSpotlightRAF();
+  const ov = document.getElementById('tutSpotlightOverlay');
+  if (ov) ov.remove();
+}
+
 function _endTutorial() {
+  _guidedFlowActive = false;
+  _stopSpotlightRAF();
+  _clearSpotlight();
   _clearTutTask();
   _clearHighlights();
+  // Remove X2 click bonus that was granted during tutorial
+  if (typeof adState !== 'undefined' && adState.click2x) {
+    const bonus = typeof AD_BONUSES !== 'undefined' && AD_BONUSES.find(b => b.id === 'click2x');
+    if (bonus) bonus.remove();
+  }
   const ov = document.getElementById('tutOverlay');
   if (ov) { ov.style.opacity = '0'; ov.style.transition = 'opacity .3s'; setTimeout(() => ov.remove(), 300); }
   const tr = document.getElementById('tutTracker');
@@ -13163,6 +13485,7 @@ function doReset() {
   localStorage.removeItem('mbs_save2');
   localStorage.removeItem('mbs_player_name');
   localStorage.removeItem('mbs_x5uses'); // reset X5 bonus
+  localStorage.removeItem('mbs_lang');   // reset language — show selector on next launch
   // Записуємо GC і premium у тимчасове сховище щоб відновити після перезавантаження
   if (savedGC > 0 || Object.keys(savedPremium).length > 0) {
     localStorage.setItem('mbs_persist_gc', JSON.stringify({ gc: savedGC, premium: savedPremium }));
@@ -15838,7 +16161,16 @@ if (state.pendingOfflineSales) {
 }
 // Show name modal on first launch
 if (!state.playerName || state.playerName.trim() === '') {
-  setTimeout(showNameModal, 300);
+  const langAlreadySet = (() => { try { return !!localStorage.getItem('mbs_lang'); } catch(e){ return false; } })();
+  if (!langAlreadySet) {
+    // New player — show language selector first
+    setTimeout(() => {
+      const lm = document.getElementById('langSelectModal');
+      if (lm) lm.style.display = 'flex';
+    }, 300);
+  } else {
+    setTimeout(showNameModal, 300);
+  }
 }
 
 // =================== HANGARS JS ===================
@@ -17237,6 +17569,16 @@ function buyTerminalSpeed() {
 
 
 // =================== PLAYER NAME ===================
+function selectLang(lang) {
+  // Set language immediately — whole game updates
+  setLanguage(lang);
+  // Hide lang modal
+  const lm = document.getElementById('langSelectModal');
+  if (lm) lm.style.display = 'none';
+  // Show name modal
+  setTimeout(showNameModal, 200);
+}
+
 function showNameModal() {
   const m = document.getElementById('nameModal');
   if (m) m.style.display = 'flex';
@@ -18261,9 +18603,24 @@ function getTodayDateStr() {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
+// Save claimed date to persistent key (survives game reset)
+function _saveDailyClaimDate() {
+  try { localStorage.setItem('mbs_daily_claimed', getTodayDateStr()); } catch(e) {}
+}
+
+// Get last claimed date — checks both state and persistent key
+function _getLastClaimDate() {
+  const fromState = state.dailyStreak ? state.dailyStreak.lastClaim : null;
+  try {
+    const fromStorage = localStorage.getItem('mbs_daily_claimed');
+    // Return whichever is more recent
+    if (fromStorage && fromState) return fromStorage > fromState ? fromStorage : fromState;
+    return fromStorage || fromState || null;
+  } catch(e) { return fromState; }
+}
+
 function canClaimToday() {
-  const ds = state.dailyStreak;
-  return ds.lastClaim !== getTodayDateStr();
+  return _getLastClaimDate() !== getTodayDateStr();
 }
 
 function getNextClaimableDay() {
@@ -18367,13 +18724,14 @@ function claimDailyReward(watchAd) {
     return;
   }
 
-  if (ds.lastClaim === getTodayDateStr()) return;
+  if (_getLastClaimDate() === getTodayDateStr()) return;
   const idx = getNextClaimableDay();
   if (idx === -1) return;
 
   ds.claimedDays[idx] = true;
   ds.lastClaim = getTodayDateStr();
   ds.day = idx + 1;
+  _saveDailyClaimDate(); // persist across resets
   addGoldCredits(DAILY_REWARDS[idx].gc);
   showToast(t('ds_day_toast').replace('{gc}', DAILY_REWARDS[idx].gc).replace('{n}', idx+1));
   saveState();
@@ -18657,6 +19015,30 @@ function imgRetry(el) {
 <div id="hangarPreviewModal" style="display:none;position:fixed;inset:0;z-index:3400;"></div>
 
 <!-- ===== NAME MODAL ===== -->
+<div id="langSelectModal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.95);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:linear-gradient(160deg,#0d1117,#161b22);border:1.5px solid rgba(245,200,66,.3);border-radius:22px;padding:36px 28px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:bounceIn .4s cubic-bezier(.34,1.56,.64,1);">
+    <div style="font-size:52px;margin-bottom:14px;">🌐</div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:17px;font-weight:800;color:var(--gold);margin-bottom:6px;">Choose Language</div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;color:rgba(245,200,66,.6);margin-bottom:28px;">Оберіть мову</div>
+    <div style="display:flex;gap:14px;">
+      <button onclick="selectLang('en')" style="flex:1;padding:18px 10px;border-radius:14px;border:1.5px solid rgba(245,200,66,.35);background:rgba(245,200,66,.06);color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:6px;"
+        onmouseover="this.style.background='rgba(245,200,66,.15)';this.style.borderColor='rgba(245,200,66,.7)'"
+        onmouseout="this.style.background='rgba(245,200,66,.06)';this.style.borderColor='rgba(245,200,66,.35)'">
+        <span style="font-size:32px;">🇬🇧</span>
+        <span style="color:var(--gold);font-size:16px;">English</span>
+        <span style="font-size:11px;color:rgba(255,255,255,.4);font-weight:600;">GB</span>
+      </button>
+      <button onclick="selectLang('uk')" style="flex:1;padding:18px 10px;border-radius:14px;border:1.5px solid rgba(245,200,66,.35);background:rgba(245,200,66,.06);color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:6px;"
+        onmouseover="this.style.background='rgba(245,200,66,.15)';this.style.borderColor='rgba(245,200,66,.7)'"
+        onmouseout="this.style.background='rgba(245,200,66,.06)';this.style.borderColor='rgba(245,200,66,.35)'">
+        <span style="font-size:32px;">🇺🇦</span>
+        <span style="color:var(--gold);font-size:16px;">Українська</span>
+        <span style="font-size:11px;color:rgba(255,255,255,.4);font-weight:600;">UA</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="nameModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);
   align-items:center;justify-content:center;padding:20px;">
   <div style="background:linear-gradient(160deg,#0d1117,#161b22);border:1px solid rgba(245,200,66,.3);
@@ -18976,6 +19358,8 @@ setTimeout(() => {
 }, 30000);
 
 function showRandomBonusCard() {
+  // Не показуємо під час навчання
+  if (typeof _tutActive !== 'undefined' && _tutActive) return;
   // Не показуємо якщо вже є активна картка того самого типу
   const available = AD_BONUSES.filter(b => {
     if (b.id === 'click2x' && adState.click2x) return false;
