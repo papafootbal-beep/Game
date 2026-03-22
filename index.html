@@ -14109,7 +14109,7 @@ function collectAll() {
   updateHUD(); saveState();
   const bonus = getLoyaltyBonus();
   const bonusStr = bonus > 0 ? ' (+' + bonus + (_currentLang==='en'?'% reputation':'% репутація') + ')' : '';
-  showToast('💰 ' + (_currentLang==='en'?'Collected ':'Зібрано ') + count + (_currentLang==='en'?' sales: +':' продажів: +') + fmtCapital(totalEarned) + (bonusStr2||'') + '!', 'gold');
+  showToast('💰 ' + (_currentLang==='en'?'Collected ':'Зібрано ') + count + (_currentLang==='en'?' sales: +':' продажів: +') + fmtCapital(totalEarned) + bonusStr + '!', 'gold');
   renderSalonTab();
 }
 
