@@ -10347,7 +10347,10 @@ function renderStats() {
   if (bd) {
     document.getElementById('bestDropCard').querySelector('.best-drop-emoji').innerHTML = itemDisplay(bd.emoji, 40);
     if (labelEl) labelEl.textContent = t('stats_best_drop_prefix') + RARITY_LABELS[bd.rarity];
-    document.getElementById('bestDropName').textContent = bd.name;
+    const bdDisplayName = (_currentLang === 'en' && bd.nameEn)
+      ? bd.nameEn
+      : (typeof getItemName === 'function' ? getItemName({ name: bd.name, nameEn: bd.nameEn, emoji: bd.emoji }) : bd.name);
+    document.getElementById('bestDropName').textContent = bdDisplayName;
     document.getElementById('bestDropVal').textContent = fmt(bd.value);
   } else {
     if (labelEl) labelEl.textContent = t('stats_no_drop_yet');
@@ -11913,7 +11916,7 @@ const TUTORIAL_STEPS = [
     titleEn: '⬆️ Market Upgrades',
     textUk: 'Чудово — перший продаж! 🎉\n\nМАРКЕТ → вкладка UPGRADES:\n\n📦 Більше слотів — більше товарів одночасно\n💰 Вищий множник ціни — продаєш дорожче\n⚡ "List All at MAX" — виставляти все одним кліком\n\nВкладай у покращення — це повертається прибутком!',
     textEn: 'Great — first sale! 🎉\n\nMARKET → UPGRADES tab:\n\n📦 More slots — more items at once\n💰 Higher price multiplier — sell for more\n⚡ "List All at MAX" — list everything with one click\n\nInvest in upgrades — it pays off!',
-    screen: 'shop', highlight: null,
+    screen: 'shop', highlight: '#shopTab-upgrades',
     action: () => { const b = document.getElementById('shopTab-upgrades'); if(b) b.click(); },
   },
   // 16. LifeShop + ??? goal (combined)
@@ -11923,8 +11926,8 @@ const TUTORIAL_STEPS = [
     titleEn: '💎 LifeShop and the main goal!',
     textUk: 'Вкладка 💎 LIFESHOP — тут витрачаєш капітал на предмети розкоші:\n\n🚗 Транспорт — авто, яхти, ракети\n🏠 Нерухомість — вілли, замки, острови, міста\n💎 Розкіш — діаманти, армії, криптовалюта\n\nКожна покупка збільшує загальний капітал у Forbes!\n\n🎯 У STATS внизу є кнопка <b style="color:#f5c842;">??? MYSTERY</b> — це головна ціль гри. Виконай умови щоб відкрити фінал!',
     textEn: 'The 💎 LIFESHOP tab — spend your capital on luxury:\n\n🚗 Transport — cars, yachts, rockets\n🏠 Real Estate — villas, castles, islands, cities\n💎 Luxury — diamonds, armies, cryptocurrency\n\nEvery purchase grows your total Forbes capital!\n\n🎯 In STATS at the bottom is the <b style="color:#f5c842;">??? MYSTERY</b> button — the main goal of the game. Complete the conditions to unlock the ending!',
-    screen: 'lifeshop', highlight: '#statsEndgameBtn',
-    action: () => { showScreen('lifeshop', document.querySelector('[onclick*="lifeshop"]')); setTimeout(() => _highlightTutEl('#statsEndgameBtn'), 800); },
+    screen: 'lifeshop', highlight: '[onclick*="showScreen(\'lifeshop\'"]',
+    action: () => { showScreen('lifeshop', document.querySelector('[onclick*="lifeshop"]')); },
   },
   // 17. Final — good luck
   {
@@ -11959,6 +11962,7 @@ function _showTutStep() {
   _clearHighlights();
   _guidedFlowActive = false;
   _stopSpotlightRAF();
+  _stopCardDimRAF();
   _clearSpotlight();
   const step = TUTORIAL_STEPS[_tutStep];
   if (!step) { _endTutorial(); return; }
@@ -11985,11 +11989,26 @@ function _showTutStep() {
   overlay.id = 'tutOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;pointer-events:none;';
 
-  // Dim background — only shown when card is visible (not during task play)
+  // Dim background
   const dim = document.createElement('div');
   dim.id = 'tutDim';
-  dim.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.7);pointer-events:all;';
-  overlay.appendChild(dim);
+  // If step has a highlight — use 4-panel spotlight (target stays bright)
+  // Otherwise — full dim
+  if (step.highlight) {
+    // 4 panels — will be positioned by RAF after highlight element is found
+    const dimCSS = 'position:absolute;background:rgba(0,0,0,.7);transition:all .15s ease;pointer-events:all;';
+    ['tutCardDimTop','tutCardDimBottom','tutCardDimLeft','tutCardDimRight'].forEach(id => {
+      const p = document.createElement('div');
+      p.id = id;
+      p.style.cssText = dimCSS;
+      overlay.appendChild(p);
+    });
+    // Start RAF to track highlight element
+    _startCardDimRAF(step.highlight);
+  } else {
+    dim.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.7);pointer-events:all;';
+    overlay.appendChild(dim);
+  }
 
   // Card
   const card = document.createElement('div');
@@ -12265,6 +12284,48 @@ function _shakeTutCard(card) {
   setTimeout(() => card.style.transform = 'translateX(-50%)', 160);
 }
 
+// ── RAF for card-step highlight dim panels ──────────────────
+let _cardDimRAF = null;
+
+function _startCardDimRAF(selector) {
+  _stopCardDimRAF();
+  const update = () => {
+    let el = document.querySelector(selector);
+    if (!el && selector === '.sell-instant-btn') el = document.querySelector('.sell-instant-btn');
+    const top    = document.getElementById('tutCardDimTop');
+    const bottom = document.getElementById('tutCardDimBottom');
+    const left   = document.getElementById('tutCardDimLeft');
+    const right  = document.getElementById('tutCardDimRight');
+    if (!top) return; // overlay removed
+
+    if (el) {
+      const r = el.getBoundingClientRect();
+      const pad = 8;
+      const L = Math.max(0, r.left - pad);
+      const T = Math.max(0, r.top  - pad);
+      const R = Math.max(0, window.innerWidth  - r.right  - pad);
+      const B = Math.max(0, window.innerHeight - r.bottom - pad);
+      top.style.cssText    = top.style.cssText    .replace(/;$/,'') || '';
+      if (top)    { top.style.left='0'; top.style.right='0'; top.style.top='0'; top.style.height=T+'px'; top.style.width=''; }
+      if (bottom) { bottom.style.left='0'; bottom.style.right='0'; bottom.style.bottom='0'; bottom.style.top=(r.bottom+pad)+'px'; bottom.style.height=''; bottom.style.width=''; }
+      if (left)   { left.style.top=T+'px'; left.style.height=(r.height+pad*2)+'px'; left.style.left='0'; left.style.width=L+'px'; left.style.right=''; }
+      if (right)  { right.style.top=T+'px'; right.style.height=(r.height+pad*2)+'px'; right.style.right='0'; right.style.left=(r.right+pad)+'px'; right.style.width=''; }
+    } else {
+      // Element not found — full dim fallback
+      if (top)    { top.style.left='0'; top.style.right='0'; top.style.top='0'; top.style.height='100%'; }
+      if (bottom) { bottom.style.height='0'; }
+      if (left)   { left.style.width='0'; }
+      if (right)  { right.style.width='0'; }
+    }
+    _cardDimRAF = requestAnimationFrame(update);
+  };
+  _cardDimRAF = requestAnimationFrame(update);
+}
+
+function _stopCardDimRAF() {
+  if (_cardDimRAF) { cancelAnimationFrame(_cardDimRAF); _cardDimRAF = null; }
+}
+
 // ── Guided spotlight for list_and_sell step ──────────────────
 let _guidedFlowActive = false;
 let _guidedFlowStep = 0;
@@ -12362,13 +12423,13 @@ function _showGuidedSpotlight() {
 
     if (el && hole) {
       const r = el.getBoundingClientRect();
-      // Only update if position actually changed (avoid layout thrash)
       const newLeft = Math.round(r.left - 6);
       const newTop  = Math.round(r.top  - 6);
       const newW    = Math.round(r.width  + 12);
       const newH    = Math.round(r.height + 12);
 
       if (hole.dataset.l !== String(newLeft) || hole.dataset.t !== String(newTop)) {
+        // Update glowing border
         hole.style.left   = newLeft + 'px';
         hole.style.top    = newTop  + 'px';
         hole.style.width  = newW    + 'px';
@@ -12376,6 +12437,18 @@ function _showGuidedSpotlight() {
         hole.style.opacity = '1';
         hole.dataset.l = newLeft;
         hole.dataset.t = newTop;
+
+        // Update 4 surrounding dim panels
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const hTop    = document.getElementById('tutDimTop');
+        const hBottom = document.getElementById('tutDimBottom');
+        const hLeft   = document.getElementById('tutDimLeft');
+        const hRight  = document.getElementById('tutDimRight');
+        if (hTop)    { hTop.style.left='0'; hTop.style.right='0'; hTop.style.top='0'; hTop.style.height=Math.max(0,newTop)+'px'; }
+        if (hBottom) { hBottom.style.left='0'; hBottom.style.right='0'; hBottom.style.bottom='0'; hBottom.style.top=(newTop+newH)+'px'; }
+        if (hLeft)   { hLeft.style.top=newTop+'px'; hLeft.style.height=newH+'px'; hLeft.style.left='0'; hLeft.style.width=Math.max(0,newLeft)+'px'; }
+        if (hRight)  { hRight.style.top=newTop+'px'; hRight.style.height=newH+'px'; hRight.style.right='0'; hRight.style.left=(newLeft+newW)+'px'; }
 
         if (bubble) {
           const bt = r.bottom + 12 < window.innerHeight - 60
@@ -12385,7 +12458,7 @@ function _showGuidedSpotlight() {
         }
       }
     } else if (hole) {
-      hole.style.opacity = '0'; // element not found — hide hole
+      hole.style.opacity = '0';
     }
 
     _spotlightRAF = requestAnimationFrame(updatePosition);
@@ -12419,12 +12492,19 @@ function _buildSpotlightOverlay(label) {
   overlay.id = 'tutSpotlightOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;pointer-events:none;';
 
-  // Dark dim
-  const dim = document.createElement('div');
-  dim.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.65);pointer-events:none;';
-  overlay.appendChild(dim);
+  // 4 dim panels around the hole (top / bottom / left / right)
+  // pointer-events:all — blocks clicks outside the target area
+  const dimCSS = 'position:absolute;background:rgba(0,0,0,.72);transition:all .12s ease;pointer-events:all;cursor:not-allowed;';
+  const dimTop    = document.createElement('div'); dimTop.id    = 'tutDimTop';    dimTop.style.cssText    = dimCSS + 'left:0;right:0;top:0;bottom:100%;';
+  const dimBottom = document.createElement('div'); dimBottom.id = 'tutDimBottom'; dimBottom.style.cssText = dimCSS + 'left:0;right:0;top:0;bottom:0;';
+  const dimLeft   = document.createElement('div'); dimLeft.id   = 'tutDimLeft';   dimLeft.style.cssText   = dimCSS + 'top:0;bottom:0;left:0;right:100%;';
+  const dimRight  = document.createElement('div'); dimRight.id  = 'tutDimRight';  dimRight.style.cssText  = dimCSS + 'top:0;bottom:0;left:0;right:0;';
+  overlay.appendChild(dimTop);
+  overlay.appendChild(dimBottom);
+  overlay.appendChild(dimLeft);
+  overlay.appendChild(dimRight);
 
-  // Hole — starts invisible, RAF will position it
+  // Glowing border around target
   const hole = document.createElement('div');
   hole.id = 'tutSpotlightHole';
   hole.style.cssText = [
@@ -12432,8 +12512,8 @@ function _buildSpotlightOverlay(label) {
     'left:0', 'top:0', 'width:0', 'height:0',
     'opacity:0',
     'border-radius:10px',
-    'box-shadow:0 0 0 9999px rgba(0,0,0,.65)',
     'border:2.5px solid #38bdf8',
+    'box-shadow:0 0 0 1px rgba(56,189,248,.3), 0 0 20px rgba(56,189,248,.6)',
     'transition:left .12s ease, top .12s ease, width .12s ease, height .12s ease, opacity .15s ease',
     'pointer-events:none',
   ].join(';');
@@ -12447,13 +12527,14 @@ function _buildSpotlightOverlay(label) {
     'left:50%', 'transform:translateX(-50%)',
     'top:50%',
     'background:linear-gradient(135deg,#0d1117,#161b22)',
-    'border:1.5px solid rgba(56,189,248,.6)',
+    'border:1.5px solid rgba(56,189,248,.7)',
     'border-radius:10px', 'padding:8px 16px',
     'font-size:13px', 'font-weight:700',
     'color:#38bdf8', 'white-space:nowrap',
-    'box-shadow:0 4px 20px rgba(0,0,0,.7)',
+    'box-shadow:0 4px 20px rgba(0,0,0,.8)',
     'pointer-events:none',
     'transition:top .12s ease',
+    'z-index:1',
   ].join(';');
   bubble.textContent = label;
   overlay.appendChild(bubble);
@@ -12490,6 +12571,7 @@ function _clearSpotlight() {
 function _endTutorial() {
   _guidedFlowActive = false;
   _stopSpotlightRAF();
+  _stopCardDimRAF();
   _clearSpotlight();
   _clearTutTask();
   _clearHighlights();
@@ -14615,7 +14697,7 @@ function updateBestDrop(item) {
     state.stats.rarityCount[item.rarity]++;
   }
   if (!state.stats.bestDrop || item.value > state.stats.bestDrop.value) {
-    state.stats.bestDrop = { name: item.name, emoji: item.emoji || '📦', rarity: item.rarity, value: item.value };
+    state.stats.bestDrop = { name: item.name, nameEn: item.nameEn || null, emoji: item.emoji || '📦', rarity: item.rarity, value: item.value };
   }
 }
 
