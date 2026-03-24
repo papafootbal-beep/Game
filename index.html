@@ -17278,11 +17278,11 @@ function renderTerminalFleet() {
   // Passive income block
   const totalRate = fleet.filter(x => x.renting).reduce((s, it) => s + getTerminalEarnRate(it), 0);
   if (passRateEl) {
-    passRateEl.textContent = '+' + fmtCapital(Math.round(totalRate)) + (_currentLang==='en'?' €/sec':' €/сек');
+    passRateEl.textContent = '+' + fmtCapital(Math.round(totalRate)) + (_currentLang==='en'?'/sec':'/сек');
     passRateEl.style.color = totalRate > 0 ? '#4ade80' : 'rgba(255,255,255,.25)';
   }
   if (passHourEl) {
-    passHourEl.textContent = '+' + fmtCapital(Math.round(totalRate * 3600)) + (_currentLang==='en'?' €/h':' €/год');
+    passHourEl.textContent = '+' + fmtCapital(Math.round(totalRate * 3600)) + (_currentLang==='en'?'/h':'/год');
     passHourEl.style.color = totalRate > 0 ? '#38bdf8' : 'rgba(255,255,255,.25)';
   }
 
@@ -17326,7 +17326,7 @@ function renderTerminalFleet() {
           '<div class="tc-durbar-wrap"><div class="tc-durbar" style="width:' + condition + '%;background:' + barColor + ';"></div></div>' +
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">' +
             '<div>' +
-              '<div style="font-size:10px;color:#4ade80;">+' + fmtCapital(Math.round(getTerminalEarnRate(it))) + (_currentLang==='en'?' €/sec':' €/сек') + '</div>' +
+              '<div style="font-size:10px;color:#4ade80;">+' + fmtCapital(Math.round(getTerminalEarnRate(it))) + (_currentLang==='en'?'/sec':'/сек') + '</div>' +
               '<div class="tc-earned" id="tc-earned-' + it.id + '">' + (_currentLang==="en"?'Earned: ':'Зароблено: ') + fmtCapital(earned) + '</div>' +
             '</div>' +
             '<button onclick="sellTerminalItem(\'' + it.id + '\')" style="padding:8px 14px;border-radius:9px;border:none;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:800;font-size:12px;cursor:pointer;">💸 ' + (_currentLang==='en'?'Sell':'Продати') + '<br><span id="tc-sell-' + it.id + '" style="font-size:11px;">' + fmtCapital(sellNow) + '</span></button>' +
@@ -17460,8 +17460,8 @@ function startTerminalTick() {
         const tickRate = fleet.filter(x => x.renting).reduce((s, it) => s + getTerminalEarnRate(it), 0) * _trAdMult * _trVip;
         const prEl = document.getElementById('terminalPassiveRate');
         const phEl = document.getElementById('terminalPassiveHour');
-        if (prEl) { prEl.textContent = '+' + fmtCapital(Math.round(tickRate)) + (_currentLang==='en'?' €/sec':' €/сек') + (_trAdMult > 1 ? ' ⚡x2' : ''); prEl.style.color = tickRate > 0 ? '#4ade80' : 'rgba(255,255,255,.25)'; }
-        if (phEl) { phEl.textContent = '+' + fmtCapital(Math.round(tickRate * 3600)) + (_currentLang==='en'?' €/h':' €/год'); phEl.style.color = tickRate > 0 ? '#38bdf8' : 'rgba(255,255,255,.25)'; }
+        if (prEl) { prEl.textContent = '+' + fmtCapital(Math.round(tickRate)) + (_currentLang==='en'?'/sec':'/сек') + (_trAdMult > 1 ? ' ⚡x2' : ''); prEl.style.color = tickRate > 0 ? '#4ade80' : 'rgba(255,255,255,.25)'; }
+        if (phEl) { phEl.textContent = '+' + fmtCapital(Math.round(tickRate * 3600)) + (_currentLang==='en'?'/h':'/год'); phEl.style.color = tickRate > 0 ? '#38bdf8' : 'rgba(255,255,255,.25)'; }
 
         fleet.forEach(it => {
           if (!it.renting) return;
@@ -17553,7 +17553,7 @@ function renderTerminalMgmt() {
   const cycleHours = (getTerminalCycleSec() / 3600).toFixed(1);
 
   const SLOT_LEVELS  = [1, 3, 5, 8, 12, 16, 20];
-  const SLOT_PRICES  = [0, 150_000_000, 500_000_000, 1_500_000_000, 5_000_000_000, 20_000_000_000, 80_000_000_000];
+  const SLOT_PRICES  = [50_000_000, 150_000_000, 500_000_000, 1_500_000_000, 5_000_000_000, 20_000_000_000, 80_000_000_000];
   const SPEED_PRICES = [150_000_000, 400_000_000, 1_500_000_000, 5_000_000_000];
   const SPEED_NAMES  = _currentLang==='en'
     ? ['Boost I (-10%, 21.6h)','Boost II (-25%, 18h)','Boost III (-50%, 12h)','Boost IV (-75%, 6h)']
@@ -17621,7 +17621,7 @@ function renderTerminalMgmt() {
 // ─── Buy management upgrades ───────────────────────────
 function buyTerminalSlot() {
   const SLOT_LEVELS = [1, 3, 5, 8, 12, 16, 20];
-  const PRICES = [0, 150_000_000, 500_000_000, 1_500_000_000, 5_000_000_000, 20_000_000_000, 80_000_000_000];
+  const PRICES = [50_000_000, 150_000_000, 500_000_000, 1_500_000_000, 5_000_000_000, 20_000_000_000, 80_000_000_000];
   const slots = state.terminalRentSlots || 1;
   if (slots >= 20) { showToast(_currentLang==='en'?'✅ Maximum 20 slots!':'✅ Максимум 20 слотів!'); return; }
   const lvl = SLOT_LEVELS.indexOf(slots);
