@@ -10,7 +10,7 @@ TYPE html>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mystery Boxes Simulator</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
@@ -35,6 +35,26 @@ TYPE html>
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body {
+  touch-action: pan-x pan-y;
+  -ms-touch-action: pan-x pan-y;
+  overscroll-behavior: none;
+}
+/* Prevent double-tap zoom on all interactive elements */
+button, a, input, [onclick] {
+  touch-action: manipulation;
+  -ms-touch-action: manipulation;
+}
+/* Prevent text selection zoom on iOS */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
 
 body {
   background: var(--bg);
@@ -429,14 +449,29 @@ nav {
   width: 100%;
 }
 nav button {
-  flex: 1 1 0; min-width: 0; padding: 10px 2px;
+  flex: 1 1 0; min-width: 0; padding: 10px 1px;
   background: none; border: none; cursor: pointer;
   color: var(--muted); font-family: 'Rajdhani', sans-serif;
-  font-size: 9px; font-weight: 700; letter-spacing: .2px;
+  font-size: 8px; font-weight: 700; letter-spacing: 0;
   text-transform: uppercase; transition: all .2s;
   border-bottom: 2px solid transparent;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   white-space: nowrap; overflow: hidden;
+}
+nav button span:not(.nav-icon) {
+  font-size: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+  line-height: 1.1;
+}
+/* Scale down text further on narrow screens */
+@media (max-width: 400px) {
+  nav button span:not(.nav-icon) { font-size: 7px; }
+}
+@media (max-width: 360px) {
+  nav button span:not(.nav-icon) { font-size: 6.5px; }
 }
 nav button .nav-icon { font-size: 17px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
@@ -3865,7 +3900,7 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
       <div id="terminalOfflineMsg" style="font-size:13px;color:var(--muted);margin-bottom:6px;"></div>
       <div id="terminalOfflineAmount" style="font-size:26px;font-weight:800;color:var(--gold);margin:12px 0;"></div>
       <div id="terminalOfflineItems" style="font-size:11px;color:var(--muted);margin-bottom:16px;text-align:left;background:var(--bg3);border-radius:8px;padding:8px;max-height:120px;overflow-y:auto;"></div>
-      <button onclick="closeTerminalOfflineModal()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#000;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:800;cursor:pointer;">💰 ПРИЙНЯТО</button>
+      <button onclick="claimTerminalOfflineIncome()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#000;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:800;cursor:pointer;" id="terminalOfflineClaimBtn">💰 COLLECT</button>
     </div>
   </div>
 </div>
@@ -6731,6 +6766,7 @@ function loadState() {
       if (state.terminalFleetLimit   === undefined)        state.terminalFleetLimit   = 10;
       if (state.terminalRentSlots    === undefined)        state.terminalRentSlots    = 1;
       if (state.terminalSpeedLvl     === undefined)        state.terminalSpeedLvl     = 0;
+      if (state.terminalPendingOffline === undefined)      state.terminalPendingOffline = 0;
       state.terminalOfflineShown = false; // always reset
       if (!state.unlockedDonateTypes) state.unlockedDonateTypes = {};
       // processed fresh each session
@@ -11768,7 +11804,34 @@ function showCrisisToast(r, loss, ev) {
   setTimeout(() => el.remove(), 5600);
 }
 
-// =================== TUTORIAL SYSTEM ===================
+// ── Prevent browser zoom (double-tap, pinch, ctrl+wheel) ──
+(function preventZoom() {
+  // Prevent Ctrl+Wheel zoom
+  document.addEventListener('wheel', function(e) {
+    if (e.ctrlKey) e.preventDefault();
+  }, { passive: false });
+
+  // Prevent pinch-to-zoom gestures
+  document.addEventListener('gesturestart',  function(e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener('gestureend',    function(e) { e.preventDefault(); }, { passive: false });
+
+  // Prevent double-tap zoom on touch devices
+  let _lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    const now = Date.now();
+    const delta = now - _lastTap;
+    if (delta < 300 && delta > 0) {
+      e.preventDefault();
+    }
+    _lastTap = now;
+  }, { passive: false });
+
+  // Prevent multi-touch pinch
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+})();
 const TUTORIAL_STEPS = [
   // 1. Welcome
   {
@@ -17275,6 +17338,26 @@ function renderTerminalFleet() {
   if (rCntEl) rCntEl.textContent = active;
   if (rMaxEl) rMaxEl.textContent = slots;
 
+  // Show pending offline income banner
+  const pending = state.terminalPendingOffline || 0;
+  const existingBanner = document.getElementById('terminalPendingBanner');
+  if (existingBanner) existingBanner.remove();
+  if (pending > 0) {
+    const en = _currentLang === 'en';
+    const banner = document.createElement('div');
+    banner.id = 'terminalPendingBanner';
+    banner.style.cssText = 'background:linear-gradient(135deg,rgba(245,200,66,.12),rgba(245,200,66,.05));border:1.5px solid rgba(245,200,66,.4);border-radius:14px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;';
+    banner.innerHTML =
+      '<div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:2px;">' + (en?'⏰ Offline income ready:':'⏰ Офлайн дохід готовий:') + '</div>' +
+        '<div style="font-size:18px;font-weight:800;color:var(--gold);">+' + fmtCapital(pending) + '</div>' +
+      '</div>' +
+      '<button onclick="claimTerminalOfflineIncome()" style="padding:10px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,#f5c842,#f97316);color:#000;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap;">' +
+        '💰 ' + (en?'Collect':'Забрати') +
+      '</button>';
+    list.parentNode.insertBefore(banner, list);
+  }
+
   // Passive income block
   const totalRate = fleet.filter(x => x.renting).reduce((s, it) => s + getTerminalEarnRate(it), 0);
   if (passRateEl) {
@@ -17482,66 +17565,91 @@ function startTerminalTick() {
 // ─── Offline processing ────────────────────────────────
 function processTerminalOffline() {
   if (!state.terminalUnlocked) return;
-  if (terminalOfflineModalShownThisSession) return; // already shown this session
+  if (terminalOfflineModalShownThisSession) return;
   terminalOfflineModalShownThisSession = true;
 
-  const now     = Date.now();
-  const fleet   = state.terminalFleet || [];
-  const cycSec  = getTerminalCycleSec();
+  const now    = Date.now();
+  const fleet  = state.terminalFleet || [];
+  const cycSec = getTerminalCycleSec();
   let totalEarned = 0;
-  const lines   = [];
+  const lines  = [];
 
   fleet.forEach(it => {
     if (!it.renting) return;
-    // Use absolute rentEnd if available, else compute from rentStart
     const rentEnd_abs = it.rentEnd || (it.rentStart + cycSec * 1000);
     const elapsed  = Math.max(0, (now - (rentEnd_abs - cycSec * 1000)) / 1000);
-    const rate      = getTerminalEarnRate(it);
+    const rate     = getTerminalEarnRate(it);
     const maxEarned = getTerminalMaxEarned(it);
-    const actual    = Math.min(elapsed, cycSec);
+    const actual   = Math.min(elapsed, cycSec);
     const rawEarned = Math.round(rate * actual);
-    // Cap: total earned (already in it.earned) + new cannot exceed value*2
     const alreadyEarned = it.earned || 0;
     const earned = Math.max(0, Math.min(rawEarned, maxEarned - alreadyEarned));
 
-    if (earned > 0) {
-      state.balance     += earned;
-      state.totalEarned += earned;
-    }
+    // Store in pending — don't credit yet
     it.earned = alreadyEarned + earned;
     totalEarned += earned;
 
     if (elapsed >= cycSec) {
-      // Completed in offline — item is broken, mark for removal
       lines.push('🔴 ' + it.name + ': ' + (_currentLang==='en'?'broken, +':'зламаний, +') + fmtCapital(earned));
       it._removeAfterOffline = true;
     } else {
-      // Still in progress — accumulate earned, preserve rentStart/rentEnd
       const cond = Math.max(0, Math.round(100 - (elapsed / cycSec) * 100));
       it.condition = cond;
-      it.earned = (it.earned || 0) + earned; // accumulate offline earnings
-      // rentStart and rentEnd stay unchanged — they mark the real window
-      lines.push('⏳ ' + it.name + ': +' + fmtCapital(earned) + (_currentLang==='en'?' (condition ':' (міцність ') + cond + '%)');
+      lines.push('⏳ ' + it.name + ': +' + fmtCapital(earned) + (_currentLang==='en'?' (cond ':' (міцн. ') + cond + '%)');
     }
   });
 
-  // Remove broken items
   state.terminalFleet = (state.terminalFleet || []).filter(it => !it._removeAfterOffline);
 
   if (totalEarned === 0) return;
 
+  // Store pending offline income — player must collect manually
+  state.terminalPendingOffline = (state.terminalPendingOffline || 0) + totalEarned;
+  state._terminalOfflineLines = lines;
+
   saveState(); updateHUD();
+  showTerminalOfflineModal(totalEarned, lines);
+}
+
+function showTerminalOfflineModal(amount, lines) {
   const modal = document.getElementById('terminalOfflineModal');
   if (!modal) return;
-  document.getElementById('terminalOfflineMsg').textContent = _currentLang==='en'?'Earned from rentals while away:':'Зароблено в оренді за ваш відхід:';
-  document.getElementById('terminalOfflineAmount').textContent = '+' + fmtCapital(totalEarned) + ' €';
+  const en = _currentLang === 'en';
+  document.getElementById('terminal-offline-title').textContent = en ? 'Terminal worked while you were away!' : 'Термінал працював без вас!';
+  document.getElementById('terminalOfflineMsg').textContent = en ? 'Pending income from rentals:' : 'Дохід з оренди очікує збору:';
+  document.getElementById('terminalOfflineAmount').textContent = '+' + fmtCapital(amount) + ' €';
   document.getElementById('terminalOfflineItems').innerHTML = lines.map(l => '<div style="margin-bottom:3px;">' + l + '</div>').join('');
+  const btn = document.getElementById('terminalOfflineClaimBtn');
+  if (btn) btn.textContent = en ? '💰 COLLECT' : '💰 ЗАБРАТИ';
   modal.style.display = 'flex';
 }
-function closeTerminalOfflineModal() {
+
+function claimTerminalOfflineIncome() {
+  const pending = state.terminalPendingOffline || 0;
+  if (pending > 0) {
+    state.balance += pending;
+    state.totalEarned += pending;
+    state.terminalPendingOffline = 0;
+    updateHUD(); saveState();
+    showToast((_currentLang==='en' ? '💰 Collected ' : '💰 Отримано ') + fmtCapital(pending) + (_currentLang==='en'?' from Terminal!':' з Терміналу!'), 'gold');
+    // Remove banner
+    const b = document.getElementById('terminalPendingBanner');
+    if (b) b.remove();
+  }
   const m = document.getElementById('terminalOfflineModal');
   if (m) m.style.display = 'none';
-  // terminalOfflineModalShownThisSession stays true — won't show again until page reload
+}
+
+function closeTerminalOfflineModal() {
+  // Close without collecting — income stays pending in terminalPendingOffline
+  const m = document.getElementById('terminalOfflineModal');
+  if (m) m.style.display = 'none';
+  // Refresh fleet to show the pending banner
+  if (typeof renderTerminalFleet === 'function') renderTerminalFleet();
+  const pending = state.terminalPendingOffline || 0;
+  if (pending > 0) {
+    showToast((_currentLang==='en'?'💡 Income waiting in Terminal Fleet tab':'💡 Дохід очікує у вкладці Fleet терміналу'), '#38bdf8', 3000);
+  }
 }
 
 // ─── Management tab ────────────────────────────────────
@@ -17643,10 +17751,35 @@ function buyTerminalSpeed() {
   const price = PRICES[speed];
   if (state.balance < price) { showToast(t('toast_not_enough')); return; }
   state.balance -= price;
+
+  // Calculate old and new cycle duration BEFORE updating the level
+  const oldCycSec = getTerminalCycleSec();
   state.terminalSpeedLvl = speed + 1;
+  const newCycSec = getTerminalCycleSec();
+  const savedSec = oldCycSec - newCycSec; // seconds saved by upgrade
+
+  // Update all active rentals — shift their rentStart earlier so remaining time decreases
+  const now = Date.now();
+  (state.terminalFleet || []).forEach(it => {
+    if (!it.renting || !it.rentStart) return;
+    // Old end time
+    const oldEnd = it.rentEnd || (it.rentStart + oldCycSec * 1000);
+    // New end time = old end - saved seconds
+    const newEnd = oldEnd - savedSec * 1000;
+    it.rentEnd = newEnd;
+    // If already past newEnd — mark as completed (will be handled by tick)
+    if (now >= newEnd) {
+      it.rentEnd = now; // will complete on next tick
+    }
+  });
+
   updateHUD(); saveState();
-  showToast((_currentLang==='en'?'⚡ Boost '+state.terminalSpeedLvl+' activated!':'⚡ Форсаж '+state.terminalSpeedLvl+' активовано!'), 'gold');
+  const savedH = (savedSec / 3600).toFixed(1);
+  showToast((_currentLang==='en'
+    ? '⚡ Boost '+state.terminalSpeedLvl+' activated! −'+savedH+'h on all active rentals'
+    : '⚡ Форсаж '+state.terminalSpeedLvl+' активовано! −'+savedH+'год для активних оренд'), 'gold');
   renderTerminalMgmt();
+  renderTerminalFleet();
 }
 
 
