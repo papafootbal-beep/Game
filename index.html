@@ -11756,6 +11756,9 @@ function tickRivalGrowth() {
   if (owned && owned.style.display !== 'none') renderLifeShop();
 }
 
+// ── Start Forbes rival growth ticker (every 10 seconds) ──
+setInterval(tickRivalGrowth, 10000);
+
 function showRankChangeToast(direction, rivalName, newRank) {
   const el = document.createElement('div');
   const isUp = direction === 'up';
