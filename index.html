@@ -3529,7 +3529,7 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
       <div class="click-gem" style="--gem-start:120deg"></div>
       <div class="click-gem" style="--gem-start:240deg"></div>
       <!-- Main button -->
-      <button class="click-btn" id="clickBtn" onclick="handleClick(event)"><img src="https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/screan_fon_clik.png" alt="" style="width:138px;height:138px;object-fit:cover;border-radius:50%;pointer-events:none;display:block;animation:clickImgPulse 2.8s ease-in-out infinite;"></button>
+      <button class="click-btn" id="clickBtn" ontouchstart="handleClick(event);event.preventDefault();" onclick="if(!event.isTrusted||event._fromTouch)return;handleClick(event);"><img src="https://raw.githubusercontent.com/papafootbal-beep/mystery-boxes-assets/refs/heads/main/screan_fon_clik.png" alt="" style="width:138px;height:138px;object-fit:cover;border-radius:50%;pointer-events:none;display:block;animation:clickImgPulse 2.8s ease-in-out infinite;"></button>
     </div>
     <div class="click-hint" id="clk-hint">TAP TO EARN</div>
     <div class="per-click">+<span id="clickValHint">1</span><span id="clk-per-click-lbl">€ per click</span></div>
@@ -7020,6 +7020,10 @@ function itemDisplay(emoji, size) {
 
 // =================== CLICKER ===================
 function handleClick(e) {
+  // Нормалізуємо координати для touch і mouse
+  const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : (e.clientX || window.innerWidth / 2);
+  const clientY = (e.touches && e.touches[0]) ? e.touches[0].clientY : (e.clientY || window.innerHeight / 2);
+
   // Base click value + collection bonuses
   let clickAmt = state.clickValue;
   clickAmt += (state._collBonus_clickFlat || 0);
@@ -7047,8 +7051,8 @@ function handleClick(e) {
   const el = document.createElement('div');
   el.className = 'float-earn' + (isCrit ? ' crit' : '');
   el.textContent = (isCrit ? '⚡ ' + (_currentLang==='en'?'CRIT! +':'КРИТ! +') : '+') + fmt(clickAmt);
-  el.style.left = (e.clientX - 20) + 'px';
-  el.style.top  = (e.clientY - 20) + 'px';
+  el.style.left = (clientX - 20) + 'px';
+  el.style.top  = (clientY - 20) + 'px';
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 1100);
 
@@ -7061,8 +7065,19 @@ function handleClick(e) {
     setTimeout(() => rip.remove(), 560);
   }
 
-  renderUpgrades();
-  saveState();
+  // Throttle важкі операції — не блокувати швидкі тапи
+  if (!handleClick._upgradeTimer) {
+    handleClick._upgradeTimer = setTimeout(() => {
+      renderUpgrades();
+      handleClick._upgradeTimer = null;
+    }, 300);
+  }
+  if (!handleClick._saveTimer) {
+    handleClick._saveTimer = setTimeout(() => {
+      saveState();
+      handleClick._saveTimer = null;
+    }, 500);
+  }
 }
 
 // Passive income
