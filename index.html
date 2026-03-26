@@ -3382,9 +3382,25 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
           <span id="splashPct">0%</span>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+
+      <!-- Privacy Policy -->
+      <div style="
+        font-family:'Rajdhani',sans-serif;
+        font-size:clamp(9px,2.2vw,11px);
+        color:rgba(255,255,255,0.38);
+        text-align:center;
+        letter-spacing:0.3px;
+        margin-top:4px;">
+        By playing, you agree to our
+        <a href="https://gist.githubusercontent.com/papafootbal-beep/57021eb5b292bd1bf084057c98df1ebd/raw/91c2a0c84aa43b65e78554cd0831da6f44f45fab/privacy-policy.html"
+          target="_blank"
+          onclick="event.stopPropagation()"
+          style="color:rgba(245,200,66,0.6);text-decoration:underline;text-underline-offset:2px;cursor:pointer;">Privacy Policy</a>
+      </div>
+
+    </div><!-- /splashOverlay -->
+  </div><!-- /splashInner -->
+</div><!-- /splashScreen -->
 <style>
 @keyframes splashFadeOut {
   0%   { opacity:1; }
@@ -3475,19 +3491,30 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 <!-- ===== CLICKER SCREEN ===== -->
 <div class="screen active" id="screen-clicker">
   <!-- П.11: Capital mini-banner -->
-  <div style="background:linear-gradient(135deg,#1a1209,#2d1f0e);border:1px solid rgba(245,200,66,.25);border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;position:relative;overflow:hidden;">
-    <div style="position:absolute;inset:0;background:radial-gradient(circle at 70% 50%,rgba(245,200,66,.05),transparent);pointer-events:none;"></div>
-    <div>
-      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;" id="clk-lbl-capital">Capital</div>
-      <div style="font-size:17px;font-weight:800;color:var(--gold);font-family:'Orbitron',sans-serif;" id="clickerCapTotal">0€</div>
+  <div style="display:flex;gap:0;background:rgba(13,17,32,.95);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;margin-bottom:8px;">
+    <div style="flex:1;padding:10px 14px;display:flex;align-items:center;gap:10px;position:relative;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#f5c842,#f59e0b);border-radius:14px 0 0 0;"></div>
+      <div style="width:30px;height:30px;border-radius:8px;background:rgba(245,200,66,.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">💰</div>
+      <div style="display:flex;flex-direction:column;gap:1px;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);" id="clk-lbl-capital">Capital</span>
+        <span style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:800;color:#f5c842;" id="clickerCapTotal">0€</span>
+      </div>
     </div>
-    <div style="text-align:center;">
-      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;" id="clk-lbl-balance">Balance</div>
-      <div style="font-size:14px;font-weight:700;color:var(--green);" id="clickerBalance">0€</div>
+    <div style="flex:1;padding:10px 14px;display:flex;align-items:center;gap:10px;position:relative;border-left:1px solid rgba(255,255,255,.06);">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#22c55e,#10b981);"></div>
+      <div style="width:30px;height:30px;border-radius:8px;background:rgba(34,197,94,.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">💵</div>
+      <div style="display:flex;flex-direction:column;gap:1px;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);" id="clk-lbl-balance">Balance</span>
+        <span style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:800;color:#22c55e;" id="clickerBalance">0€</span>
+      </div>
     </div>
-    <div style="text-align:right;">
-      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;" id="clk-lbl-forbes">Forbes</div>
-      <div style="font-size:14px;font-weight:800;color:var(--gold);font-family:'Orbitron',sans-serif;" id="clickerForbes">#—</div>
+    <div style="flex:0 0 auto;padding:10px 14px;display:flex;align-items:center;gap:10px;position:relative;border-left:1px solid rgba(255,255,255,.06);">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#6366f1);border-radius:0 14px 0 0;"></div>
+      <div style="width:30px;height:30px;border-radius:8px;background:rgba(139,92,246,.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🏆</div>
+      <div style="display:flex;flex-direction:column;gap:1px;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);" id="clk-lbl-forbes">Forbes</span>
+        <span style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:800;color:#a78bfa;" id="clickerForbes">#—</span>
+      </div>
     </div>
   </div>
   <!-- hidden spans for totalEarned and perClickDisplay used elsewhere -->
@@ -3948,7 +3975,7 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
     <div id="endgameCondList" style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px 24px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:12px;">
       <div style="display:flex;align-items:center;gap:12px;">
         <span id="eg-cond1-icon" style="font-size:20px;flex-shrink:0;">❌</span>
-        <div style="text-align:left;"><div style="font-size:13px;color:var(--text);font-weight:700;">🏆 Top 1 Forbes</div><div id="eg-cond1-desc" style="font-size:11px;color:var(--muted);">Обігнати Ілона Маска та стати №1</div></div>
+        <div style="text-align:left;"><div style="font-size:13px;color:var(--text);font-weight:700;">🏆 Top 1 Forbes</div><div id="eg-cond1-desc" style="font-size:11px;color:var(--muted);">Обігнати Леона Флакса та стати №1</div></div>
       </div>
       <div style="height:1px;background:rgba(255,255,255,.06);"></div>
       <div style="display:flex;align-items:center;gap:12px;">
@@ -4253,7 +4280,7 @@ const LANG_DATA = {
     sett_version: 'Mystery Boxes Simulator · v2.0',
 
     // CLICKER SCREEN
-    capital_label: 'Капітал', balance_label: 'Баланс', forbes_label: 'Forbes',
+    capital_label: 'Капітал', balance_label: 'Баланс', forbes_label: 'Forbes', clk_forbes: 'Forbes',
 
     // UPGRADES
     upg_title: 'Покращення кліку',
@@ -4351,7 +4378,7 @@ const LANG_DATA = {
 
     // ENDGAME / ??? MYSTERY
     eg_locked_desc: 'Щоб відкрити цю вкладку, потрібно довести своє панування над цим світом.',
-    eg_cond1_desc: 'Обігнати Ілона Маска та стати №1',
+    eg_cond1_desc: 'Обігнати Леона Флакса та стати №1',
     eg_cond2_desc: 'Куплено абсолютно всі товари в LifeShop',
     eg_cond3_desc: 'Зібрано всі 10 колекцій кейсів',
     eg_unlocked_label: 'Фінал Гри',
@@ -4491,7 +4518,7 @@ const LANG_DATA = {
     sett_version: 'Mystery Boxes Simulator · v2.0',
 
     // CLICKER SCREEN
-    capital_label: 'Capital', balance_label: 'Balance', forbes_label: 'Forbes',
+    capital_label: 'Capital', balance_label: 'Balance', forbes_label: 'Forbes', clk_forbes: 'Forbes',
 
     // UPGRADES
     upg_title: 'Click Upgrades',
@@ -4589,7 +4616,7 @@ const LANG_DATA = {
 
     // ENDGAME / ??? MYSTERY
     eg_locked_desc: 'To unlock this tab, you must prove your dominance over this world.',
-    eg_cond1_desc: 'Surpass Elon Musk and become #1',
+    eg_cond1_desc: 'Surpass Leon Flux and become #1',
     eg_cond2_desc: 'Purchase every item in the LifeShop',
     eg_cond3_desc: 'Complete all 10 case collections',
     eg_unlocked_label: 'End Game',
@@ -4702,7 +4729,7 @@ const ITEM_NAME_MAP = {
   '__CASE_CHEF__': 'Chef Case',
   '__CASE_GAMER__': 'Gamer Case',
   '__CASE_FITNESS__': 'Fitness Case',
-  '__CASE_APPLE__': 'Apple Case',
+  '__CASE_APPLE__': 'Tech Case',
   '__CASE_PHOTO__': 'Photo Case',
   '__CASE_WORKSHOP__': 'Workshop Case',
   '__CASE_SMART__': 'Smart Case',
@@ -4773,14 +4800,14 @@ const ITEM_NAME_MAP = {
   '__APPL_CHARGER20W__': '20W Charger',
   '__APPL_SOLOSTRAP__': 'Solo Loop Band',
   '__APPL_SILCASE__': 'Silicone Case',
-  '__APPL_AIRPODSPRO__': 'AirPods Pro 2',
-  '__APPL_PENCIL__': 'Apple Pencil',
+  '__APPL_AIRPODSPRO__': 'AirBuds Pro 2',
+  '__APPL_PENCIL__': 'Tech Pencil',
   '__APPL_MAGSAFE__': 'MagSafe Battery',
   '__APPL_AIRTAG__': 'AirTag 4-Pack',
-  '__APPL_WATCH__': 'Apple Watch S9',
-  '__APPL_IPAD__': 'iPad Air',
-  '__APPL_AIRPODSMAX__': 'AirPods Max',
-  '__APPL_MACBOOK__': 'MacBook Air M3',
+  '__APPL_WATCH__': 'Smart Watch S9',
+  '__APPL_IPAD__': 'Tab Air',
+  '__APPL_AIRPODSMAX__': 'AirBuds Max',
+  '__APPL_MACBOOK__': 'LapBook Air M3',
   '__APPL_MACPRO__': 'Mac Pro',
   '__PHT_CLEANKIT__': 'Cleaning Kit',
   '__PHT_LENSHOOD__': 'Lens Hood',
@@ -4810,7 +4837,7 @@ const ITEM_NAME_MAP = {
   '__WS_DEWALT__': 'DeWalt Tool Set',
   '__WS_WELDER__': 'Welding Machine',
   '__WS_WORKBENCH__': 'Workbench',
-  '__WS_3DPRINTER__': 'Bambu 3D Printer',
+  '__WS_3DPRINTER__': '3D Printer',
   '__WS_ENGRAVER__': 'Laser Engraver',
   '__SMT_BULB__': 'Smart Bulb',
   '__SMT_PLUG__': 'Smart Plug',
@@ -4823,9 +4850,9 @@ const ITEM_NAME_MAP = {
   '__SMT_DYSON__': 'Dyson Air Purifier',
   '__SMT_MIRROR__': 'Smart Mirror',
   '__SMT_ROOMBA__': 'Robot Vacuum',
-  '__SMT_PROJECTOR__': 'Samsung Freestyle',
+  '__SMT_PROJECTOR__': 'Smart Projector',
   '__SMT_SMARTHOME__': 'Smart Home System',
-  '__SMT_TV__': 'Samsung 85" TV',
+  '__SMT_TV__': 'Smart TV 85"',
   '__SMT_BED__': 'Smart Bed',
   '__ELT_CARDHOLDER__': 'Card Holder',
   '__ELT_TIE__': 'Designer Tie',
@@ -4834,11 +4861,11 @@ const ITEM_NAME_MAP = {
   '__ELT_SUNGLASSES__': 'Sunglasses',
   '__ELT_UMBRELLA__': 'Elite Umbrella',
   '__ELT_MONTBLANC__': 'Montblanc Pen',
-  '__ELT_CUFFLINKS__': 'Cartier Cufflinks',
-  '__ELT_BELT__': 'Gucci Belt',
-  '__ELT_SCARF__': 'Hermès Scarf',
-  '__ELT_SUIT__': 'Tom Ford Suit',
-  '__ELT_LV__': 'Louis Vuitton Bag',
+  '__ELT_CUFFLINKS__': 'Gold Cufflinks',
+  '__ELT_BELT__': 'Designer Belt',
+  '__ELT_SCARF__': 'Silk Scarf',
+  '__ELT_SUIT__': 'Couture Suit',
+  '__ELT_LV__': 'Couture Bag',
   '__ELT_WINECABINET__': 'Wine Cabinet',
   '__ELT_OMEGA__': 'Omega Seamaster',
   '__ELT_GOLDCOIN__': 'Gold Coin',
@@ -5271,8 +5298,8 @@ const CASES = [
     ]},
 
   // ── 6. Apple Garden ──────────────────────────────────────────────
-  { id:'apple', name:'Apple Garden', icon:'__CASE_APPLE__', price:2500,
-    desc:'Преміум Apple-екосистема', color:'#94a3b8',
+  { id:'apple', name:'Tech Garden', icon:'__CASE_APPLE__', price:2500,
+    desc:'Преміум Tech-екосистема', color:'#94a3b8',
     items:[
       {name:'Серветка полірувальна',emoji:'__APPL_CLOTH__', rarity:'common',   value:250},
       {name:'Перехідник',          emoji:'__APPL_ADAPTER__', rarity:'common',    value:275},
@@ -5280,14 +5307,14 @@ const CASES = [
       {name:'Зарядка 20W',         emoji:'__APPL_CHARGER20W__', rarity:'common',    value:310},
       {name:'Ремінець Solo Loop',  emoji:'__APPL_SOLOSTRAP__', rarity:'common',    value:340},
       {name:'Силіконовий чохол',   emoji:'__APPL_SILCASE__', rarity:'common',    value:370},
-      {name:'AirPods Pro 2',       emoji:'__APPL_AIRPODSPRO__', rarity:'rare',      value:1200},
-      {name:'Apple Pencil',        emoji:'__APPL_PENCIL__', rarity:'rare',      value:1500},
+      {name:'AirBuds Pro 2',       emoji:'__APPL_AIRPODSPRO__', rarity:'rare',      value:1200},
+      {name:'Tech Pencil',        emoji:'__APPL_PENCIL__', rarity:'rare',      value:1500},
       {name:'MagSafe Battery',     emoji:'__APPL_MAGSAFE__', rarity:'rare',      value:1700},
       {name:'AirTag 4-pack',       emoji:'__APPL_AIRTAG__', rarity:'rare',      value:2000},
-      {name:'Apple Watch S9',      emoji:'__APPL_WATCH__', rarity:'epic',      value:5000},
-      {name:'iPad Air',            emoji:'__APPL_IPAD__', rarity:'epic',      value:7500},
-      {name:'AirPods Max',         emoji:'__APPL_AIRPODSMAX__', rarity:'epic',      value:10000},
-      {name:'MacBook Air M3',      emoji:'__APPL_MACBOOK__', rarity:'legendary', value:20000},
+      {name:'Smart Watch S9',      emoji:'__APPL_WATCH__', rarity:'epic',      value:5000},
+      {name:'Tab Air',            emoji:'__APPL_IPAD__', rarity:'epic',      value:7500},
+      {name:'AirBuds Max',         emoji:'__APPL_AIRPODSMAX__', rarity:'epic',      value:10000},
+      {name:'LapBook Air M3',      emoji:'__APPL_MACBOOK__', rarity:'legendary', value:20000},
       {name:'Mac Pro',             emoji:'__APPL_MACPRO__', rarity:'legendary', value:35000},
     ]},
 
@@ -5329,7 +5356,7 @@ const CASES = [
       {name:'Набір інструментів DeWalt',emoji:'__WS_DEWALT__',rarity:'epic',  value:20000},
       {name:'Зварювальний апарат', emoji:'__WS_WELDER__', rarity:'epic',      value:30000},
       {name:'Верстак',             emoji:'__WS_WORKBENCH__', rarity:'epic',      value:40000},
-      {name:'3D Принтер Bambu',    emoji:'__WS_3DPRINTER__', rarity:'legendary', value:80000},
+      {name:'3D Принтер',    emoji:'__WS_3DPRINTER__', rarity:'legendary', value:80000},
       {name:'Гравірувальний верстат',emoji:'⚙️',rarity:'legendary',value:140000},
     ]},
 
@@ -5350,7 +5377,7 @@ const CASES = [
       {name:'Робот-пилосос+база',  emoji:'__SMT_ROOMBA__', rarity:'epic',      value:32000},
       {name:'Проектор Freestyle',  emoji:'__SMT_PROJECTOR__', rarity:'epic',      value:48000},
       {name:'Система розумного дому',emoji:'__SMT_SMARTHOME__',rarity:'epic',     value:64000},
-      {name:'Samsung TV 85"',      emoji:'__SMT_TV__', rarity:'legendary', value:120000},
+      {name:'Smart TV 85"',      emoji:'__SMT_TV__', rarity:'legendary', value:120000},
       {name:'Розумне ліжко',       emoji:'__SMT_BED__', rarity:'legendary', value:220000},
     ]},
 
@@ -5365,11 +5392,11 @@ const CASES = [
       {name:'Окуляри сонцезахисні',emoji:'__ELT_SUNGLASSES__', rarity:'common',   value:3100},
       {name:'Парасолька елітна',   emoji:'__ELT_UMBRELLA__', rarity:'common',    value:3300},
       {name:'Ручка Montblanc',     emoji:'__ELT_MONTBLANC__', rarity:'rare',      value:11000},
-      {name:'Запонки Cartier',     emoji:'__ELT_CUFFLINKS__', rarity:'rare',      value:13000},
-      {name:'Ремінь Gucci',        emoji:'__ELT_BELT__', rarity:'rare',      value:15000},
-      {name:'Шарф Hermès',         emoji:'__ELT_SCARF__', rarity:'rare',      value:17000},
-      {name:'Костюм Tom Ford',     emoji:'__ELT_SUIT__', rarity:'epic',      value:44000},
-      {name:'Сумка Louis Vuitton', emoji:'__ELT_LV__', rarity:'epic',      value:66000},
+      {name:'Золоті запонки',     emoji:'__ELT_CUFFLINKS__', rarity:'rare',      value:13000},
+      {name:'Дизайнерський ремінь',        emoji:'__ELT_BELT__', rarity:'rare',      value:15000},
+      {name:'Шовковий шарф',         emoji:'__ELT_SCARF__', rarity:'rare',      value:17000},
+      {name:'Костюм від кутюр',     emoji:'__ELT_SUIT__', rarity:'epic',      value:44000},
+      {name:'Сумка від кутюр', emoji:'__ELT_LV__', rarity:'epic',      value:66000},
       {name:'Винна шафа',          emoji:'__ELT_WINECABINET__', rarity:'epic',      value:88000},
       {name:'Omega Seamaster',     emoji:'__ELT_OMEGA__', rarity:'legendary', value:170000},
       {name:'Золота монета',       emoji:'__ELT_GOLDCOIN__', rarity:'legendary', value:300000},
@@ -5402,7 +5429,7 @@ const MYSTERY_BOXES = [
       {name:'Водонепроникний чохол',        nameEn:'Waterproof Phone Case',           emoji:'📱', rarity:'common', value:6800},
       {name:'Дорожня аптечка',              nameEn:'Travel First Aid Kit',            emoji:'🩹', rarity:'common', value:6900},
       {name:'Магніт "I was there"',         nameEn:'"I was there" Magnet',            emoji:'🧲', rarity:'common', value:7000},
-      {name:'Валіза Louis Vuitton Horizon', nameEn:'Louis Vuitton Horizon Luggage',   emoji:'🧳', rarity:'rare',   value:10000},
+      {name:'Валіза Horizon Luxe', nameEn:'Horizon Luxe Luggage',   emoji:'🧳', rarity:'rare',   value:10000},
       {name:'Намет для сходження',          nameEn:'Mountaineering Tent',             emoji:'⛺', rarity:'rare',   value:11000},
       {name:'Гірськолижний комплект',       nameEn:'Ski Kit',                         emoji:'🎿', rarity:'rare',   value:12000},
       {name:'GoPro Hero 12 Bundle',         nameEn:'GoPro Hero 12 Bundle',            emoji:'📷', rarity:'rare',   value:12500},
@@ -5439,7 +5466,7 @@ const MYSTERY_BOXES = [
       {name:'Чохол з E-Ink екраном',        nameEn:'E-Ink Screen Phone Case',       emoji:'📱', rarity:'common', value:10000},
       {name:'USB-холодильник косметики',    nameEn:'USB Cosmetics Fridge',          emoji:'🧊', rarity:'common', value:10500},
       {name:'Розумна скарбничка-сейф',      nameEn:'Smart Safe Piggy Bank',         emoji:'🔒', rarity:'common', value:11000},
-      {name:'Клавіатура Apple Magic',       nameEn:'Apple Magic Keyboard',          emoji:'⌨️', rarity:'common', value:11500},
+      {name:'Клавіатура Magic',       nameEn:'Magic Keyboard',          emoji:'⌨️', rarity:'common', value:11500},
       {name:'Смарт-пляшка HidrateSpark',    nameEn:'HidrateSpark Smart Bottle',     emoji:'💧', rarity:'common', value:12000},
       {name:'Тестер якості повітря',        nameEn:'Air Quality Tester',            emoji:'💨', rarity:'common', value:12500},
       {name:'Зарядка Nomad Base Station',   nameEn:'Nomad Base Station Charger',    emoji:'🔋', rarity:'common', value:12800},
@@ -5467,9 +5494,9 @@ const MYSTERY_BOXES = [
       {name:'Bose QuietComfort Special',    nameEn:'Bose QuietComfort Special',     emoji:'🎧', rarity:'rare',   value:38000},
       {name:'Garmin Marq смарт-годинник',   nameEn:'Garmin Marq Smartwatch',        emoji:'⌚', rarity:'rare',   value:39000},
       {name:'Очищувач Dyson Big+Quiet',     nameEn:'Dyson Big+Quiet Purifier',      emoji:'💨', rarity:'rare',   value:40000},
-      {name:'Apple Vision Pro 2',           nameEn:'Apple Vision Pro 2',            emoji:'🥽', rarity:'epic',   value:120000},
+      {name:'Vision Pro 2',           nameEn:'Vision Pro 2',            emoji:'🥽', rarity:'epic',   value:120000},
       {name:'Крісло-станція Acer Predator', nameEn:'Acer Predator Gaming Chair',    emoji:'🪑', rarity:'epic',   value:130000},
-      {name:'Tesla Powerwall Home Battery', nameEn:'Tesla Powerwall Home Battery',  emoji:'⚡', rarity:'epic',   value:140000},
+      {name:'PowerCell Home Battery', nameEn:'PowerCell Home Battery',  emoji:'⚡', rarity:'epic',   value:140000},
       {name:'Прозорий Micro-LED дисплей',   nameEn:'Transparent Micro-LED Display', emoji:'📺', rarity:'epic',   value:155000},
       {name:'Розумна кухня-робот',          nameEn:'Smart Robot Kitchen',           emoji:'🤖', rarity:'epic',   value:165000},
       {name:'Екзоскелет для спини',         nameEn:'Back Exoskeleton',              emoji:'🦾', rarity:'epic',   value:175000},
@@ -5605,7 +5632,7 @@ const MYSTERY_BOXES = [
       {name:'Карти Таро Major Arcana',      nameEn:'Tarot Cards Major Arcana',      emoji:'🃏', rarity:'rare',   value:75000},
       {name:'Золота монета Наполеона',      nameEn:"Napoleon's Gold Coin",          emoji:'🪙', rarity:'rare',   value:78000},
       {name:'Годинник "Destiny"',           nameEn:'"Destiny" Watch',               emoji:'⏰', rarity:'rare',   value:80000},
-      {name:'Духи Fortune by Dior',         nameEn:'Fortune by Dior Perfume',       emoji:'🧴', rarity:'rare',   value:82000},
+      {name:'Духи Fortune by Diore',         nameEn:'Fortune by Diore Perfume',       emoji:'🧴', rarity:'rare',   value:82000},
       {name:'Кришталева куля (велика)',      nameEn:'Large Crystal Ball',            emoji:'🔮', rarity:'rare',   value:84000},
       {name:'Манускрипт нострадамуса',      nameEn:'Nostradamus Manuscript',        emoji:'📜', rarity:'rare',   value:87000},
       {name:'Смарагдова таблиця (копія)',   nameEn:'Emerald Tablet (Copy)',          emoji:'💚', rarity:'rare',   value:90000},
@@ -5669,7 +5696,7 @@ const HANGARS = [
       {name:'Лайнер "Freedom of Seas"',              nameEn:'"Freedom of Seas" Liner',            emoji:'🚢', rarity:'legendary', value:20000000000},
       {name:'Глибоководна наукова база',             nameEn:'Deep-Sea Research Base',             emoji:'🔬', rarity:'epic',      value:10000000000},
       {name:'Штучний плавучий острів',               nameEn:'Artificial Floating Island',         emoji:'🏝️', rarity:'epic',     value:8000000000},
-      {name:'Мега-яхта "Eclipse 2"',                 nameEn:'"Eclipse 2" Mega-Yacht',             emoji:'💎', rarity:'epic',      value:6000000000},
+      {name:'Мега-яхта "Eclipze 2"',                 nameEn:'"Eclipze 2" Mega-Yacht',             emoji:'💎', rarity:'epic',      value:6000000000},
       {name:'Підводний готель "Немо"',               nameEn:'"Nemo" Underwater Hotel',            emoji:'🐟', rarity:'rare',      value:3000000000},
       {name:'Супер-яхта (100 метрів)',               nameEn:'Super Yacht (100 metres)',            emoji:'🛥️', rarity:'rare',     value:2800000000},
       {name:'Експедиційне судно',                    nameEn:'Expedition Vessel',                  emoji:'🌊', rarity:'rare',      value:2500000000},
@@ -5699,9 +5726,9 @@ const HANGARS = [
       {name:'Прототип летючого авто',                nameEn:'Flying Car Prototype',               emoji:'🚗', rarity:'rare',      value:8000000000},
       {name:'Реактивний джет-амфібія',               nameEn:'Jet Amphibian',                      emoji:'🌊', rarity:'rare',      value:7500000000},
       {name:'Відреставрований "Конкорд"',            nameEn:'Restored Concorde',                  emoji:'⚡', rarity:'rare',      value:7000000000},
-      {name:'Boeing 747 VIP Edition',                nameEn:'Boeing 747 VIP Edition',             emoji:'✈️', rarity:'rare',     value:6000000000},
-      {name:'Bombardier Global 7500',                nameEn:'Bombardier Global 7500',             emoji:'💺', rarity:'rare',      value:5000000000},
-      {name:'Gulfstream G700',                       nameEn:'Gulfstream G700',                    emoji:'🛩️', rarity:'rare',     value:4000000000},
+      {name:'Boing 747 VIP Edition',                nameEn:'Boing 747 VIP Edition',             emoji:'✈️', rarity:'rare',     value:6000000000},
+      {name:'Imperior Global 7500',                nameEn:'Imperior Global 7500',             emoji:'💺', rarity:'rare',      value:5000000000},
+      {name:'Stormjet G700',                       nameEn:'Stormjet G700',                    emoji:'🛩️', rarity:'rare',     value:4000000000},
       {name:'Вантажний борт AN-124',                 nameEn:'AN-124 Cargo Aircraft',              emoji:'🛫', rarity:'common',    value:2800000000},
       {name:'Приватна злітна смуга',                 nameEn:'Private Runway',                     emoji:'🛣️', rarity:'common',   value:2700000000},
       {name:'Парк автозаправників',                  nameEn:'Fuel Truck Fleet',                   emoji:'⛽', rarity:'common',    value:2500000000},
@@ -5710,7 +5737,7 @@ const HANGARS = [
       {name:'Приватний ангар у Дубаї',               nameEn:'Private Hangar in Dubai',            emoji:'🏢', rarity:'common',    value:2100000000},
       {name:'Бізнес-джет Learjet',                   nameEn:'Learjet Business Jet',               emoji:'🛩️', rarity:'common',   value:1900000000},
       {name:'Гелікоптер Airbus VIP',                 nameEn:'Airbus VIP Helicopter',              emoji:'🚁', rarity:'common',    value:1700000000},
-      {name:'Гвинтовий літак Cessna',                nameEn:'Cessna Propeller Plane',             emoji:'✈️', rarity:'common',   value:1500000000},
+      {name:'Гвинтовий літак Sessna',                nameEn:'Sessna Propeller Plane',             emoji:'✈️', rarity:'common',   value:1500000000},
     ]},
   { id:'hangar4', name:'Атлантида', nameEn:'Atlantis', subtitle:'Global Assets', subtitleEn:'Global Assets',
     price: 50_000_000_000,
@@ -5830,113 +5857,113 @@ function getRivalDynamicRate(r, playerCapital) {
 
 // Персоналізовані кризові події для кожного мільярдера
 const RIVAL_CRISIS_EVENTS = {
-  'Ілон Маск': [
-    { text: 'Скандальний твіт обвалив акції Tesla на 12%', textEn: 'Controversial tweet crashed Tesla stock by 12%', loss: 0.025 },
-    { text: 'SEC розпочало кримінальне розслідування SpaceX', textEn: 'SEC launched criminal investigation into SpaceX', loss: 0.018 },
-    { text: 'Twitter/X зафіксував рекордний відтік рекламодавців', textEn: 'Twitter/X recorded record advertiser exodus', loss: 0.014 },
+  'Леон Флакс': [
+    { text: 'Скандальний твіт обвалив акції VoltaCar на 12%', textEn: 'Controversial tweet crashed VoltaCar stock by 12%', loss: 0.025 },
+    { text: 'SEC розпочало кримінальне розслідування StarX', textEn: 'SEC launched criminal investigation into StarX', loss: 0.018 },
+    { text: 'Chirper/X зафіксував рекордний відтік рекламодавців', textEn: 'Chirper/X recorded record advertiser exodus', loss: 0.014 },
     { text: 'Провал запуску Starship — страховий збиток $3B', textEn: 'Starship launch failure — insurance loss $3B', loss: 0.020 },
-    { text: 'Маск програв мегасудовий позов акціонерів Tesla', textEn: 'Musk lost massive Tesla shareholder lawsuit', loss: 0.022 },
-    { text: 'Розпродаж акцій Tesla топ-менеджерами обвалив курс', textEn: 'Tesla executive stock dump crashed share price', loss: 0.016 },
+    { text: 'Флакс програв мегасудовий позов акціонерів VoltaCar', textEn: 'Flux lost massive VoltaCar shareholder lawsuit', loss: 0.022 },
+    { text: 'Розпродаж акцій VoltaCar топ-менеджерами обвалив курс', textEn: 'VoltaCar executive stock dump crashed share price', loss: 0.016 },
     { text: 'Neuralink заборонено в ЄС через порушення біоетики', textEn: 'Neuralink banned in EU for bioethics violations', loss: 0.010 },
-    { text: 'Уряд США скасував контракт SpaceX на $8B', textEn: 'US government cancelled $8B SpaceX contract', loss: 0.019 },
-    { text: 'Масові звільнення в Tesla спровокували страйк', textEn: 'Mass Tesla layoffs triggered nationwide strike', loss: 0.012 },
-    { text: 'Рейтингові агентства знизили оцінку Tesla до "сміттєвого"', textEn: 'Rating agencies downgraded Tesla to "junk"', loss: 0.017 },
+    { text: 'Уряд США скасував контракт StarX на $8B', textEn: 'US government cancelled $8B StarX contract', loss: 0.019 },
+    { text: 'Масові звільнення в VoltaCar спровокували страйк', textEn: 'Mass VoltaCar layoffs triggered nationwide strike', loss: 0.012 },
+    { text: 'Рейтингові агентства знизили оцінку VoltaCar до "сміттєвого"', textEn: 'Rating agencies downgraded VoltaCar to "junk"', loss: 0.017 },
   ],
-  'Джефф Безос': [
-    { text: 'ЄС виписав Amazon антимонопольний штраф €8.25B', textEn: 'EU issued Amazon €8.25B antitrust fine', loss: 0.015 },
+  'Джефф Бозос': [
+    { text: 'ЄС виписав Amazoom антимонопольний штраф €8.25B', textEn: 'EU issued Amazoom €8.25B antitrust fine', loss: 0.015 },
     { text: 'AWS зазнав глобального збою — клієнти масово йдуть', textEn: 'AWS global outage — clients abandoning en masse', loss: 0.012 },
-    { text: 'Страйк 350,000 працівників Amazon паралізував склади', textEn: '350,000 Amazon workers strike paralyzed warehouses', loss: 0.009 },
+    { text: 'Страйк 350,000 працівників Amazoom паралізував склади', textEn: '350,000 Amazoom workers strike paralyzed warehouses', loss: 0.009 },
     { text: 'Blue Origin вибухнув під час тестового польоту', textEn: 'Blue Origin exploded during test flight', loss: 0.022 },
-    { text: 'Конгрес США розпочав слухання щодо монополії Amazon', textEn: 'US Congress opened Amazon monopoly hearings', loss: 0.016 },
-    { text: 'Витік персональних даних 200M клієнтів Amazon', textEn: '200M Amazon customer records leaked', loss: 0.013 },
-    { text: 'Amazon Prime втратив 40M підписників за квартал', textEn: 'Amazon Prime lost 40M subscribers in one quarter', loss: 0.018 },
-    { text: 'Безос програв судовий позов щодо умов праці', textEn: 'Bezos lost lawsuit over labor conditions', loss: 0.008 },
-    { text: 'FTC заблокувала злиття Amazon з MGM Studios', textEn: 'FTC blocked Amazon-MGM Studios merger', loss: 0.011 },
+    { text: 'Конгрес США розпочав слухання щодо монополії Amazoom', textEn: 'US Congress opened Amazoom monopoly hearings', loss: 0.016 },
+    { text: 'Витік персональних даних 200M клієнтів Amazoom', textEn: '200M Amazoom customer records leaked', loss: 0.013 },
+    { text: 'Amazoom Prime втратив 40M підписників за квартал', textEn: 'Amazoom Prime lost 40M subscribers in one quarter', loss: 0.018 },
+    { text: 'Бозос програв судовий позов щодо умов праці', textEn: 'Bozos lost lawsuit over labor conditions', loss: 0.008 },
+    { text: 'FTC заблокувала злиття Amazoom з MGM Studios', textEn: 'FTC blocked Amazoom-MGM Studios merger', loss: 0.011 },
     { text: 'Warehouse Robotics проект провалився — списано $4.5B', textEn: 'Warehouse Robotics project failed — $4.5B written off', loss: 0.014 },
   ],
-  'Бернар Арно': [
-    { text: 'Китай ввів 45% мито на всі продукти LVMH', textEn: 'China imposed 45% tariff on all LVMH products', loss: 0.020 },
-    { text: 'Поліція вилучила 2M підробок Louis Vuitton — скандал', textEn: 'Police seized 2M Louis Vuitton counterfeits — scandal', loss: 0.013 },
+  'Бернар Орно': [
+    { text: 'Китай ввів 45% мито на всі продукти LXMH', textEn: 'China imposed 45% tariff on all LXMH products', loss: 0.020 },
+    { text: 'Поліція вилучила 2M підробок Louie Vittone — скандал', textEn: 'Police seized 2M Louie Vittone counterfeits — scandal', loss: 0.013 },
     { text: 'Невдале поглинання Richemont — збитки €6B', textEn: 'Failed Richemont acquisition — €6B losses', loss: 0.021 },
-    { text: 'Колекція Dior провалилась — критики розгромили бренд', textEn: 'Dior collection flopped — critics destroyed the brand', loss: 0.008 },
-    { text: 'Арно звинувачують у корупційній схемі у Франції', textEn: 'Arnault accused of corruption scheme in France', loss: 0.017 },
-    { text: 'Christian Dior відкликав продукцію через хімічний скандал', textEn: 'Christian Dior recalled products over chemical scandal', loss: 0.011 },
+    { text: 'Колекція Diore провалилась — критики розгромили бренд', textEn: 'Diore collection flopped — critics destroyed the brand', loss: 0.008 },
+    { text: 'Орно звинувачують у корупційній схемі у Франції', textEn: 'Ornot accused of corruption scheme in France', loss: 0.017 },
+    { text: 'Christian Diore відкликав продукцію через хімічний скандал', textEn: 'Christian Diore recalled products over chemical scandal', loss: 0.011 },
     { text: 'Moet Hennessy втрачає ринкову частку в США', textEn: 'Moet Hennessy losing US market share', loss: 0.009 },
-    { text: 'Страйк 80,000 працівників LVMH по всій Франції', textEn: '80,000 LVMH workers strike across France', loss: 0.014 },
-    { text: 'Bulgari програв патентний суд — виплата €1.8B', textEn: 'Bulgari lost patent case — €1.8B payout', loss: 0.012 },
-    { text: 'Бойкот LVMH у Японії після скандальних заяв Арно', textEn: 'LVMH boycott in Japan after Arnault scandal', loss: 0.016 },
+    { text: 'Страйк 80,000 працівників LXMH по всій Франції', textEn: '80,000 LXMH workers strike across France', loss: 0.014 },
+    { text: 'Belvari програв патентний суд — виплата €1.8B', textEn: 'Belvari lost patent case — €1.8B payout', loss: 0.012 },
+    { text: 'Бойкот LXMH у Японії після скандальних заяв Арно', textEn: 'LXMH boycott in Japan after Ornot scandal', loss: 0.016 },
   ],
-  'Білл Гейтс': [
-    { text: 'Скандал у Gates Foundation — відставки ради директорів', textEn: 'Gates Foundation scandal — board resignations', loss: 0.011 },
+  'Вілл Грейтс': [
+    { text: 'Скандал у Gates Foundation — відставки ради директорів', textEn: 'Grates Foundation scandal — board resignations', loss: 0.011 },
     { text: 'Великий програш в інвестиційному портфелі Cascade', textEn: 'Massive loss in Cascade investment portfolio', loss: 0.016 },
     { text: 'Ставка на сільськогосподарські землі обернулась збитками', textEn: 'Agricultural land bet turned into losses', loss: 0.013 },
     { text: 'Антивакцинний рух паплюжить фонд у 40 країнах', textEn: 'Anti-vaccine movement tarnishes foundation in 40 countries', loss: 0.009 },
     { text: 'Четвертий Foundation партнер оголосив банкрутство', textEn: 'Fourth Foundation partner declared bankruptcy', loss: 0.014 },
-    { text: 'Microsoft (пасивна частка) під слідством DOJ', textEn: 'Microsoft (passive stake) under DOJ investigation', loss: 0.012 },
+    { text: 'Microshift (пасивна частка) під слідством DOJ', textEn: 'Microshift (passive stake) under DOJ investigation', loss: 0.012 },
     { text: 'Ядерний проект TerraPower призупинено на 5 років', textEn: 'TerraPower nuclear project suspended for 5 years', loss: 0.018 },
-    { text: 'Гейтса судять за приховані активи в офшорах', textEn: 'Gates sued for hidden offshore assets', loss: 0.015 },
-    { text: 'Мережа шкіл Gates Foundation зазнала фінансового краху', textEn: 'Gates Foundation school network suffered financial collapse', loss: 0.010 },
+    { text: 'Грейтса судять за приховані активи в офшорах', textEn: 'Grates sued for hidden offshore assets', loss: 0.015 },
+    { text: 'Мережа шкіл Grates Foundation зазнала фінансового краху', textEn: 'Grates Foundation school network suffered financial collapse', loss: 0.010 },
     { text: 'Cascade Investment програв ставку на нафтовий сектор', textEn: 'Cascade Investment lost bet on oil sector', loss: 0.019 },
   ],
-  'Ларрі Еллісон': [
-    { text: 'Oracle програв контракт Пентагону на $10B Microsoft', textEn: 'Oracle lost $10B Pentagon contract to Microsoft', loss: 0.020 },
-    { text: 'Глобальний збій Oracle Cloud — 6 годин простою', textEn: 'Oracle Cloud global outage — 6 hours downtime', loss: 0.015 },
-    { text: 'Колишні партнери подали позов на Еллісона — $2.3B', textEn: 'Former partners sued Ellison — $2.3B claim', loss: 0.011 },
-    { text: 'Квартальна звітність Oracle: прибуток нижче прогнозу на 40%', textEn: 'Oracle quarterly report: profit 40% below forecast', loss: 0.022 },
-    { text: 'Oracle втратила держконтракти після витоку держданих', textEn: 'Oracle lost government contracts after data leak', loss: 0.017 },
-    { text: 'TikTok розірвав хмарну угоду з Oracle', textEn: 'TikTok terminated cloud deal with Oracle', loss: 0.013 },
-    { text: 'Масова хвиля звільнень в Oracle — акції падають', textEn: 'Mass Oracle layoffs — stock price dropping', loss: 0.009 },
-    { text: 'Еллісон програв судовий позов щодо авторських прав Java', textEn: 'Ellison lost Java copyright lawsuit', loss: 0.016 },
-    { text: 'Oracle ERP провалився у 3 великих банках одночасно', textEn: 'Oracle ERP failed in 3 major banks simultaneously', loss: 0.018 },
-    { text: 'SEC розслідує інсайдерські угоди Еллісона', textEn: 'SEC investigating Ellison insider trading', loss: 0.014 },
+  'Ларрі Аллісон': [
+    { text: 'Orakel програв контракт Пентагону на $10B Microshift', textEn: 'Orakel lost $10B Pentagon contract to Microshift', loss: 0.020 },
+    { text: 'Глобальний збій Orakel Cloud — 6 годин простою', textEn: 'Orakel Cloud global outage — 6 hours downtime', loss: 0.015 },
+    { text: 'Колишні партнери подали позов на Аллісона — $2.3B', textEn: 'Former partners sued Allison — $2.3B claim', loss: 0.011 },
+    { text: 'Квартальна звітність Orakel: прибуток нижче прогнозу на 40%', textEn: 'Orakel quarterly report: profit 40% below forecast', loss: 0.022 },
+    { text: 'Orakel втратила держконтракти після витоку держданих', textEn: 'Orakel lost government contracts after data leak', loss: 0.017 },
+    { text: 'TickTack розірвав хмарну угоду з Orakel', textEn: 'TikTok terminated cloud deal with Orakel', loss: 0.013 },
+    { text: 'Масова хвиля звільнень в Orakel — акції падають', textEn: 'Mass Orakel layoffs — stock price dropping', loss: 0.009 },
+    { text: 'Аллісон програв судовий позов щодо авторських прав Java', textEn: 'Allison lost Java copyright lawsuit', loss: 0.016 },
+    { text: 'Orakel ERP провалився у 3 великих банках одночасно', textEn: 'Orakel ERP failed in 3 major banks simultaneously', loss: 0.018 },
+    { text: 'SEC розслідує інсайдерські угоди Аллісона', textEn: 'SEC investigating Allison insider trading', loss: 0.014 },
   ],
-  'Уоррен Баффет': [
+  'Уоррен Баффіт': [
     { text: 'Berkshire Hathaway: рекордні збитки $28B за квартал', textEn: 'Berkshire Hathaway: record $28B quarterly loss', loss: 0.011 },
     { text: 'Ставка на залізничні перевезення обернулась катастрофою', textEn: 'Rail transport bet turned into disaster', loss: 0.016 },
-    { text: 'Ключовий актив Berkshire — Apple — обвалився на 30%', textEn: 'Berkshire key asset Apple crashed 30%', loss: 0.020 },
+    { text: 'Ключовий актив Berkshire — Pear — обвалився на 30%', textEn: 'Berkshire key asset Pear crashed 30%', loss: 0.020 },
     { text: 'Медіаскандал з дочірньою компанією Berkshire', textEn: 'Media scandal involving Berkshire subsidiary', loss: 0.009 },
     { text: 'Страховий підрозділ Geico зазнав рекордних виплат', textEn: 'Geico insurance unit suffered record payouts', loss: 0.014 },
-    { text: 'Баффет помилився зі ставкою на банківський сектор', textEn: 'Buffett was wrong about banking sector bet', loss: 0.017 },
+    { text: 'Баффіт помилився зі ставкою на банківський сектор', textEn: 'Biffett was wrong about banking sector bet', loss: 0.017 },
     { text: 'Wells Fargo (частка Berkshire) під кримінальним слідством', textEn: 'Wells Fargo (Berkshire stake) under criminal investigation', loss: 0.013 },
     { text: 'Berkshire Energy програла регуляторну битву в 5 штатах', textEn: 'Berkshire Energy lost regulatory battle in 5 states', loss: 0.012 },
-    { text: 'Ринок розкритикував рішення Баффета утримувати готівку', textEn: 'Market criticized Buffett for holding cash', loss: 0.008 },
+    { text: 'Ринок розкритикував рішення Баффіта утримувати готівку', textEn: 'Market criticized Biffett for holding cash', loss: 0.008 },
     { text: 'Інвестиція в японські торгові доми дала нульовий дохід', textEn: 'Investment in Japanese trading houses yielded zero return', loss: 0.010 },
   ],
-  'Ларрі Пейдж': [
-    { text: 'DOJ виграв антимонопольний суд — Google змушений розпастись', textEn: 'DOJ won antitrust case — Google forced to break up', loss: 0.022 },
-    { text: 'Пошук Google злив 500M записів — штраф €12B', textEn: 'Google Search leaked 500M records — €12B fine', loss: 0.014 },
-    { text: 'Google Bard провалився — ChatGPT забирає 35% ринку', textEn: 'Google Bard flopped — ChatGPT takes 35% of market', loss: 0.016 },
+  'Ларрі Сейдж': [
+    { text: 'DOJ виграв антимонопольний суд — Goggle змушений розпастись', textEn: 'DOJ won antitrust case — Goggle forced to break up', loss: 0.022 },
+    { text: 'Пошук Goggle злив 500M записів — штраф €12B', textEn: 'Goggle Search leaked 500M records — €12B fine', loss: 0.014 },
+    { text: 'Goggle Bard провалився — ChatGPT забирає 35% ринку', textEn: 'Goggle Bard flopped — ChatGPT takes 35% of market', loss: 0.016 },
     { text: 'ЄС заблокував злиття Alphabet із стартапом на $8B', textEn: 'EU blocked Alphabet $8B startup merger', loss: 0.011 },
-    { text: 'YouTube втратив найбільших рекламодавців через контент', textEn: 'YouTube lost top advertisers over content issues', loss: 0.013 },
+    { text: 'ViewTube втратив найбільших рекламодавців через контент', textEn: 'ViewTube lost top advertisers over content issues', loss: 0.013 },
     { text: 'Waymo зазнав серії аварій — ліцензію призупинено', textEn: 'Waymo had series of crashes — license suspended', loss: 0.018 },
-    { text: 'Google Cloud програв тендер уряду США AWS', textEn: 'Google Cloud lost US government tender to AWS', loss: 0.015 },
+    { text: 'Goggle Cloud програв тендер уряду США AWS', textEn: 'Goggle Cloud lost US government tender to AWS', loss: 0.015 },
     { text: 'Проект Loon остаточно закрито — списано $4B', textEn: 'Project Loon finally shut down — $4B written off', loss: 0.010 },
     { text: 'Alphabet програв патентний позов Sonos на $1.67B', textEn: 'Alphabet lost $1.67B Sonos patent lawsuit', loss: 0.009 },
-    { text: 'Google Play під слідством за нечесні комісії 30%', textEn: 'Google Play under investigation for unfair 30% fees', loss: 0.012 },
+    { text: 'Goggle Play під слідством за нечесні комісії 30%', textEn: 'Goggle Play under investigation for unfair 30% fees', loss: 0.012 },
   ],
-  'Сергій Брін': [
+  'Сергій Грін': [
     { text: 'Waymo спричинив смертельну ДТП — масові позови', textEn: 'Waymo caused fatal accident — mass lawsuits', loss: 0.020 },
-    { text: 'ЄС оштрафував Google Ads на €6.5B за монополізм', textEn: 'EU fined Google Ads €6.5B for monopoly', loss: 0.017 },
-    { text: 'Злиті алгоритми Google Search продано конкурентам', textEn: 'Leaked Google Search algorithms sold to competitors', loss: 0.015 },
-    { text: 'Проект Google Glass 2.0 провалився на старті', textEn: 'Google Glass 2.0 project failed at launch', loss: 0.009 },
-    { text: 'Особисті дані Брін злиті у великому зломі Google', textEn: "Brin's personal data leaked in major Google breach", loss: 0.011 },
-    { text: 'Акції Alphabet обвалились після виходу Пейджа з ради', textEn: 'Alphabet stock crashed after Page left the board', loss: 0.013 },
+    { text: 'ЄС оштрафував Goggle Ads на €6.5B за монополізм', textEn: 'EU fined Goggle Ads €6.5B for monopoly', loss: 0.017 },
+    { text: 'Злиті алгоритми Goggle Search продано конкурентам', textEn: 'Leaked Goggle Search algorithms sold to competitors', loss: 0.015 },
+    { text: 'Проект Goggle Glass 2.0 провалився на старті', textEn: 'Goggle Glass 2.0 project failed at launch', loss: 0.009 },
+    { text: 'Особисті дані Грін злиті у великому зломі Goggle', textEn: "Grin's personal data leaked in major Goggle breach", loss: 0.011 },
+    { text: 'Акції Betabet обвалились після виходу Сейджа з ради', textEn: 'Betabet stock crashed after Sage left the board', loss: 0.013 },
     { text: 'Quantum AI проект потребує додаткових $5B — акції падають', textEn: 'Quantum AI project needs extra $5B — stock falling', loss: 0.014 },
-    { text: 'FTC розпочало розслідування рекламної монополії Google', textEn: 'FTC launched Google advertising monopoly probe', loss: 0.016 },
-    { text: 'Дирижабль Брін Pathfinder знищено штормом — збиток $300M', textEn: "Brin's Pathfinder blimp destroyed by storm — $300M loss", loss: 0.008 },
+    { text: 'FTC розпочало розслідування рекламної монополії Goggle', textEn: 'FTC launched Goggle advertising monopoly probe', loss: 0.016 },
+    { text: 'Дирижабль Грін Pathfinder знищено штормом — збиток $300M', textEn: "Grin's Pathfinder blimp destroyed by storm — $300M loss", loss: 0.008 },
     { text: 'DeepMind оголосив про відхід ключових вчених до OpenAI', textEn: 'DeepMind announced key scientists leaving for OpenAI', loss: 0.012 },
   ],
-  'Марк Цукерберг': [
-    { text: 'Meta програла масовий позов щодо впливу на дітей: $7B', textEn: 'Meta lost massive child harm lawsuit: $7B', loss: 0.023 },
-    { text: 'Instagram втратив 80M підписників за місяць', textEn: 'Instagram lost 80M followers in one month', loss: 0.019 },
-    { text: 'Meta Quest 4 провалився — повернуто 2M пристроїв', textEn: 'Meta Quest 4 flopped — 2M devices returned', loss: 0.021 },
-    { text: 'Apple заблокував Facebook з App Store — переговори зірвались', textEn: 'Apple blocked Facebook from App Store — talks collapsed', loss: 0.016 },
-    { text: 'Цукерберга допитують у Конгресі 12 годин — акції падають', textEn: 'Zuckerberg grilled by Congress 12 hours — stock falls', loss: 0.014 },
+  'Марк Зукерберг': [
+    { text: 'Metha програла масовий позов щодо впливу на дітей: $7B', textEn: 'Metha lost massive child harm lawsuit: $7B', loss: 0.023 },
+    { text: 'Picstagram втратив 80M підписників за місяць', textEn: 'Picstagram lost 80M followers in one month', loss: 0.019 },
+    { text: 'Metha Quest 4 провалився — повернуто 2M пристроїв', textEn: 'Metha Quest 4 flopped — 2M devices returned', loss: 0.021 },
+    { text: 'Pear заблокував Facepage з App Store — переговори зірвались', textEn: 'Pear blocked Facepage from App Store — talks collapsed', loss: 0.016 },
+    { text: 'Зукерберга допитують у Конгресі 12 годин — акції падають', textEn: 'Zookerberg grilled by Congress 12 hours — stock falls', loss: 0.014 },
     { text: 'WhatsApp втратив шифрування — глобальний скандал', textEn: 'WhatsApp lost encryption — global scandal', loss: 0.018 },
     { text: 'Метавсесвіт Horizon Worlds — кількість активних юзерів 0.1M', textEn: 'Metaverse Horizon Worlds — active users down to 0.1M', loss: 0.022 },
-    { text: 'Нова рекламна модель Meta порушила GDPR — штраф €4B', textEn: 'New Meta ad model violated GDPR — €4B fine', loss: 0.017 },
-    { text: 'Threads зупинив ріст — Twitter відвоював аудиторію', textEn: 'Threads stalled — Twitter reclaimed audience', loss: 0.010 },
-    { text: 'Персонал Meta масово покидає через токсичну культуру', textEn: 'Meta staff leaving en masse over toxic culture', loss: 0.012 },
+    { text: 'Нова рекламна модель Metha порушила GDPR — штраф €4B', textEn: 'New Metha ad model violated GDPR — €4B fine', loss: 0.017 },
+    { text: 'Strings зупинив ріст — Chirper відвоював аудиторію', textEn: 'Strings stalled — Chirper reclaimed audience', loss: 0.010 },
+    { text: 'Персонал Meta масово покидає через токсичну культуру', textEn: 'Metha staff leaving en masse over toxic culture', loss: 0.012 },
   ],
   'Стів Балмер': [
     { text: 'LA Clippers програли чемпіонат — спонсори йдуть', textEn: 'LA Clippers lost championship — sponsors leaving', loss: 0.013 },
@@ -5945,7 +5972,7 @@ const RIVAL_CRISIS_EVENTS = {
     { text: 'Медіахолдинг Балмера зазнав кібератаки — $2B збиток', textEn: "Ballmer media holding suffered cyberattack — $2B loss", loss: 0.019 },
     { text: 'Нова арена Clippers коштувала вдвічі більше бюджету', textEn: 'New Clippers arena cost twice the budget', loss: 0.014 },
     { text: 'Комерційна нерухомість Балмера в кризі ліквідності', textEn: "Ballmer commercial real estate in liquidity crisis", loss: 0.017 },
-    { text: 'Microsoft (пасивна частка) виплачує рекордні дивіденди — не на користь Балмера', textEn: 'Microsoft (passive stake) pays record dividends — not benefiting Ballmer', loss: 0.009 },
+    { text: 'Microshift (пасивна частка) виплачує рекордні дивіденди — не на користь Балмера', textEn: 'Microshift (passive stake) pays record dividends — not benefiting Ballmer', loss: 0.009 },
     { text: 'Провальна інвестиція в регіональні банки: -$1.4B', textEn: 'Failed investment in regional banks: -$1.4B', loss: 0.015 },
     { text: 'Клубний персонал Clippers подав колективний позов', textEn: 'Clippers club staff filed class action lawsuit', loss: 0.008 },
     { text: 'Balmer Group зазнала аудиторського скандалу', textEn: 'Balmer Group hit by auditing scandal', loss: 0.012 },
@@ -5971,32 +5998,32 @@ const RIVAL_CRISIS_EVENTS = {
     { text: 'América Móvil виплатить $3.5B за порушення конкуренції', textEn: 'América Móvil to pay $3.5B for competition violations', loss: 0.015 },
     { text: 'Збій мережі Telcel паралізував Мексику на 8 годин', textEn: 'Telcel network outage paralyzed Mexico for 8 hours', loss: 0.010 },
     { text: 'Фінансовий портфель Slim Group — збитки від кризи в Аргентині', textEn: 'Slim Group financial portfolio hit by Argentina crisis', loss: 0.017 },
-    { text: 'Claro Brasil втрачає позиції через Starlink Маска', textEn: "Claro Brasil losing ground to Musk's Starlink", loss: 0.012 },
+    { text: 'Claro Brasil втрачає позиції через StarNet Флакса', textEn: "Claro Brasil losing ground to Flux's StarNet", loss: 0.012 },
     { text: 'Нові вибори в Мексиці — уряд переглядає угоди зі Slim', textEn: 'New Mexico elections — government reviewing Slim deals', loss: 0.014 },
   ],
   'Франсуаза Меєр': [
-    { text: 'Walmart знизив квартальний прогноз прибутку на 25%', textEn: 'Walmart cut quarterly profit forecast by 25%', loss: 0.016 },
-    { text: 'Amazon захопив 45% онлайн-ринку США — Walmart відстає', textEn: 'Amazon captured 45% of US online market — Walmart falls behind', loss: 0.019 },
-    { text: 'Масова крадіжка у 300 магазинах Walmart — збиток $1.2B', textEn: 'Mass theft at 300 Walmart stores — $1.2B loss', loss: 0.009 },
-    { text: 'FTC заблокувала злиття Walmart з Vizio', textEn: 'FTC blocked Walmart-Vizio merger', loss: 0.013 },
-    { text: 'Постачальники Walmart розривають контракти після скандалу', textEn: 'Walmart suppliers breaking contracts after scandal', loss: 0.011 },
-    { text: 'Walmart+ так і не наздогнав Amazon Prime — провал', textEn: 'Walmart+ failed to catch Amazon Prime — total failure', loss: 0.015 },
-    { text: 'Сімейний траст Walton під слідством IRS', textEn: 'Walton family trust under IRS investigation', loss: 0.014 },
-    { text: 'Масові судові позови проти Walmart за умови праці', textEn: 'Mass lawsuits against Walmart over working conditions', loss: 0.010 },
-    { text: 'Walmart Health закривають усі 51 клінік — $2B списано', textEn: 'Walmart Health closing all 51 clinics — $2B written off', loss: 0.017 },
-    { text: 'Магазини Walmart у Китаї масово закриваються', textEn: 'Walmart stores in China closing en masse', loss: 0.012 },
+    { text: 'Wallmart знизив квартальний прогноз прибутку на 25%', textEn: 'Wallmart cut quarterly profit forecast by 25%', loss: 0.016 },
+    { text: 'Amazoom захопив 45% онлайн-ринку США — Wallmart відстає', textEn: 'Amazoom captured 45% of US online market — Wallmart falls behind', loss: 0.019 },
+    { text: 'Масова крадіжка у 300 магазинах Wallmart — збиток $1.2B', textEn: 'Mass theft at 300 Wallmart stores — $1.2B loss', loss: 0.009 },
+    { text: 'FTC заблокувала злиття Wallmart з Vizio', textEn: 'FTC blocked Wallmart-Vizio merger', loss: 0.013 },
+    { text: 'Постачальники Wallmart розривають контракти після скандалу', textEn: 'Wallmart suppliers breaking contracts after scandal', loss: 0.011 },
+    { text: 'Wallmart+ так і не наздогнав Amazoom Prime — провал', textEn: 'Wallmart+ failed to catch Amazoom Prime — total failure', loss: 0.015 },
+    { text: 'Сімейний траст Waltson під слідством IRS', textEn: 'Waltson family trust under IRS investigation', loss: 0.014 },
+    { text: 'Масові судові позови проти Wallmart за умови праці', textEn: 'Mass lawsuits against Wallmart over working conditions', loss: 0.010 },
+    { text: 'Wallmart Health закривають усі 51 клінік — $2B списано', textEn: 'Wallmart Health closing all 51 clinics — $2B written off', loss: 0.017 },
+    { text: 'Магазини Wallmart у Китаї масово закриваються', textEn: 'Wallmart stores in China closing en masse', loss: 0.012 },
   ],
-  'Джим Волтон': [
+  'Джим Уолтсон': [
     { text: 'Arvest Bank зазнав набігу вкладників — криза ліквідності', textEn: 'Arvest Bank hit by depositor run — liquidity crisis', loss: 0.016 },
-    { text: 'Сімейний траст Walton програв IRS спір на $4.5B', textEn: 'Walton family trust lost $4.5B IRS dispute', loss: 0.015 },
-    { text: 'Постачальники подали колективний позов проти Walmart', textEn: 'Suppliers filed class action against Walmart', loss: 0.013 },
-    { text: 'EPA виписав Walmart рекордний штраф $3.1B за відходи', textEn: 'EPA issued Walmart record $3.1B fine for waste', loss: 0.019 },
-    { text: 'Медіаскандал — Wolton Family Foundation під розслідуванням', textEn: 'Media scandal — Walton Family Foundation under investigation', loss: 0.011 },
-    { text: 'Walmart Supercenter: масова контамінація продуктів', textEn: 'Walmart Supercenter: mass product contamination', loss: 0.014 },
-    { text: 'Acme Markets (частка Волтона) оголосив банкрутство', textEn: 'Acme Markets (Walton stake) declared bankruptcy', loss: 0.018 },
+    { text: 'Сімейний траст Waltson програв IRS спір на $4.5B', textEn: 'Waltson family trust lost $4.5B IRS dispute', loss: 0.015 },
+    { text: 'Постачальники подали колективний позов проти Walmart', textEn: 'Suppliers filed class action against Wallmart', loss: 0.013 },
+    { text: 'EPA виписав Wallmart рекордний штраф $3.1B за відходи', textEn: 'EPA issued Wallmart record $3.1B fine for waste', loss: 0.019 },
+    { text: 'Медіаскандал — Waltson Family Foundation під розслідуванням', textEn: 'Media scandal — Waltson Family Foundation under investigation', loss: 0.011 },
+    { text: 'Wallmart Supercenter: масова контамінація продуктів', textEn: 'Wallmart Supercenter: mass product contamination', loss: 0.014 },
+    { text: 'Acme Markets (частка Уолтсона) оголосив банкрутство', textEn: 'Acme Markets (Waltson stake) declared bankruptcy', loss: 0.018 },
     { text: 'Регулятори заморозили активи Arvest Bank на перевірку', textEn: 'Regulators froze Arvest Bank assets for audit', loss: 0.017 },
-    { text: 'Клас-екшн проти Walmart — права інвалідів, $2B', textEn: 'Class action against Walmart — disability rights, $2B', loss: 0.010 },
-    { text: 'Автоматизація Walmart скорочує 150K робочих місць — бойкот', textEn: 'Walmart automation cuts 150K jobs — boycott', loss: 0.012 },
+    { text: 'Клас-екшн проти Wallmart — права інвалідів, $2B', textEn: 'Class action against Wallmart — disability rights, $2B', loss: 0.010 },
+    { text: 'Автоматизація Wallmart скорочує 150K робочих місць — бойкот', textEn: 'Wallmart automation cuts 150K jobs — boycott', loss: 0.012 },
   ],
   'Мішель Делор': [
     { text: 'Промисловий холдинг Delore зазнав кризи ліквідності €3B', textEn: 'Delore industrial holding hit €3B liquidity crisis', loss: 0.023 },
@@ -6010,7 +6037,7 @@ const RIVAL_CRISIS_EVENTS = {
     { text: 'Провал диверсифікації — технологічний підрозділ ліквідовано', textEn: 'Diversification failure — tech division liquidated', loss: 0.017 },
     { text: 'Делор звинувачений у маніпуляції ринком — слідство', textEn: 'Delor accused of market manipulation — investigation', loss: 0.015 },
   ],
-  'Роберт Арно': [
+  'Роберт Орно': [
     { text: 'Research Affiliates програв ключовий позов: виплата $1.8B', textEn: 'Research Affiliates lost key lawsuit: $1.8B payout', loss: 0.021 },
     { text: 'Клієнти вивели $45B з фондів RA за квартал', textEn: 'Clients withdrew $45B from RA funds in one quarter', loss: 0.025 },
     { text: 'Нова Smart Beta стратегія дала мінусовий дохід -18%', textEn: 'New Smart Beta strategy yielded -18% return', loss: 0.019 },
@@ -6053,10 +6080,10 @@ const RIVAL_CRISIS_EVENTS = {
     { text: 'IPO Stripe відкладено вчетверте — оцінка впала до $35B', textEn: 'Stripe IPO delayed for fourth time — valuation fell to $35B', loss: 0.016 },
     { text: 'FTC порушила справу щодо комісій Stripe для малого бізнесу', textEn: 'FTC opened case over Stripe fees for small business', loss: 0.014 },
     { text: 'Витік коду Stripe — конкуренти отримали технологічний ключ', textEn: 'Stripe code leak — competitors obtained tech key', loss: 0.020 },
-    { text: 'Stripe втратив контракт з Apple Pay — $4B виручки під ризиком', textEn: 'Stripe lost Apple Pay contract — $4B revenue at risk', loss: 0.018 },
+    { text: 'Stripe втратив контракт з Pear Pay — $4B виручки під ризиком', textEn: 'Stripe lost Pear Pay contract — $4B revenue at risk', loss: 0.018 },
     { text: 'Масове шахрайство через Stripe — збиток клієнтів $2.3B', textEn: 'Mass fraud through Stripe — client losses $2.3B', loss: 0.015 },
     { text: 'Stripe Atlas закрито через регуляторний тиск у 12 країнах', textEn: 'Stripe Atlas shut down due to regulatory pressure in 12 countries', loss: 0.011 },
-    { text: 'Найбільший клієнт Stripe — Amazon — перейшов до конкурента', textEn: "Stripe's biggest client Amazon switched to competitor", loss: 0.023 },
+    { text: 'Найбільший клієнт Stripe — Amazoom — перейшов до конкурента', textEn: "Stripe's biggest client Amazoom switched to competitor", loss: 0.023 },
   ],
 };
 
@@ -6087,7 +6114,7 @@ const CONTAINERS = [
       { name:'Баггі Maverick',          nameEn:'Maverick Buggy',           emoji:'🚗', rarity:'epic',      value:600_000,  vehicleType:'car'   },
       { name:'Polaris Slingshot',       nameEn:'Polaris Slingshot',        emoji:'🛺', rarity:'epic',      value:850_000,  vehicleType:'car'   },
       { name:'Harley-Davidson CVO',     nameEn:'Harley-Davidson CVO',      emoji:'🏍️', rarity:'legendary', value:1_500_000, vehicleType:'moto' },
-      { name:'Ducati Panigale V4 R',    nameEn:'Ducati Panigale V4 R',     emoji:'🏍️', rarity:'legendary', value:1_800_000, vehicleType:'moto' },
+      { name:'Dukati Panigale V4 R',    nameEn:'Dukati Panigale V4 R',     emoji:'🏍️', rarity:'legendary', value:1_800_000, vehicleType:'moto' },
     ]
   },
   {
@@ -6100,7 +6127,7 @@ const CONTAINERS = [
       { name:'ВАЗ 2101 Custom',           nameEn:'VAZ 2101 Custom',           emoji:'🚗', rarity:'common',    value:220_000,   vehicleType:'car' },
       { name:'VW Golf Mk2',               nameEn:'VW Golf Mk2',               emoji:'🚗', rarity:'common',    value:280_000,   vehicleType:'car' },
       { name:'Honda Civic Type-R 1998',   nameEn:'Honda Civic Type-R 1998',   emoji:'🚗', rarity:'common',    value:350_000,   vehicleType:'car' },
-      { name:'BMW E30',                   nameEn:'BMW E30',                   emoji:'🚗', rarity:'common',    value:430_000,   vehicleType:'car' },
+      { name:'BNW E30',                   nameEn:'BNW E30',                   emoji:'🚗', rarity:'common',    value:430_000,   vehicleType:'car' },
       { name:'Mazda Miata',               nameEn:'Mazda Miata',               emoji:'🚗', rarity:'common',    value:520_000,   vehicleType:'car' },
       { name:'Nissan Silvia S15',         nameEn:'Nissan Silvia S15',         emoji:'🚗', rarity:'common',    value:620_000,   vehicleType:'car' },
       { name:'Mitsubishi Lancer Evo IX',  nameEn:'Mitsubishi Lancer Evo IX',  emoji:'🏎️', rarity:'rare',      value:800_000,   vehicleType:'car' },
@@ -6110,8 +6137,8 @@ const CONTAINERS = [
       { name:'Ford Mustang Shelby GT500', nameEn:'Ford Mustang Shelby GT500', emoji:'🚗', rarity:'epic',      value:2_500_000, vehicleType:'car' },
       { name:'Dodge Charger 1969',        nameEn:'Dodge Charger 1969',        emoji:'🚗', rarity:'epic',      value:3_000_000, vehicleType:'car' },
       { name:'Plymouth Barracuda',        nameEn:'Plymouth Barracuda',        emoji:'🚗', rarity:'epic',      value:3_800_000, vehicleType:'car' },
-      { name:'Porsche 911 Singer',        nameEn:'Porsche 911 Singer',        emoji:'🏎️', rarity:'legendary', value:6_500_000, vehicleType:'car' },
-      { name:'Ferrari F40',              nameEn:'Ferrari F40',               emoji:'🏎️', rarity:'legendary', value:9_000_000, vehicleType:'car' },
+      { name:'Porshe 911 Singer',        nameEn:'Porshe 911 Singer',        emoji:'🏎️', rarity:'legendary', value:6_500_000, vehicleType:'car' },
+      { name:'Ferrarri F40',              nameEn:'Ferrarri F40',               emoji:'🏎️', rarity:'legendary', value:9_000_000, vehicleType:'car' },
     ]
   },
   {
@@ -6121,21 +6148,21 @@ const CONTAINERS = [
     price: 12_000_000,
     color: '#1a3a8f', colorName: 'blue', accent: '#4d88ff', stripeColor: '#2255cc',
     items: [
-      { name:'Audi A6',                    nameEn:'Audi A6',                    emoji:'🚘', rarity:'common',    value:1_200_000,  vehicleType:'car' },
-      { name:'BMW 5 Series',               nameEn:'BMW 5 Series',               emoji:'🚘', rarity:'common',    value:1_500_000,  vehicleType:'car' },
-      { name:'Mercedes E-Class',           nameEn:'Mercedes E-Class',           emoji:'🚘', rarity:'common',    value:1_800_000,  vehicleType:'car' },
+      { name:'Avdi A6',                    nameEn:'Avdi A6',                    emoji:'🚘', rarity:'common',    value:1_200_000,  vehicleType:'car' },
+      { name:'BNW 5 Series',               nameEn:'BNW 5 Series',               emoji:'🚘', rarity:'common',    value:1_500_000,  vehicleType:'car' },
+      { name:'Mercedez E-Class',           nameEn:'Mercedez E-Class',           emoji:'🚘', rarity:'common',    value:1_800_000,  vehicleType:'car' },
       { name:'Volvo XC90',                 nameEn:'Volvo XC90',                 emoji:'🚘', rarity:'common',    value:2_100_000,  vehicleType:'car' },
       { name:'Lexus RX',                   nameEn:'Lexus RX',                   emoji:'🚘', rarity:'common',    value:2_500_000,  vehicleType:'car' },
-      { name:'Tesla Model 3',              nameEn:'Tesla Model 3',              emoji:'⚡', rarity:'common',    value:2_900_000,  vehicleType:'car' },
-      { name:'Range Rover Vogue',          nameEn:'Range Rover Vogue',          emoji:'🚙', rarity:'rare',      value:3_800_000,  vehicleType:'car' },
+      { name:'Volta Model 3',              nameEn:'Volta Model 3',              emoji:'⚡', rarity:'common',    value:2_900_000,  vehicleType:'car' },
+      { name:'Range Raver Vogue',          nameEn:'Range Raver Vogue',          emoji:'🚙', rarity:'rare',      value:3_800_000,  vehicleType:'car' },
       { name:'Cadillac Escalade',          nameEn:'Cadillac Escalade',          emoji:'🚙', rarity:'rare',      value:4_500_000,  vehicleType:'car' },
-      { name:'Mercedes G63 AMG',           nameEn:'Mercedes G63 AMG',           emoji:'🚙', rarity:'rare',      value:5_500_000,  vehicleType:'car' },
-      { name:'Porsche Cayenne Turbo',      nameEn:'Porsche Cayenne Turbo',      emoji:'🚙', rarity:'rare',      value:6_500_000,  vehicleType:'car' },
-      { name:'Bentley Bentayga',           nameEn:'Bentley Bentayga',           emoji:'🏅', rarity:'epic',      value:8_000_000,  vehicleType:'car' },
-      { name:'Rolls-Royce Ghost',          nameEn:'Rolls-Royce Ghost',          emoji:'👑', rarity:'epic',      value:12_000_000, vehicleType:'car' },
+      { name:'Mercedez G63 AMG',           nameEn:'Mercedez G63 AMG',           emoji:'🚙', rarity:'rare',      value:5_500_000,  vehicleType:'car' },
+      { name:'Porshe Cayenne Turbo',      nameEn:'Porshe Cayenne Turbo',      emoji:'🚙', rarity:'rare',      value:6_500_000,  vehicleType:'car' },
+      { name:'Bentlee Bentayga',           nameEn:'Bentlee Bentayga',           emoji:'🏅', rarity:'epic',      value:8_000_000,  vehicleType:'car' },
+      { name:'Rolce-Royce Ghost',          nameEn:'Rolce-Royce Ghost',          emoji:'👑', rarity:'epic',      value:12_000_000, vehicleType:'car' },
       { name:'Maybach S680',               nameEn:'Maybach S680',               emoji:'👑', rarity:'epic',      value:15_000_000, vehicleType:'car' },
-      { name:'Rolls-Royce Phantom',        nameEn:'Rolls-Royce Phantom',        emoji:'👑', rarity:'legendary', value:25_000_000, vehicleType:'car' },
-      { name:'Mercedes-Maybach Pullman',   nameEn:'Mercedes-Maybach Pullman',   emoji:'👑', rarity:'legendary', value:35_000_000, vehicleType:'car' },
+      { name:'Rolce-Royce Phantom',        nameEn:'Rolce-Royce Phantom',        emoji:'👑', rarity:'legendary', value:25_000_000, vehicleType:'car' },
+      { name:'Mercedez-Maybach Pullman',   nameEn:'Mercedez-Maybach Pullman',   emoji:'👑', rarity:'legendary', value:35_000_000, vehicleType:'car' },
     ]
   },
   {
@@ -6145,21 +6172,21 @@ const CONTAINERS = [
     price: 60_000_000,
     color: '#1a1a1a', colorName: 'black', accent: '#f5c842', stripeColor: '#333',
     items: [
-      { name:'Audi R8',                nameEn:'Audi R8',                emoji:'🏎️', rarity:'common',    value:6_000_000,   vehicleType:'car' },
-      { name:'BMW M8',                 nameEn:'BMW M8',                 emoji:'🏎️', rarity:'common',    value:7_000_000,   vehicleType:'car' },
+      { name:'Avdi R8',                nameEn:'Avdi R8',                emoji:'🏎️', rarity:'common',    value:6_000_000,   vehicleType:'car' },
+      { name:'BNW M8',                 nameEn:'BNW M8',                 emoji:'🏎️', rarity:'common',    value:7_000_000,   vehicleType:'car' },
       { name:'Nissan GT-R Nismo',      nameEn:'Nissan GT-R Nismo',      emoji:'🏎️', rarity:'common',    value:8_000_000,   vehicleType:'car' },
-      { name:'Porsche 911 GT3',        nameEn:'Porsche 911 GT3',        emoji:'🏎️', rarity:'common',    value:9_500_000,   vehicleType:'car' },
+      { name:'Porshe 911 GT3',        nameEn:'Porshe 911 GT3',        emoji:'🏎️', rarity:'common',    value:9_500_000,   vehicleType:'car' },
       { name:'Corvette C8 Z06',        nameEn:'Corvette C8 Z06',        emoji:'🏎️', rarity:'common',    value:11_000_000,  vehicleType:'car' },
       { name:'Lotus Emira',            nameEn:'Lotus Emira',            emoji:'🏎️', rarity:'common',    value:13_000_000,  vehicleType:'car' },
-      { name:'Lamborghini Huracan STO',nameEn:'Lamborghini Huracan STO',emoji:'🏎️', rarity:'rare',      value:18_000_000,  vehicleType:'car' },
-      { name:'Ferrari 488 Pista',      nameEn:'Ferrari 488 Pista',      emoji:'🏎️', rarity:'rare',      value:22_000_000,  vehicleType:'car' },
-      { name:'McLaren 720S',           nameEn:'McLaren 720S',           emoji:'🏎️', rarity:'rare',      value:27_000_000,  vehicleType:'car' },
-      { name:'Aston Martin DBS',       nameEn:'Aston Martin DBS',       emoji:'🏎️', rarity:'rare',      value:32_000_000,  vehicleType:'car' },
-      { name:'Lamborghini Aventador SVJ', nameEn:'Lamborghini Aventador SVJ', emoji:'🏎️', rarity:'epic', value:45_000_000,  vehicleType:'car' },
-      { name:'Ferrari SF90',           nameEn:'Ferrari SF90',           emoji:'🏎️', rarity:'epic',      value:55_000_000,  vehicleType:'car' },
-      { name:'Porsche 918 Spyder',     nameEn:'Porsche 918 Spyder',     emoji:'🏎️', rarity:'epic',      value:70_000_000,  vehicleType:'car' },
-      { name:'Bugatti Chiron Super Sport', nameEn:'Bugatti Chiron Super Sport', emoji:'🏎️', rarity:'legendary', value:150_000_000, vehicleType:'car' },
-      { name:'Koenigsegg Jesko',       nameEn:'Koenigsegg Jesko',       emoji:'🏎️', rarity:'legendary', value:180_000_000, vehicleType:'car' },
+      { name:'Lambo Huracan STO',nameEn:'Lambo Huracan STO',emoji:'🏎️', rarity:'rare',      value:18_000_000,  vehicleType:'car' },
+      { name:'Ferrarri 488 Pista',      nameEn:'Ferrarri 488 Pista',      emoji:'🏎️', rarity:'rare',      value:22_000_000,  vehicleType:'car' },
+      { name:'McLarren 720S',           nameEn:'McLarren 720S',           emoji:'🏎️', rarity:'rare',      value:27_000_000,  vehicleType:'car' },
+      { name:'Easton Martin DBS',       nameEn:'Easton Martin DBS',       emoji:'🏎️', rarity:'rare',      value:32_000_000,  vehicleType:'car' },
+      { name:'Lambo Aventador SVJ', nameEn:'Lambo Aventador SVJ', emoji:'🏎️', rarity:'epic', value:45_000_000,  vehicleType:'car' },
+      { name:'Ferrarri SF90',           nameEn:'Ferrarri SF90',           emoji:'🏎️', rarity:'epic',      value:55_000_000,  vehicleType:'car' },
+      { name:'Porshe 918 Spyder',     nameEn:'Porshe 918 Spyder',     emoji:'🏎️', rarity:'epic',      value:70_000_000,  vehicleType:'car' },
+      { name:'Bugatti Chiron SS', nameEn:'Bugatti Chiron SS', emoji:'🏎️', rarity:'legendary', value:150_000_000, vehicleType:'car' },
+      { name:'Konigsegg Jesko',       nameEn:'Konigsegg Jesko',       emoji:'🏎️', rarity:'legendary', value:180_000_000, vehicleType:'car' },
     ]
   },
   {
@@ -6169,21 +6196,21 @@ const CONTAINERS = [
     price: 350_000_000,
     color: '#4a0080', colorName: 'purple', accent: '#cc44ff', stripeColor: '#7700bb',
     items: [
-      { name:'Lamborghini Urus Mansory', nameEn:'Lamborghini Urus Mansory', emoji:'🏎️', rarity:'common',    value:35_000_000,   vehicleType:'car' },
-      { name:'Ferrari Roma',             nameEn:'Ferrari Roma',             emoji:'🏎️', rarity:'common',    value:42_000_000,   vehicleType:'car' },
-      { name:'McLaren Artura',           nameEn:'McLaren Artura',           emoji:'🏎️', rarity:'common',    value:50_000_000,   vehicleType:'car' },
+      { name:'Lambo Urus Mansory', nameEn:'Lambo Urus Mansory', emoji:'🏎️', rarity:'common',    value:35_000_000,   vehicleType:'car' },
+      { name:'Ferrarri Roma',             nameEn:'Ferrarri Roma',             emoji:'🏎️', rarity:'common',    value:42_000_000,   vehicleType:'car' },
+      { name:'McLarren Artura',           nameEn:'McLarren Artura',           emoji:'🏎️', rarity:'common',    value:50_000_000,   vehicleType:'car' },
       { name:'Ford GT',                  nameEn:'Ford GT',                  emoji:'🏎️', rarity:'common',    value:58_000_000,   vehicleType:'car' },
       { name:'Lexus LFA',                nameEn:'Lexus LFA',                emoji:'🏎️', rarity:'common',    value:67_000_000,   vehicleType:'car' },
-      { name:'Porsche Carrera GT',       nameEn:'Porsche Carrera GT',       emoji:'🏎️', rarity:'common',    value:77_000_000,   vehicleType:'car' },
-      { name:'Pagani Huayra',            nameEn:'Pagani Huayra',            emoji:'🏎️', rarity:'rare',      value:100_000_000,  vehicleType:'car' },
+      { name:'Porshe Carrera GT',       nameEn:'Porshe Carrera GT',       emoji:'🏎️', rarity:'common',    value:77_000_000,   vehicleType:'car' },
+      { name:'Paganni Huayra',            nameEn:'Paganni Huayra',            emoji:'🏎️', rarity:'rare',      value:100_000_000,  vehicleType:'car' },
       { name:'Rimac Nevera',             nameEn:'Rimac Nevera',             emoji:'⚡',  rarity:'rare',      value:120_000_000,  vehicleType:'car' },
-      { name:'Aston Martin Valkyrie',    nameEn:'Aston Martin Valkyrie',    emoji:'🏎️', rarity:'rare',      value:145_000_000,  vehicleType:'car' },
+      { name:'Easton Martin Valkyrie',    nameEn:'Easton Martin Valkyrie',    emoji:'🏎️', rarity:'rare',      value:145_000_000,  vehicleType:'car' },
       { name:'Gordon Murray T.50',       nameEn:'Gordon Murray T.50',       emoji:'🏎️', rarity:'rare',      value:170_000_000,  vehicleType:'car' },
-      { name:'Mercedes-AMG One',         nameEn:'Mercedes-AMG One',         emoji:'🏎️', rarity:'epic',      value:350_000_000,  vehicleType:'car' },
-      { name:'McLaren P1 GTR',           nameEn:'McLaren P1 GTR',           emoji:'🏎️', rarity:'epic',      value:450_000_000,  vehicleType:'car' },
-      { name:'Lamborghini Veneno',       nameEn:'Lamborghini Veneno',       emoji:'🏎️', rarity:'epic',      value:600_000_000,  vehicleType:'car' },
+      { name:'Mercedez-AMG One',         nameEn:'Mercedez-AMG One',         emoji:'🏎️', rarity:'epic',      value:350_000_000,  vehicleType:'car' },
+      { name:'McLarren P1 GTR',           nameEn:'McLarren P1 GTR',           emoji:'🏎️', rarity:'epic',      value:450_000_000,  vehicleType:'car' },
+      { name:'Lambo Veneno',       nameEn:'Lambo Veneno',       emoji:'🏎️', rarity:'epic',      value:600_000_000,  vehicleType:'car' },
       { name:'Bugatti La Voiture Noire', nameEn:'Bugatti La Voiture Noire', emoji:'🏎️', rarity:'legendary', value:1_200_000_000, vehicleType:'car' },
-      { name:'Ferrari 250 GTO Original', nameEn:'Ferrari 250 GTO Original', emoji:'🏆',  rarity:'legendary', value:2_500_000_000, vehicleType:'car' },
+      { name:'Ferrarri 250 GTO Original', nameEn:'Ferrarri 250 GTO Original', emoji:'🏆',  rarity:'legendary', value:2_500_000_000, vehicleType:'car' },
     ]
   },
 ];
@@ -6213,16 +6240,16 @@ const DONATE_CASE = {
     {name:'Велотренажер',              emoji:'__FIT_BIKEMACHINE__', rarity:'legendary', value:8000},
     {name:'Бігова доріжка',            emoji:'__FIT_TREADMILL__', rarity:'legendary', value:14000},
     // From apple
-    {name:'MacBook Air M3',            emoji:'__APPL_MACBOOK__', rarity:'legendary', value:20000},
+    {name:'LapBook Air M3',            emoji:'__APPL_MACBOOK__', rarity:'legendary', value:20000},
     {name:'Mac Pro',                   emoji:'__APPL_MACPRO__', rarity:'legendary', value:35000},
     // From photo
     {name:'Hasselblad X2D',            emoji:'__PHT_HASSELBLAD__', rarity:'legendary', value:44000},
     {name:'Phase One IQ4',             emoji:'__PHT_PHASEONE__', rarity:'legendary', value:75000},
     // From workshop
-    {name:'3D Принтер Bambu',          emoji:'__WS_3DPRINTER__', rarity:'legendary', value:80000},
+    {name:'3D Принтер',          emoji:'__WS_3DPRINTER__', rarity:'legendary', value:80000},
     {name:'Гравірувальний верстат',    emoji:'__WS_ENGRAVER__', rarity:'legendary', value:140000},
     // From smart
-    {name:'Samsung TV 85"',            emoji:'__SMT_TV__', rarity:'legendary', value:120000},
+    {name:'Smart TV 85"',            emoji:'__SMT_TV__', rarity:'legendary', value:120000},
     {name:'Розумне ліжко',             emoji:'__SMT_BED__', rarity:'legendary', value:220000},
     // From elite
     {name:'Omega Seamaster',           emoji:'__ELT_OMEGA__', rarity:'legendary', value:170000},
@@ -6265,19 +6292,19 @@ const DONATE_CONTAINER = {
   items: [
     // From urban_micro
     {name:'Harley-Davidson CVO',           emoji:'🏍️', rarity:'legendary', value:1_500_000,   vehicleType:'moto'},
-    {name:'Ducati Panigale V4 R',          emoji:'🏍️', rarity:'legendary', value:1_800_000,   vehicleType:'moto'},
+    {name:'Dukati Panigale V4 R',          emoji:'🏍️', rarity:'legendary', value:1_800_000,   vehicleType:'moto'},
     // From street_classics
-    {name:'Porsche 911 Singer',            emoji:'🏎️', rarity:'legendary', value:6_500_000,   vehicleType:'car'},
-    {name:'Ferrari F40',                   emoji:'🏎️', rarity:'legendary', value:9_000_000,   vehicleType:'car'},
+    {name:'Porshe 911 Singer',            emoji:'🏎️', rarity:'legendary', value:6_500_000,   vehicleType:'car'},
+    {name:'Ferrarri F40',                   emoji:'🏎️', rarity:'legendary', value:9_000_000,   vehicleType:'car'},
     // From business_class
-    {name:'Rolls-Royce Phantom',           emoji:'👑', rarity:'legendary', value:25_000_000,  vehicleType:'car'},
-    {name:'Mercedes-Maybach Pullman',      emoji:'👑', rarity:'legendary', value:35_000_000,  vehicleType:'car'},
+    {name:'Rolce-Royce Phantom',           emoji:'👑', rarity:'legendary', value:25_000_000,  vehicleType:'car'},
+    {name:'Mercedez-Maybach Pullman',      emoji:'👑', rarity:'legendary', value:35_000_000,  vehicleType:'car'},
     // From hyper_track
-    {name:'Bugatti Chiron Super Sport',    emoji:'🏎️', rarity:'legendary', value:150_000_000, vehicleType:'car'},
-    {name:'Koenigsegg Jesko',              emoji:'🏎️', rarity:'legendary', value:180_000_000, vehicleType:'car'},
+    {name:'Bugatti Chiron SS',    emoji:'🏎️', rarity:'legendary', value:150_000_000, vehicleType:'car'},
+    {name:'Konigsegg Jesko',              emoji:'🏎️', rarity:'legendary', value:180_000_000, vehicleType:'car'},
     // From ultimate_collection
     {name:'Bugatti La Voiture Noire',      emoji:'🏎️', rarity:'legendary', value:1_200_000_000, vehicleType:'car'},
-    {name:'Ferrari 250 GTO Original',      emoji:'🏆', rarity:'legendary', value:2_500_000_000, vehicleType:'car'},
+    {name:'Ferrarri 250 GTO Original',      emoji:'🏆', rarity:'legendary', value:2_500_000_000, vehicleType:'car'},
   ],
 };
 
@@ -6303,22 +6330,22 @@ const DONATE_HANGAR = {
 
 // =================== LIFESHOP DATA ===================
 const FORBES_RIVALS = [
-  { name:{uk:'Ілон Маск',       en:'Elon Musk'},        net:180_000_000_000, emoji:'🚀' },
-  { name:{uk:'Джефф Безос',     en:'Jeff Bezos'},        net:120_000_000_000, emoji:'📦' },
-  { name:{uk:'Бернар Арно',     en:'Bernard Arnault'},   net:100_000_000_000, emoji:'👜' },
-  { name:{uk:'Білл Гейтс',      en:'Bill Gates'},         net: 85_000_000_000, emoji:'💻' },
-  { name:{uk:'Ларрі Еллісон',   en:'Larry Ellison'},     net: 78_000_000_000, emoji:'☁️' },
-  { name:{uk:'Уоррен Баффет',   en:'Warren Buffett'},    net: 65_000_000_000, emoji:'📈' },
-  { name:{uk:'Ларрі Пейдж',     en:'Larry Page'},        net: 58_000_000_000, emoji:'🔍' },
-  { name:{uk:'Сергій Брін',     en:'Sergey Brin'},       net: 55_000_000_000, emoji:'🌐' },
-  { name:{uk:'Марк Цукерберг',  en:'Mark Zuckerberg'},   net: 48_000_000_000, emoji:'👤' },
+  { name:{uk:'Леон Флакс',       en:'Leon Flux'},        net:180_000_000_000, emoji:'🚀' },
+  { name:{uk:'Джефф Бозос',     en:'Jeff Bozos'},        net:120_000_000_000, emoji:'📦' },
+  { name:{uk:'Бернар Орно',     en:'Bernard Ornot'},   net:100_000_000_000, emoji:'👜' },
+  { name:{uk:'Вілл Грейтс',      en:'Will Grates'},         net: 85_000_000_000, emoji:'💻' },
+  { name:{uk:'Ларрі Аллісон',   en:'Larry Allison'},     net: 78_000_000_000, emoji:'☁️' },
+  { name:{uk:'Уоррен Баффіт',   en:'Warren Biffett'},    net: 65_000_000_000, emoji:'📈' },
+  { name:{uk:'Ларрі Сейдж',     en:'Larry Sage'},        net: 58_000_000_000, emoji:'🔍' },
+  { name:{uk:'Сергій Грін',     en:'Sergey Grin'},       net: 55_000_000_000, emoji:'🌐' },
+  { name:{uk:'Марк Зукерберг',  en:'Marc Zookerberg'},   net: 48_000_000_000, emoji:'👤' },
   { name:{uk:'Стів Балмер',     en:'Steve Ballmer'},     net: 42_000_000_000, emoji:'🪟' },
   { name:{uk:'Мукеш Амбані',    en:'Mukesh Ambani'},     net: 35_000_000_000, emoji:'⛽' },
   { name:{uk:'Карлос Слім',     en:'Carlos Slim'},       net: 28_000_000_000, emoji:'📡' },
   { name:{uk:'Франсуаза Меєр',  en:'Françoise Meyers'},  net: 20_000_000_000, emoji:'🛒' },
-  { name:{uk:'Джим Волтон',     en:'Jim Walton'},        net: 15_000_000_000, emoji:'🏪' },
+  { name:{uk:'Джим Уолтсон',     en:'Jim Waltson'},        net: 15_000_000_000, emoji:'🏪' },
   { name:{uk:'Мішель Делор',    en:'Michel Delors'},     net:  8_000_000_000, emoji:'🏭' },
-  { name:{uk:'Роберт Арно',     en:'Robert Arnault'},    net:  5_000_000_000, emoji:'🍾' },
+  { name:{uk:'Роберт Орно',     en:'Robert Ornot'},    net:  5_000_000_000, emoji:'🍾' },
   { name:{uk:'Рей Даліо',       en:'Ray Dalio'},         net:  3_000_000_000, emoji:'💹' },
   { name:{uk:'Пітер Тіль',      en:'Peter Thiel'},       net:  1_500_000_000, emoji:'🔐' },
   { name:{uk:'Патрік Коллісон', en:'Patrick Collison'},  net:    700_000_000, emoji:'💳' },
@@ -6329,23 +6356,23 @@ const FORBES_RIVALS = [
 
 const LIFESHOP_ITEMS = {
   transport: [
-    { id:'tr01', name:{uk:'Спортивний байк Ducati',       en:'Ducati Sport Bike'},              emoji:'🏍️', price:50_000,          category:'transport' },
-    { id:'tr02', name:{uk:'Тюнінгований Jeep Wrangler',   en:'Tuned Jeep Wrangler'},            emoji:'🚙', price:85_000,          category:'transport' },
-    { id:'tr03', name:{uk:'Mercedes S-Class',             en:'Mercedes S-Class'},               emoji:'🚘', price:130_000,         category:'transport' },
-    { id:'tr04', name:{uk:'Tesla Model S Plaid',          en:'Tesla Model S Plaid'},            emoji:'⚡', price:160_000,         category:'transport' },
+    { id:'tr01', name:{uk:'Спортивний байк Dukati',       en:'Dukati Sport Bike'},              emoji:'🏍️', price:50_000,          category:'transport' },
+    { id:'tr02', name:{uk:'Тюнінгований Jeepp Wrangler',   en:'Tuned Jeepp Wrangler'},            emoji:'🚙', price:85_000,          category:'transport' },
+    { id:'tr03', name:{uk:'Mercedez S-Class',             en:'Mercedez S-Class'},               emoji:'🚘', price:130_000,         category:'transport' },
+    { id:'tr04', name:{uk:'Volta Model S Plaid',          en:'Volta Model S Plaid'},            emoji:'⚡', price:160_000,         category:'transport' },
     { id:'tr05', name:{uk:'Маслкар 1969 року',            en:'1969 Muscle Car'},                emoji:'🚗', price:250_000,         category:'transport' },
-    { id:'tr06', name:{uk:'Lamborghini Huracán',          en:'Lamborghini Huracán'},            emoji:'🐂', price:350_000,         category:'transport' },
+    { id:'tr06', name:{uk:'Lambo Huracán',          en:'Lambo Huracán'},            emoji:'🐂', price:350_000,         category:'transport' },
     { id:'tr07', name:{uk:'Броньований лімузин',          en:'Armoured Limousine'},             emoji:'🚖', price:500_000,         category:'transport' },
-    { id:'tr08', name:{uk:'Ferrari Enzo (колекційний)',   en:'Ferrari Enzo (Collector\'s)'},    emoji:'🏎️', price:1_200_000,       category:'transport' },
-    { id:'tr09', name:{uk:'Вертоліт Robinson R44',        en:'Robinson R44 Helicopter'},        emoji:'🚁', price:2_500_000,       category:'transport' },
-    { id:'tr10', name:{uk:'Приватний літак Cessna',       en:'Cessna Private Jet'},             emoji:'✈️', price:5_000_000,       category:'transport' },
+    { id:'tr08', name:{uk:'Ferrarri Enzo (колекційний)',   en:'Ferrarri Enzo (Collector\'s)'},    emoji:'🏎️', price:1_200_000,       category:'transport' },
+    { id:'tr09', name:{uk:'Вертоліт Robison R44',        en:'Robison R44 Helicopter'},        emoji:'🚁', price:2_500_000,       category:'transport' },
+    { id:'tr10', name:{uk:'Приватний літак Sessna',       en:'Sessna Private Jet'},             emoji:'✈️', price:5_000_000,       category:'transport' },
     { id:'tr11', name:{uk:'Швидкісна яхта 15м',          en:'Speed Yacht 15m'},                emoji:'⛵', price:8_500_000,       category:'transport' },
-    { id:'tr12', name:{uk:'Вертоліт Bell 429',            en:'Bell 429 Helicopter'},            emoji:'🚁', price:12_000_000,      category:'transport' },
+    { id:'tr12', name:{uk:'Вертоліт Bel 429',            en:'Bel 429 Helicopter'},            emoji:'🚁', price:12_000_000,      category:'transport' },
     { id:'tr13', name:{uk:'Bugatti Chiron',               en:'Bugatti Chiron'},                 emoji:'🐛', price:18_000_000,      category:'transport' },
-    { id:'tr14', name:{uk:'Gulfstream G650',              en:'Gulfstream G650'},                emoji:'🛩️', price:45_000_000,      category:'transport' },
+    { id:'tr14', name:{uk:'Stormjet G650',              en:'Stormjet G650'},                emoji:'🛩️', price:45_000_000,      category:'transport' },
     { id:'tr15', name:{uk:'Яхта Explorer (75м)',          en:'Explorer Yacht (75m)'},           emoji:'🛥️', price:75_000_000,      category:'transport' },
-    { id:'tr16', name:{uk:'Boeing 747 вантажний',         en:'Boeing 747 Cargo'},               emoji:'✈️', price:120_000_000,     category:'transport' },
-    { id:'tr17', name:{uk:'Супер-яхта Eclipse (80м)',     en:'Superyacht Eclipse (80m)'},       emoji:'🚢', price:200_000_000,     category:'transport' },
+    { id:'tr16', name:{uk:'Boing 747 вантажний',         en:'Boing 747 Cargo'},               emoji:'✈️', price:120_000_000,     category:'transport' },
+    { id:'tr17', name:{uk:'Супер-яхта Eclipze (80м)',     en:'Superyacht Eclipze (80m)'},       emoji:'🚢', price:200_000_000,     category:'transport' },
     { id:'tr18', name:{uk:'Особистий підводний човен',    en:'Personal Submarine'},             emoji:'🤿', price:350_000_000,     category:'transport' },
     { id:'tr19', name:{uk:'Приватний авіаносець',         en:'Private Aircraft Carrier'},       emoji:'⚓', price:750_000_000,     category:'transport' },
     { id:'tr20', name:{uk:'Космічний шаттл для туризму',  en:'Space Tourism Shuttle'},          emoji:'🚀', price:1_500_000_000,   category:'transport' },
@@ -6380,18 +6407,18 @@ const LIFESHOP_ITEMS = {
     { id:'re22', name:{uk:'Підводне місто',              en:'Underwater City'},                emoji:'🌊', price:1_000_000_000_000, category:'realestate' },
   ],
   luxury: [
-    { id:'lx01', name:{uk:'Rolex Daytona',                       en:'Rolex Daytona'},                         emoji:'⌚', price:40_000,          category:'luxury' },
+    { id:'lx01', name:{uk:'Rollex Daytona',                       en:'Rollex Daytona'},                         emoji:'⌚', price:40_000,          category:'luxury' },
     { id:'lx02', name:{uk:'Колекція рідкісних вин',              en:'Rare Wine Collection'},                  emoji:'🍾', price:75_000,          category:'luxury' },
     { id:'lx03', name:{uk:'Золотий самородок (2кг)',              en:'Gold Nugget (2kg)'},                     emoji:'🥇', price:120_000,         category:'luxury' },
     { id:'lx04', name:{uk:'Скульптура сучасного мистецтва',      en:'Contemporary Art Sculpture'},            emoji:'🗿', price:250_000,         category:'luxury' },
     { id:'lx05', name:{uk:'Діамантове намисто',                  en:'Diamond Necklace'},                      emoji:'💎', price:450_000,         category:'luxury' },
-    { id:'lx06', name:{uk:'Рояль Steinway & Sons',               en:'Steinway & Sons Grand Piano'},           emoji:'🎹', price:600_000,         category:'luxury' },
+    { id:'lx06', name:{uk:'Рояль Steinvay & Sons',               en:'Steinvay & Sons Grand Piano'},           emoji:'🎹', price:600_000,         category:'luxury' },
     { id:'lx07', name:{uk:'Раритетні комікси',                   en:'Rare Comics Collection'},                emoji:'📚', price:900_000,         category:'luxury' },
     { id:'lx08', name:{uk:'Картина імпресіоніста',               en:'Impressionist Painting'},                emoji:'🖼️', price:2_500_000,       category:'luxury' },
     { id:'lx09', name:{uk:'Корона XVIII століття',               en:'18th Century Crown'},                    emoji:'👑', price:5_000_000,       category:'luxury' },
     { id:'lx10', name:{uk:'Скелет тиранозавра',                  en:'T-Rex Skeleton'},                        emoji:'🦖', price:12_000_000,      category:'luxury' },
-    { id:'lx11', name:{uk:'Яйце Фаберже (оригінал)',             en:'Fabergé Egg (Original)'},                emoji:'🥚', price:25_000_000,      category:'luxury' },
-    { id:'lx12', name:{uk:'Скрипка Страдіварі',                  en:'Stradivarius Violin'},                   emoji:'🎻', price:45_000_000,      category:'luxury' },
+    { id:'lx11', name:{uk:'Яйце Фабержа (оригінал)',             en:'Faberge Egg (Original)'},                emoji:'🥚', price:25_000_000,      category:'luxury' },
+    { id:'lx12', name:{uk:'Скрипка Страдіварі',                  en:'Stradivari Violin'},                   emoji:'🎻', price:45_000_000,      category:'luxury' },
     { id:'lx13', name:{uk:'Колекція авто (20 штук)',              en:'Car Collection (20 pieces)'},            emoji:'🚗', price:80_000_000,      category:'luxury' },
     { id:'lx14', name:{uk:'Золотий унітаз з діамантами',         en:'Diamond-Encrusted Golden Toilet'},       emoji:'🚽', price:120_000_000,     category:'luxury' },
     { id:'lx15', name:{uk:'Рукопис да Вінчі',                    en:'Da Vinci Manuscript'},                   emoji:'📜', price:250_000_000,     category:'luxury' },
@@ -6739,6 +6766,31 @@ function loadState() {
         state.rivalNets = {};
         FORBES_RIVALS.forEach(r => { if (!r.isPlayer) state.rivalNets[rivalKey(r)] = r.net; });
       }
+      // ── Міграція ключів після перейменування Forbes-рівалів ──
+      const _rivalKeyMigration = {
+        'Ілон Маск':      'Леон Флакс',
+        'Джефф Безос':    'Джефф Бозос',
+        'Бернар Арно':    'Бернар Орно',
+        'Білл Гейтс':     'Вілл Грейтс',
+        'Ларрі Еллісон':  'Ларрі Аллісон',
+        'Уоррен Баффет':  'Уоррен Баффіт',
+        'Ларрі Пейдж':    'Ларрі Сейдж',
+        'Сергій Брін':    'Сергій Грін',
+        'Марк Цукерберг': 'Марк Зукерберг',
+        'Джим Волтон':    'Джим Уолтсон',
+      };
+      Object.entries(_rivalKeyMigration).forEach(([oldKey, newKey]) => {
+        if (state.rivalNets[oldKey] !== undefined && state.rivalNets[newKey] === undefined) {
+          state.rivalNets[newKey] = state.rivalNets[oldKey];
+          delete state.rivalNets[oldKey];
+        }
+      });
+      // Заповнити відсутні ключі базовими значеннями
+      FORBES_RIVALS.forEach(r => {
+        if (!r.isPlayer && state.rivalNets[rivalKey(r)] == null) {
+          state.rivalNets[rivalKey(r)] = r.net;
+        }
+      });
       // Re-apply collection bonuses immediately after load
       // (called inline so bonuses are ready before any render)
       if (!state.capitalAchievements) state.capitalAchievements = {};
@@ -7498,14 +7550,14 @@ const UPGRADE_DESC_EN = {
 // ── Case/item name translations ───────────────────────────────────────
 const CASE_NAME_EN = {
   street:'Street Stuff', office:'Office Hero', chef:'Home Chef',
-  gamer:"Gamer's Den", fitness:'Fitness Pro', apple:'Apple Garden',
+  gamer:"Gamer's Den", fitness:'Fitness Pro', apple:'Tech Garden',
   photo:'Photo Studio', workshop:'Hobbyist Workshop',
   smart:'Smart Comfort', elite:'Elite Collector',
 };
 const CASE_DESC_EN = {
   street:'Everyday street essentials', office:'All for productive office',
   chef:'For the true home chef', gamer:'Top gear for gamers',
-  fitness:'Everything for workouts', apple:'Premium Apple ecosystem',
+  fitness:'Everything for workouts', apple:'Premium Tech ecosystem',
   photo:'For true photo masters', workshop:'Workshop for enthusiasts',
   smart:'Premium smart home', elite:'Collection for the chosen',
 };
@@ -16293,6 +16345,12 @@ if (!state.rivalNets) {
   state.rivalNets = {};
   FORBES_RIVALS.forEach(r => { if (!r.isPlayer) state.rivalNets[rivalKey(r)] = r.net; });
 }
+// Заповнити відсутні ключі (після міграції імен або для нових рівалів)
+FORBES_RIVALS.forEach(r => {
+  if (!r.isPlayer && state.rivalNets[rivalKey(r)] == null) {
+    state.rivalNets[rivalKey(r)] = r.net;
+  }
+});
 updateHUD();
 renderUpgrades();
 // П.8: Restore timers for items that were selling
@@ -20097,6 +20155,19 @@ if (typeof showToast !== 'function') {
   <!-- VERSION -->
   <div style="text-align:center;padding:16px 0;color:var(--muted);font-size:11px;" id="sett-version">
     Mystery Boxes Simulator · v2.0
+  </div>
+
+  <!-- Privacy Policy -->
+  <div style="text-align:center;padding-bottom:20px;">
+    <button onclick="window.open('https://gist.githubusercontent.com/papafootbal-beep/57021eb5b292bd1bf084057c98df1ebd/raw/91c2a0c84aa43b65e78554cd0831da6f44f45fab/privacy-policy.html','_blank')"
+      style="background:none;border:none;cursor:pointer;
+        font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;
+        color:var(--muted);letter-spacing:1px;text-decoration:underline;
+        text-underline-offset:3px;opacity:.6;transition:opacity .2s;padding:4px 8px;"
+      onmouseover="this.style.opacity='1'"
+      onmouseout="this.style.opacity='.6'">
+      🔒 Privacy Policy
+    </button>
   </div>
 </div>
 
