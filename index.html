@@ -3491,29 +3491,29 @@ nav button.active { color: var(--gold); border-bottom-color: var(--gold); }
 <!-- ===== CLICKER SCREEN ===== -->
 <div class="screen active" id="screen-clicker">
   <!-- П.11: Capital mini-banner -->
-  <div style="display:flex;gap:0;background:rgba(13,17,32,.95);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;margin-bottom:8px;">
-    <div style="flex:1;padding:10px 14px;display:flex;align-items:center;gap:10px;position:relative;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#f5c842,#f59e0b);border-radius:14px 0 0 0;"></div>
-      <div style="width:30px;height:30px;border-radius:8px;background:rgba(245,200,66,.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">💰</div>
-      <div style="display:flex;flex-direction:column;gap:1px;">
-        <span style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);" id="clk-lbl-capital">Capital</span>
-        <span style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:800;color:#f5c842;" id="clickerCapTotal">0€</span>
+  <div style="display:flex;gap:0;background:rgba(13,17,32,.95);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden;margin-bottom:8px;">
+    <div style="flex:1;min-width:0;padding:7px 10px;display:flex;align-items:center;gap:7px;position:relative;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#f5c842,#f59e0b);border-radius:12px 0 0 0;"></div>
+      <div style="width:24px;height:24px;border-radius:6px;background:rgba(245,200,66,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">💰</div>
+      <div style="display:flex;flex-direction:column;gap:0;min-width:0;">
+        <span style="font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3);white-space:nowrap;" id="clk-lbl-capital">Капітал</span>
+        <span style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:800;color:#f5c842;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="clickerCapTotal">0€</span>
       </div>
     </div>
-    <div style="flex:1;padding:10px 14px;display:flex;align-items:center;gap:10px;position:relative;border-left:1px solid rgba(255,255,255,.06);">
+    <div style="flex:1;min-width:0;padding:7px 10px;display:flex;align-items:center;gap:7px;position:relative;border-left:1px solid rgba(255,255,255,.06);">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#22c55e,#10b981);"></div>
-      <div style="width:30px;height:30px;border-radius:8px;background:rgba(34,197,94,.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">💵</div>
-      <div style="display:flex;flex-direction:column;gap:1px;">
-        <span style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);" id="clk-lbl-balance">Balance</span>
-        <span style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:800;color:#22c55e;" id="clickerBalance">0€</span>
+      <div style="width:24px;height:24px;border-radius:6px;background:rgba(34,197,94,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">💵</div>
+      <div style="display:flex;flex-direction:column;gap:0;min-width:0;">
+        <span style="font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3);white-space:nowrap;" id="clk-lbl-balance">Баланс</span>
+        <span style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:800;color:#22c55e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="clickerBalance">0€</span>
       </div>
     </div>
-    <div style="flex:0 0 auto;padding:10px 14px;display:flex;align-items:center;gap:10px;position:relative;border-left:1px solid rgba(255,255,255,.06);">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#6366f1);border-radius:0 14px 0 0;"></div>
-      <div style="width:30px;height:30px;border-radius:8px;background:rgba(139,92,246,.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🏆</div>
-      <div style="display:flex;flex-direction:column;gap:1px;">
-        <span style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);" id="clk-lbl-forbes">Forbes</span>
-        <span style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:800;color:#a78bfa;" id="clickerForbes">#—</span>
+    <div style="flex:0 0 auto;padding:7px 10px;display:flex;align-items:center;gap:7px;position:relative;border-left:1px solid rgba(255,255,255,.06);cursor:pointer;transition:background .15s;" onclick="openForbesRank()" onmouseover="this.style.background='rgba(139,92,246,.08)'" onmouseout="this.style.background=''">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#6366f1);border-radius:0 12px 0 0;"></div>
+      <div style="width:24px;height:24px;border-radius:6px;background:rgba(139,92,246,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">🏆</div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        <span style="font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3);white-space:nowrap;" id="clk-lbl-forbes">Forbes</span>
+        <span style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:800;color:#a78bfa;" id="clickerForbes">#—</span>
       </div>
     </div>
   </div>
@@ -7099,6 +7099,12 @@ setInterval(() => {
 }, 1000);
 
 // =================== HUD ===================
+function openForbesRank() {
+  const navBtn = document.querySelector('[onclick*="lifeshop"]');
+  showScreen('lifeshop', navBtn);
+  setTimeout(() => switchLifeTab('owned'), 50);
+}
+
 function updateHUD() {
   const el = document.getElementById('balanceDisplay');
   el.textContent = fmt(state.balance);
