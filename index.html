@@ -17455,7 +17455,11 @@ function renderTerminalFleet() {
       const remaining_ms = it.rentEnd ? Math.max(0, it.rentEnd - now) : Math.max(0, (it.rentStart + cycSec * 1000) - now);
       const elapsed_ms   = it.rentEnd ? Math.max(0, it.rentEnd - it.rentStart - remaining_ms) : (now - it.rentStart);
       const elapsed      = elapsed_ms / 1000;
-      const pct       = Math.min(100, (elapsed / cycSec) * 100);
+      // Condition = max(time-based %, earned-based %) — синхронізовані
+      const timePct   = Math.min(100, (elapsed / cycSec) * 100);
+      const maxEarned = getTerminalMaxEarned(it);
+      const earnPct   = maxEarned > 0 ? Math.min(100, ((it.earned || 0) / maxEarned) * 100) : 0;
+      const pct       = Math.max(timePct, earnPct);
       const condition = Math.max(0, 100 - pct);
       const earned    = it.earned + Math.round(getTerminalEarnRate(it) * elapsed);
       const remaining = remaining_ms / 1000;
@@ -17584,8 +17588,8 @@ function startTerminalTick() {
       // Update real condition based on total elapsed time from original rentStart
       it.condition = Math.max(0, Math.round(100 - Math.min(100, (elapsed / cycSec) * 100)));
 
-      // Check if cycle complete — item is "broken", remove from fleet
-      if (elapsed >= cycSec) {
+      // Check if cycle complete — either time ran out OR max income reached
+      if (elapsed >= cycSec || it.earned >= maxEarned) {
         it._removeAfterTick = true;
         changed = true;
         showToast(t('toast_rental_broken') + ' ' + it.name + ' ' + t('toast_broken_suffix'), 'gold');
@@ -17619,7 +17623,10 @@ function startTerminalTick() {
           const sl = document.getElementById('tc-sell-' + it.id);
           const elapsed   = (now - it.rentStart) / 1000;
           const earned    = it.earned;
-          const condition = Math.max(0, 100 - Math.min(100, (elapsed / cycSec) * 100));
+          const timePct2  = Math.min(100, (elapsed / cycSec) * 100);
+          const maxEarned2 = getTerminalMaxEarned(it);
+          const earnPct2  = maxEarned2 > 0 ? Math.min(100, (earned / maxEarned2) * 100) : 0;
+          const condition = Math.max(0, 100 - Math.max(timePct2, earnPct2));
           const sellNow   = Math.round(it.value * (condition / 100));
           if (el) el.textContent = (_currentLang==='en'?'Earned: ':'Зароблено: ') + fmtCapital(Math.round(earned));
           if (sl) sl.textContent = fmtCapital(sellNow);
@@ -17656,7 +17663,7 @@ function processTerminalOffline() {
     it.earned = alreadyEarned + earned;
     totalEarned += earned;
 
-    if (elapsed >= cycSec) {
+    if (elapsed >= cycSec || it.earned >= maxEarned) {
       lines.push('🔴 ' + it.name + ': ' + (_currentLang==='en'?'broken, +':'зламаний, +') + fmtCapital(earned));
       it._removeAfterOffline = true;
     } else {
