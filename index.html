@@ -7798,41 +7798,109 @@ function showX5LockedToast() {
   }, 5000);
 }
 
+// ══════════════════════════════════════════════════════════
+// DAILY AD VIEWS SYSTEM
+// ══════════════════════════════════════════════════════════
+const DAILY_AD_REWARDS = [10, 15, 25, 50, 100]; // gc за кожен перегляд
+const DAILY_AD_MAX = DAILY_AD_REWARDS.length;    // 5 переглядів
+
+function getDailyAdDate() {
+  try { return localStorage.getItem('mbs_daily_ad_date') || ''; } catch(e){ return ''; }
+}
+function getDailyAdCount() {
+  const today = getTodayDateStr();
+  if (getDailyAdDate() !== today) return 0;
+  try { return parseInt(localStorage.getItem('mbs_daily_ad_count') || '0', 10); } catch(e){ return 0; }
+}
+function setDailyAdCount(n) {
+  try {
+    localStorage.setItem('mbs_daily_ad_date', getTodayDateStr());
+    localStorage.setItem('mbs_daily_ad_count', String(n));
+  } catch(e){}
+}
+
+function renderDonateShopAdViews() {
+  const list = document.getElementById('dshopAdViewsList');
+  if (!list) return;
+  const count = getDailyAdCount();
+  const _en = _currentLang === 'en';
+  list.innerHTML = '';
+
+  DAILY_AD_REWARDS.forEach((gc, i) => {
+    const done = i < count;
+    const isNext = i === count;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid ' +
+      (done ? 'rgba(74,222,128,.25)' : isNext ? 'rgba(56,189,248,.4)' : 'rgba(255,255,255,.07)') + ';' +
+      'background:' + (done ? 'rgba(74,222,128,.06)' : isNext ? 'rgba(56,189,248,.08)' : 'rgba(255,255,255,.03)') + ';';
+
+    const numBadge = '<div style="width:22px;height:22px;border-radius:50%;background:' +
+      (done ? 'rgba(74,222,128,.25)' : isNext ? 'rgba(56,189,248,.25)' : 'rgba(255,255,255,.08)') +
+      ';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:' +
+      (done ? '#4ade80' : isNext ? '#38bdf8' : 'rgba(255,255,255,.3)') + ';flex-shrink:0;">' + (i+1) + '</div>';
+
+    const label = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:' +
+      (done ? '#4ade80' : isNext ? '#fff' : 'rgba(255,255,255,.4)') + ';">' +
+      (_en ? 'View ' : 'Перегляд ') + (i+1) + '</div>' +
+      '<div style="font-size:11px;color:' + (done ? 'rgba(74,222,128,.6)' : 'rgba(255,255,255,.35)') + ';">+' + gc + ' 💎</div></div>';
+
+    let btnHtml = '';
+    if (done) {
+      btnHtml = '<div style="font-size:13px;color:#4ade80;font-weight:800;">✓</div>';
+    } else if (isNext) {
+      btnHtml = '<button onclick="watchAdForGC()" style="padding:8px 14px;border-radius:9px;border:none;' +
+        'background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#000;font-family:\'Rajdhani\',sans-serif;' +
+        'font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;">📺 +' + gc + ' 💎</button>';
+    } else {
+      btnHtml = '<div style="font-size:11px;color:rgba(255,255,255,.2);">' + (_en ? 'Locked' : 'Заблоковано') + '</div>';
+    }
+
+    row.innerHTML = numBadge + label + btnHtml;
+    list.appendChild(row);
+  });
+
+  // Оновити total
+  const totalEl = document.getElementById('dshopTotalEarned');
+  if (totalEl) {
+    const earned = DAILY_AD_REWARDS.slice(0, count).reduce((s, v) => s + v, 0);
+    totalEl.textContent = earned;
+  }
+
+  // Підпис оновлення
+  const hint = document.getElementById('dshop-reset-hint');
+  if (hint) hint.textContent = _en ? 'Resets daily at 00:00' : 'Оновлюється щодня о 00:00';
+  const totalLbl = document.getElementById('dshop-total-label');
+  if (totalLbl) {
+    const earned2 = DAILY_AD_REWARDS.slice(0, count).reduce((s, v) => s + v, 0);
+    totalLbl.innerHTML = (_en ? 'Today: ' : 'Сьогодні: ') + '<span id="dshopTotalEarned" style="color:#f5c842;">' + earned2 + '</span> / 200 💎';
+  }
+}
+
 function watchAdForGC() {
-  const GC_AD_REWARD = 10;
-  const noAds = typeof hasNoAds === 'function' && hasNoAds();
+  const count = getDailyAdCount();
+  if (count >= DAILY_AD_MAX) {
+    showToast(_currentLang==='en' ? '✅ All views used today! Come back tomorrow.' : '✅ Всі перегляди використано! Повертайся завтра.', '#f5c842', 3000);
+    return;
+  }
+  const gc = DAILY_AD_REWARDS[count];
+
   const grantGC = () => {
-    addGoldCredits(GC_AD_REWARD);
-    showToast('💎 +' + GC_AD_REWARD + (_currentLang==='en'?' Gold Credits for watching!':' Gold Credits за перегляд!'), '#f5c842', 3000);
-    // Cooldown: disable button for 30 min
-    const btn = document.getElementById('dshopAdGcBtn');
-    if (btn) {
-      btn.disabled = true;
-      btn.style.opacity = '0.45';
-      btn.style.cursor = 'not-allowed';
-      const lbl = document.getElementById('dshop-ad-gc-btn-lbl');
-      let sec = 1800;
-      const iv = setInterval(() => {
-        sec--;
-        const m = Math.floor(sec/60), s = sec%60;
-        if (lbl) lbl.textContent = m + ':' + String(s).padStart(2,'0');
-        if (sec <= 0) {
-          clearInterval(iv);
-          btn.disabled = false;
-          btn.style.opacity = '1';
-          btn.style.cursor = 'pointer';
-          if (lbl) lbl.textContent = '+10 💎';
-        }
-      }, 1000);
+    const newCount = getDailyAdCount() + 1;
+    setDailyAdCount(newCount);
+    addGoldCredits(gc);
+    showToast('💎 +' + gc + (_currentLang==='en' ? ' Gold Credits!' : ' Gold Credits!'), '#38bdf8', 3000);
+    renderDonateShopAdViews();
+    if (newCount >= DAILY_AD_MAX) {
+      spawnConfetti && spawnConfetti(30, ['#38bdf8','#fbbf24','#a78bfa']);
     }
   };
-  if (noAds) { grantGC(); return; }
+
   const modal = document.getElementById('adModal');
   if (!modal) { grantGC(); return; }
   const descEl = document.getElementById('adBonusDesc');
   if (descEl) descEl.textContent = _currentLang==='en'
-    ? '📺 Watch ad — get +10 Gold Credits!'
-    : '📺 Переглянь рекламу — отримай +10 Gold Credits!';
+    ? '📺 Watch ad — get +' + gc + ' Gold Credits!'
+    : '📺 Переглянь рекламу — отримай +' + gc + ' Gold Credits!';
   document.getElementById('adClaimBtn').style.display = 'none';
   document.getElementById('adTimerText').style.display = 'block';
   document.getElementById('adTimerBar').style.width = '0%';
@@ -7847,8 +7915,7 @@ function watchAdForGC() {
     if (sec <= 0) {
       clearInterval(iv);
       document.getElementById('adTimerText').style.display = 'none';
-      const cb = document.getElementById('adClaimBtn');
-      cb.style.display = 'block';
+      document.getElementById('adClaimBtn').style.display = 'block';
       window._adClaimOverride = () => { modal.style.display = 'none'; grantGC(); };
     }
   }, 1000);
@@ -11098,25 +11165,26 @@ function showCertificate(c) {
   const _su = COLLECTION_SHOP_UPGRADES[c.id];
   const _shopUpgHtml = _su
     ? '<div style="margin-top:8px;padding:8px 10px;background:rgba(245,200,66,.08);border-radius:8px;border:1px solid rgba(245,200,66,.25);">'
-      + '<div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:2px;">🏪 Нове покращення в магазині!</div>'
-      + '<div style="font-size:10px;color:var(--muted);">' + _su.icon + ' ' + _su.title + ' · ' + _su.steps + ' рівнів · ' + _su.subtitle + '</div></div>'
+      + '<div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:2px;">🏪 ' + (_currentLang==='en' ? 'New market upgrade!' : 'Нове покращення в магазині!') + '</div>'
+      + '<div style="font-size:10px;color:var(--muted);">' + _su.icon + ' ' + (_currentLang==='en' && _su.titleEn ? _su.titleEn : _su.title) + ' · ' + _su.steps + ' ' + (_currentLang==='en' ? 'levels' : 'рівнів') + ' · ' + (_currentLang==='en' && _su.subtitleEn ? _su.subtitleEn : _su.subtitle) + '</div></div>'
     : '';
+  const _en = _currentLang === 'en';
   div.innerHTML =
     '<div class="cert-card">' +
-      '<div class="cert-title">🏆 КОЛЕКЦІЯ ЗІБРАНА!</div>' +
+      '<div class="cert-title">🏆 ' + (_en ? 'COLLECTION COMPLETE!' : 'КОЛЕКЦІЯ ЗІБРАНА!') + '</div>' +
       '<div class="cert-case" style="margin:10px 0;display:flex;justify-content:center;align-items:center;">' + itemDisplay(c.icon, 56) + '</div>' +
       '<div style="font-size:17px;font-weight:800;color:var(--gold);margin-bottom:2px;">' + getCaseName(c) + '</div>' +
-      '<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Золотий сертифікат Майстра</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">' + (_en ? 'Golden Master Certificate' : 'Золотий сертифікат Майстра') + '</div>' +
       '<div class="cert-bonuses" style="text-align:left;">' +
-        '<div style="margin-bottom:5px;">⚡ <b style="color:var(--gold)">Оптовий контракт</b> — відкриття ×5 за клік</div>' +
-        '<div style="margin-bottom:5px;">💚 <b style="color:#22c55e">Прямі поставки</b> — ціна відкриття −20%</div>' +
-        (_ub ? '<div style="margin-bottom:5px;">✨ <b style="color:#60a5fa">Унікальний бонус</b> — ' + _ub.desc + '</div>' : '') +
+        '<div style="margin-bottom:5px;">⚡ <b style="color:var(--gold)">' + (_en ? 'Wholesale Contract' : 'Оптовий контракт') + '</b> — ' + (_en ? 'open ×5 per click' : 'відкриття ×5 за клік') + '</div>' +
+        '<div style="margin-bottom:5px;">💚 <b style="color:#22c55e">' + (_en ? 'Direct Supply' : 'Прямі поставки') + '</b> — ' + (_en ? 'open price −20%' : 'ціна відкриття −20%') + '</div>' +
+        (_ub ? '<div style="margin-bottom:5px;">✨ <b style="color:#60a5fa">' + (_en ? 'Unique Bonus' : 'Унікальний бонус') + '</b> — ' + (_en && _ub.descEn ? _ub.descEn : _ub.desc) + '</div>' : '') +
         _shopUpgHtml +
       '</div>' +
       '<button onclick="claimCollectionGC(\'' + c.id + '\'); this.closest(\'.cert-popup\').remove();" ' +
         'style="margin-top:14px;padding:10px 28px;border-radius:10px;border:none;' +
         'background:linear-gradient(135deg,var(--gold),#f97316);color:#000;' +
-        'font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">🎉 ОТРИМАТИ! +250 💎</button>' +
+        'font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">🎉 ' + (_en ? 'CLAIM! +' : 'ОТРИМАТИ! +') + COLL_GC_REWARD + ' 💎</button>' +
     '</div>';
   document.body.appendChild(div);
   spawnConfetti();
@@ -16273,7 +16341,7 @@ function showScreen(id, btn) {
   if (id === 'terminal') {
     currentTerminalTab = 'fleet';
     renderTerminal();
-    processTerminalOffline();
+    setTimeout(processTerminalOffline, 600);
   }
   if (id === 'endgame') { renderEndgameScreen(); }
   // Stop garage timers if leaving
@@ -16377,11 +16445,8 @@ renderUpgrades();
 // П.8: Restore timers for items that were selling
 setTimeout(restoreActiveTimers, 200);
 // Process terminal offline income on startup (even before tab is opened)
-setTimeout(function() {
-  if (state.terminalUnlocked && (state.terminalFleet || []).some(x => x.renting)) {
-    processTerminalOffline();
-  }
-}, 400);
+// НЕ викликаємо тут — показуємо модалку тільки коли гравець відкриває термінал
+// setTimeout(function() { ... }, 400); — прибрано навмисно
 // П.8: Show offline sales if any
 if (state.pendingOfflineSales) {
   setTimeout(showOfflineSalesModal, 800);
@@ -17649,19 +17714,30 @@ function startTerminalTick() {
 function processTerminalOffline() {
   if (!state.terminalUnlocked) return;
   if (terminalOfflineModalShownThisSession) return;
-  terminalOfflineModalShownThisSession = true;
 
   const now     = Date.now();
   const fleet   = state.terminalFleet || [];
   const cycSec  = getTerminalCycleSec();
 
   // Реальний час відсутності — від останнього збереження до зараз
-  // Обмежуємо одним повним циклом щоб не нараховувати зайве
   const lastSeen   = state._lastSeen || now;
   const offlineSec = Math.max(0, Math.min((now - lastSeen) / 1000, cycSec));
 
-  // Якщо менше 10 секунд — нічого не нараховуємо
-  if (offlineSec < 10) return;
+  // Якщо менше 30 секунд — нічого не нараховуємо і не показуємо
+  if (offlineSec < 30) {
+    terminalOfflineModalShownThisSession = true;
+    return;
+  }
+
+  // Перевіряємо чи є активні оренди
+  const hasRenting = fleet.some(x => x.renting);
+  if (!hasRenting) {
+    terminalOfflineModalShownThisSession = true;
+    return;
+  }
+
+  // Ставимо прапорець тільки тут — після реальних перевірок
+  terminalOfflineModalShownThisSession = true;
 
   let totalEarned = 0;
   const lines = [];
@@ -17692,8 +17768,7 @@ function processTerminalOffline() {
     // Предмет зламаний тільки якщо цикл реально завершився під час відсутності
     const cycleFinished = (lastSeen + offlineSec * 1000) >= rentEnd_abs;
     if (cycleFinished) {
-      const cond = 0;
-      it.condition = cond;
+      it.condition = 0;
       lines.push('🔴 ' + it.name + ': ' + (_currentLang==='en'?'broken, +':'зламаний, +') + fmtCapital(earned));
       it._removeAfterOffline = true;
     } else {
@@ -18107,8 +18182,8 @@ function _applyDonateShopLang() {
 }
 
 function openDonateShop() {
-  _applyDonateShopLang();
   document.getElementById('donateShopModal').classList.add('open');
+  renderDonateShopAdViews();
 }
 function closeDonateShop() {
   document.getElementById('donateShopModal').classList.remove('open');
@@ -19007,20 +19082,29 @@ function renderDailyStreakModal() {
   // Buttons
   const claimBtn = document.getElementById('dsClaimBtn');
   const watchBtn = document.getElementById('dsWatchBtn');
+  const x2Btn    = document.getElementById('dsX2Btn');
 
   if (!alreadyClaimed && nextIdx !== -1) {
     claimBtn.disabled = false;
     claimBtn.textContent = t('ds_claim_btn').replace('{gc}', DAILY_REWARDS[nextIdx].gc);
+    // Показуємо x2 якщо ще не забирали сьогодні
+    if (x2Btn) {
+      x2Btn.style.display = 'flex';
+      x2Btn.style.alignItems = 'center';
+      x2Btn.textContent = '📺 x2 (' + (DAILY_REWARDS[nextIdx].gc * 2) + ' 💎)';
+    }
     watchBtn.style.display = 'none';
   } else if (alreadyClaimed) {
     claimBtn.disabled = true;
     claimBtn.textContent = t('ds_claimed_today');
+    if (x2Btn) x2Btn.style.display = 'none';
     const hasMissed = DAILY_REWARDS.some((r, i) => !ds.claimedDays[i] && i < nextIdx);
     watchBtn.style.display = hasMissed ? 'block' : 'none';
     watchBtn.textContent = t('ds_watch_btn');
   } else {
     claimBtn.disabled = true;
     claimBtn.textContent = t('ds_all_done_btn');
+    if (x2Btn) x2Btn.style.display = 'none';
     watchBtn.style.display = 'none';
   }
 }
@@ -19061,6 +19145,72 @@ function claimDailyReward(watchAd) {
   if (DAILY_REWARDS[idx].gc >= 50) {
     spawnConfetti && spawnConfetti(40, ['#fbbf24','#fde68a','#f59e0b','#fff']);
   }
+}
+
+function claimDailyRewardX2() {
+  // Перевіряємо що ще не забирали сьогодні
+  if (_getLastClaimDate() === getTodayDateStr()) return;
+  const idx = getNextClaimableDay();
+  if (idx === -1) return;
+
+  const gc = DAILY_REWARDS[idx].gc;
+  const x2Btn = document.getElementById('dsX2Btn');
+  if (x2Btn) x2Btn.disabled = true;
+
+  // No Ads — одразу x2 без реклами
+  if (state.premiumOwned && state.premiumOwned.noAds) {
+    const ds = state.dailyStreak;
+    ds.claimedDays[idx] = true;
+    ds.lastClaim = getTodayDateStr();
+    ds.day = idx + 1;
+    _saveDailyClaimDate();
+    addGoldCredits(gc * 2);
+    showToast('💎 x2! +' + (gc * 2) + ' Gold Credits — No Ads!', '#38bdf8', 3500);
+    saveState();
+    renderDailyStreakModal();
+    spawnConfetti && spawnConfetti(50, ['#38bdf8','#fbbf24','#a78bfa','#fff']);
+    return;
+  }
+
+  // Показуємо рекламний модал
+  const modal = document.getElementById('adModal');
+  document.getElementById('adBonusDesc').textContent =
+    _currentLang === 'en'
+      ? '📺 Watch ad to double your Daily Streak reward!'
+      : '📺 Переглянь рекламу щоб подвоїти бонус Daily Streak!';
+  document.getElementById('adClaimBtn').style.display = 'none';
+  document.getElementById('adTimerText').style.display = 'block';
+  document.getElementById('adTimerBar').style.width = '0%';
+  modal.style.display = 'flex';
+
+  let sec = 5;
+  document.getElementById('adCountdown').textContent = sec;
+  clearInterval(adState.adTimerInterval);
+  adState.adTimerInterval = setInterval(() => {
+    sec--;
+    document.getElementById('adCountdown').textContent = sec;
+    document.getElementById('adTimerBar').style.width = ((5 - sec) / 5 * 100) + '%';
+    if (sec <= 0) {
+      clearInterval(adState.adTimerInterval);
+      document.getElementById('adTimerText').style.display = 'none';
+      document.getElementById('adClaimBtn').style.display = 'block';
+    }
+  }, 1000);
+
+  // Після кліку "Отримати бонус"
+  window._adClaimOverride = function() {
+    const ds = state.dailyStreak;
+    ds.claimedDays[idx] = true;
+    ds.lastClaim = getTodayDateStr();
+    ds.day = idx + 1;
+    _saveDailyClaimDate();
+    addGoldCredits(gc * 2);
+    closeAdModal();
+    showToast('💎 x2! +' + (gc * 2) + ' Gold Credits!', '#38bdf8', 3500);
+    saveState();
+    renderDailyStreakModal();
+    spawnConfetti && spawnConfetti(50, ['#38bdf8','#fbbf24','#a78bfa','#fff']);
+  };
 }
 
 // ── Auto-show Daily Streak once after midnight ─────────────
@@ -19298,6 +19448,17 @@ function imgRetry(el) {
     <div style="font-size:10px;color:#a78bfa;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:2px;">👁️ Endgame</div>
     <button onclick="devResetEndgame()" style="padding:8px 12px;border-radius:8px;border:none;background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25);font-weight:700;cursor:pointer;font-size:12px;">🗑️ Скинути фінал і спогади</button>
   </div>
+</div>
+
+<!-- ===== TEST BUTTON (TEMP) ===== -->
+<div style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:8000;pointer-events:all;">
+  <button onclick="devFillCollection(0)"
+    style="padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.2);
+    background:rgba(0,0,0,.35);color:rgba(255,255,255,.4);
+    font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
+    cursor:pointer;backdrop-filter:blur(4px);letter-spacing:.5px;">
+    🏅 тест колекція
+  </button>
 </div>
 
 <!-- ===== CONTAINER OPEN MODAL ===== -->
@@ -20023,90 +20184,16 @@ if (typeof showToast !== 'function') {
     <div class="dshop-header">
       <div style="font-size:36px;margin-bottom:6px;">💎</div>
       <div class="dshop-title">GOLD CREDITS SHOP</div>
-      <div class="dshop-subtitle" id="dshop-subtitle-lbl">Premium Mystery Boxes currency</div>
+      <div class="dshop-subtitle" id="dshop-subtitle-lbl">Дивись рекламу — отримуй Gold Credits!</div>
     </div>
 
-    <!-- Credit Packs -->
-    <div class="dshop-section-label" id="dshop-free-lbl">🎁 Безкоштовно</div>
-    <div id="dshopAdGcCard" style="
-      background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,197,94,.05));
-      border:1px solid rgba(34,197,94,.35);border-radius:12px;
-      padding:12px 14px;margin-bottom:14px;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="font-size:28px;">📺</div>
-        <div>
-          <div style="font-weight:800;font-size:13px;color:#4ade80;" id="dshop-ad-gc-title">Watch an Ad</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.5);" id="dshop-ad-gc-desc">Get +10 💎 per view</div>
-        </div>
-      </div>
-      <button id="dshopAdGcBtn" onclick="watchAdForGC()" style="
-        padding:10px 16px;border-radius:10px;border:none;
-        background:linear-gradient(135deg,#22c55e,#15803d);
-        color:#fff;font-weight:800;font-size:13px;cursor:pointer;
-        font-family:'Rajdhani',sans-serif;white-space:nowrap;
-        box-shadow:0 2px 12px rgba(34,197,94,.4);">
-        <span id="dshop-ad-gc-btn-lbl">+10 💎</span>
-      </button>
-    </div>
+    <!-- Daily Ad Views -->
+    <div class="dshop-section-label" id="dshop-free-lbl">📺 Щоденні перегляди реклами</div>
+    <div id="dshopAdViewsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:6px;"></div>
 
-    <div class="dshop-section-label" id="dshop-packs-lbl">💰 Gold Credits Packs</div>
-    <div class="dshop-packs">
-      <div class="dshop-pack" onclick="initiatePurchase('pouch')">
-        <div class="dshop-pack-icon">👝</div>
-        <div class="dshop-pack-name">Pouch of Credits</div>
-        <div class="dshop-pack-gc">250 💎</div>
-        <div class="dshop-pack-price">1.99€</div>
-      </div>
-      <div class="dshop-pack popular" onclick="initiatePurchase('box')">
-        <div class="dshop-pack-badge badge-popular" id="badge-popular-lbl">POPULAR</div>
-        <div class="dshop-pack-icon">📦</div>
-        <div class="dshop-pack-name">Box of Credits</div>
-        <div class="dshop-pack-gc">750 💎</div>
-        <div class="dshop-pack-price">4.99€</div>
-      </div>
-      <div class="dshop-pack value" onclick="initiatePurchase('suitcase')">
-        <div class="dshop-pack-badge badge-value" id="badge-value-lbl">VALUE</div>
-        <div class="dshop-pack-icon">🧳</div>
-        <div class="dshop-pack-name">Suitcase of Credits</div>
-        <div class="dshop-pack-gc">2,000 💎</div>
-        <div class="dshop-pack-price">11.99€</div>
-      </div>
-      <div class="dshop-pack best" onclick="initiatePurchase('vault')">
-        <div class="dshop-pack-badge badge-best" id="badge-best-lbl">BEST VALUE</div>
-        <div class="dshop-pack-icon">🏦</div>
-        <div class="dshop-pack-name">Vault of Credits</div>
-        <div class="dshop-pack-gc">5,000 💎</div>
-        <div class="dshop-pack-price">24.99€</div>
-      </div>
-    </div>
-
-    <!-- Premium -->
-    <div class="dshop-section-label" id="dshop-premium-lbl">👑 Premium Statuses</div>
-    <div class="dshop-premium-list" id="dshopPremiumList"></div>
-  </div>
-</div>
-
-<!-- ===== PAYMENT CONFIRM MODAL ===== -->
-<div id="dshopPayModal">
-  <div class="dshop-pay-card">
-    <div class="dshop-pay-title" id="dshopPayTitle">PAYMENT CONFIRMATION</div>
-    <div class="dshop-pay-item" id="dshopPayItem"></div>
-    <div id="dshopPayStage1">
-      <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:16px;" id="dshop-pay-prep-lbl">Preparing payment...</div>
-      <div class="dshop-pay-timer" id="dshopPayTimer">5</div>
-      <div class="dshop-pay-bar"><div class="dshop-pay-bar-fill" id="dshopPayBarFill" style="width:0%"></div></div>
-      <div class="dshop-pay-btns">
-        <button class="dshop-pay-yes" id="dshopPayYesBtn" disabled onclick="confirmDonatePayment()"><span id="dshop-confirm-lbl">✓ Confirm</span></button>
-        <button class="dshop-pay-no" onclick="cancelDonatePayment()"><span id="dshop-cancel-lbl">✕ Cancel</span></button>
-      </div>
-    </div>
-    <div id="dshopPayStage2" style="display:none;">
-      <div style="font-size:32px;margin:10px 0;">⏳</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.5);" id="dshop-processing-lbl">Processing transaction...</div>
-      <div class="dshop-pay-timer" id="dshopPayTimer2">5</div>
-      <div class="dshop-pay-bar"><div class="dshop-pay-bar-fill" id="dshopPayBarFill2" style="width:0%"></div></div>
-      <div class="dshop-pay-processing" id="dshop-wait-lbl">Please wait</div>
+    <div style="margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);text-align:center;">
+      <div style="font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1px;" id="dshop-reset-hint">Оновлюється щодня о 00:00</div>
+      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.5);margin-top:3px;" id="dshop-total-label">Всього сьогодні: <span id="dshopTotalEarned" style="color:#f5c842;">0</span> / 200 💎</div>
     </div>
   </div>
 </div>
@@ -20118,7 +20205,11 @@ if (typeof showToast !== 'function') {
     <div class="ds-title">💎 DAILY STREAK</div>
     <div class="ds-subtitle" id="dsSubtitle">Заходь кожен день і збирай Gold Credits!</div>
     <div class="ds-grid" id="dsGrid"></div>
-    <button class="ds-claim-btn" id="dsClaimBtn" onclick="claimDailyReward(false)">ЗАБРАТИ НАГОРОДУ</button>
+    <!-- Основні кнопки -->
+    <div id="dsMainBtns" style="display:flex;gap:8px;align-items:stretch;">
+      <button class="ds-claim-btn" id="dsClaimBtn" onclick="claimDailyReward(false)" style="flex:1;">ЗАБРАТИ НАГОРОДУ</button>
+      <button class="ds-x2-btn" id="dsX2Btn" onclick="claimDailyRewardX2()" style="display:none;flex-shrink:0;padding:0 14px;border-radius:14px;border:1px solid rgba(56,189,248,.5);background:linear-gradient(135deg,rgba(56,189,248,.15),rgba(56,189,248,.05));color:#38bdf8;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(56,189,248,.25),rgba(56,189,248,.1))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(56,189,248,.15),rgba(56,189,248,.05))'">📺 x2</button>
+    </div>
     <button class="ds-watch-btn" id="dsWatchBtn" onclick="claimDailyReward(true)" style="display:none;">📺 Дивитись рекламу → Забрати пропущений день</button>
   </div>
 </div>
