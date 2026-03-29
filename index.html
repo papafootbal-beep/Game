@@ -6818,6 +6818,7 @@ function loadState() {
       if (state.terminalFleetLimit   === undefined)        state.terminalFleetLimit   = 10;
       if (state.terminalRentSlots    === undefined)        state.terminalRentSlots    = 1;
       if (state.terminalSpeedLvl     === undefined)        state.terminalSpeedLvl     = 0;
+      if (state.terminalIncomeLvl    === undefined)        state.terminalIncomeLvl    = 0;
       if (state.terminalPendingOffline === undefined)      state.terminalPendingOffline = 0;
       state.terminalOfflineShown = false; // always reset
       if (!state.unlockedDonateTypes) state.unlockedDonateTypes = {};
@@ -17378,10 +17379,15 @@ function getTerminalCycleSec() {
   return Math.round(86400 * (1 - disc));
 }
 function getTerminalEarnRate(item) {
-  return (item.value * 2) / getTerminalCycleSec();
+  const mult = getTerminalIncomeMult();
+  return (item.value * mult) / getTerminalCycleSec();
 }
 function getTerminalMaxEarned(item) {
-  return item.value * 2;
+  return item.value * getTerminalIncomeMult();
+}
+function getTerminalIncomeMult() {
+  // Base x2, +0.1 per upgrade level (max lvl 10 = x3.0)
+  return 2.0 + (state.terminalIncomeLvl || 0) * 0.1;
 }
 function getActiveRentals() {
   return (state.terminalFleet || []).filter(x => x.renting).length;
@@ -17899,6 +17905,59 @@ function renderTerminalMgmt() {
       '</div>' +
     '</div>';
   el.appendChild(speedCard);
+
+  // ── Income Multiplier ──
+  const incomeLvl = state.terminalIncomeLvl || 0;
+  const INCOME_PRICES = [
+    200_000_000,      // lvl 0→1  x2.1
+    600_000_000,      // lvl 1→2  x2.2
+    1_500_000_000,    // lvl 2→3  x2.3
+    4_000_000_000,    // lvl 3→4  x2.4
+    10_000_000_000,   // lvl 4→5  x2.5
+    25_000_000_000,   // lvl 5→6  x2.6
+    60_000_000_000,   // lvl 6→7  x2.7
+    150_000_000_000,  // lvl 7→8  x2.8
+    400_000_000_000,  // lvl 8→9  x2.9
+    1_000_000_000_000,// lvl 9→10 x3.0
+  ];
+  const currentMult = getTerminalIncomeMult().toFixed(1);
+  const nextIncomeLvl = incomeLvl < 10 ? INCOME_PRICES[incomeLvl] : null;
+  const canBuyIncome  = nextIncomeLvl && state.balance >= nextIncomeLvl;
+  const incomeCard = document.createElement('div');
+  incomeCard.style.cssText = 'background:var(--bg2);border-radius:16px;border:1px solid rgba(168,85,247,.2);padding:16px;margin-bottom:12px;';
+
+  let incomeDots = '';
+  for (let i = 0; i < 10; i++) incomeDots += '<span style="display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 2px;background:' + (i < incomeLvl ? '#a855f7' : 'rgba(255,255,255,.12)') + ';"></span>';
+
+  incomeCard.innerHTML =
+    '<div style="display:flex;align-items:flex-start;gap:12px;">' +
+      '<div style="font-size:30px;flex-shrink:0;">💹</div>' +
+      '<div style="flex:1;">' +
+        '<div style="font-family:\'Orbitron\',sans-serif;font-size:13px;font-weight:800;color:#a855f7;margin-bottom:4px;">' +
+          (_currentLang==='en' ? 'Rental Income Boost' : 'Підсилення доходу оренди') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">' +
+          (_currentLang==='en' ? 'Increases max rental income multiplier' : 'Збільшує максимальний множник доходу з оренди') + '</div>' +
+        '<div style="font-size:11px;color:#a855f7;margin-bottom:8px;">' +
+          (_currentLang==='en' ? 'Current: ×' : 'Поточно: ×') + currentMult +
+          (incomeLvl >= 10 ? '' : ' → <b style="color:#c084fc">×' + (2.0 + (incomeLvl+1)*0.1).toFixed(1) + '</b>') + '</div>' +
+        '<div style="margin-bottom:10px;">' + incomeDots + '</div>' +
+        (incomeLvl >= 10
+          ? '<div style="padding:10px;border-radius:10px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80;font-weight:800;font-size:13px;text-align:center;">' +
+              (_currentLang==='en' ? '✅ Maximum ×3.0 reached!' : '✅ Максимум ×3.0 досягнуто!') + '</div>'
+          : '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border-radius:10px;padding:10px 12px;">' +
+              '<div>' +
+                '<div style="font-size:11px;color:var(--muted);">' +
+                  (_currentLang==='en' ? 'Level ' : 'Рівень ') + (incomeLvl+1) + ' / 10</div>' +
+                '<div style="font-size:13px;font-weight:700;color:#c084fc;">+0.1 ' +
+                  (_currentLang==='en' ? 'to multiplier' : 'до множника') + '</div>' +
+              '</div>' +
+              '<button onclick="buyTerminalIncome()" style="padding:9px 16px;border-radius:10px;border:none;font-family:\'Rajdhani\',sans-serif;font-size:13px;font-weight:800;cursor:' +
+                (canBuyIncome ? 'pointer;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;' : 'not-allowed;background:rgba(255,255,255,.08);color:var(--muted);') + '">' +
+                fmtCapital(nextIncomeLvl) + '</button>' +
+            '</div>') +
+      '</div>' +
+    '</div>';
+  el.appendChild(incomeCard);
 }
 
 // ─── Buy management upgrades ───────────────────────────
@@ -17953,6 +18012,27 @@ function buyTerminalSpeed() {
   showToast((_currentLang==='en'
     ? '⚡ Boost '+state.terminalSpeedLvl+' activated! −'+savedH+'h on all active rentals'
     : '⚡ Форсаж '+state.terminalSpeedLvl+' активовано! −'+savedH+'год для активних оренд'), 'gold');
+  renderTerminalMgmt();
+  renderTerminalFleet();
+}
+
+function buyTerminalIncome() {
+  const PRICES = [
+    200_000_000, 600_000_000, 1_500_000_000, 4_000_000_000,
+    10_000_000_000, 25_000_000_000, 60_000_000_000,
+    150_000_000_000, 400_000_000_000, 1_000_000_000_000,
+  ];
+  const lvl = state.terminalIncomeLvl || 0;
+  if (lvl >= 10) { showToast(_currentLang==='en'?'✅ Maximum ×3.0!':'✅ Максимум ×3.0!'); return; }
+  const price = PRICES[lvl];
+  if (state.balance < price) { showToast(t('toast_not_enough')); return; }
+  state.balance -= price;
+  state.terminalIncomeLvl = lvl + 1;
+  const newMult = getTerminalIncomeMult().toFixed(1);
+  updateHUD(); saveState();
+  showToast((_currentLang==='en'
+    ? '💹 Income Boost ' + state.terminalIncomeLvl + ' — now ×' + newMult + ' per rental!'
+    : '💹 Підсилення доходу ' + state.terminalIncomeLvl + ' — тепер ×' + newMult + ' з оренди!'), '#a855f7', 3500);
   renderTerminalMgmt();
   renderTerminalFleet();
 }
