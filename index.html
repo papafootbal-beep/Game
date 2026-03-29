@@ -16422,9 +16422,11 @@ updateEndgameNavDot(); // init endgame dot
 (function() {
   const dot = document.getElementById('terminalLockDot');
   if (dot) dot.style.display = state.terminalUnlocked ? 'none' : 'block';
-  // Start terminal tick in background if rentals are active (income keeps ticking)
+  // Спочатку обробляємо офлайн-дохід, потім запускаємо тік
   if (state.terminalUnlocked && (state.terminalFleet || []).some(x => x.renting)) {
-    setTimeout(startTerminalTick, 300);
+    // processTerminalOffline зберігає pending і показує модалку при відкритті терміналу
+    // Тік запускаємо після — щоб не видалив expired предмети до офлайн-обробки
+    setTimeout(startTerminalTick, 500);
   }
 })();
 // Update endgame nav dot on load
@@ -17647,8 +17649,6 @@ function startTerminalTick() {
       const elapsed = (now - it.rentStart) / 1000;
       const rate    = getTerminalEarnRate(it);
 
-      // Only add balance for this 1-second tick (avoid double-counting offline income)
-      // Apply X2 ad bonus and VIP mult to terminal rental income
       const _tAdMult = (typeof adState !== 'undefined' && adState.passive2x) ? 2 : 1;
       const _tVip    = typeof getVipMult === 'function' ? getVipMult() : 1;
       const maxEarned = getTerminalMaxEarned(it);
@@ -17661,31 +17661,27 @@ function startTerminalTick() {
         it.earned = alreadyEarned + tickEarn;
       }
 
-      // Update real condition based on total elapsed time from original rentStart
       it.condition = Math.max(0, Math.round(100 - Math.min(100, (elapsed / cycSec) * 100)));
 
-      // Check if cycle complete — only by time, not by earned amount
-      // (bonuses like x2 can make earned reach max faster but item stays until cycle ends)
-      if (elapsed >= cycSec) {
+      // Видаляємо expired ТІЛЬКИ якщо офлайн-обробка вже відбулась
+      // (щоб processTerminalOffline міг правильно показати модалку при відкритті терміналу)
+      if (elapsed >= cycSec && terminalOfflineModalShownThisSession) {
         it._removeAfterTick = true;
         changed = true;
         showToast(t('toast_rental_broken') + ' ' + it.name + ' ' + t('toast_broken_suffix'), 'gold');
       }
     });
 
-    // Remove items flagged as broken after rental cycle
     if (changed) {
       state.terminalFleet = (state.terminalFleet || []).filter(it => !it._removeAfterTick);
       saveState();
+      if (currentTerminalTab === 'fleet') renderTerminalFleet();
     }
     updateHUD();
 
-    // Live update cards if fleet tab open
     if (currentTerminalTab === 'fleet') {
       const screen = document.getElementById('screen-terminal');
       if (screen && screen.classList.contains('active')) {
-        // Update live earn/sell text without full re-render
-        // Update passive income display
         const _trAdMult = (typeof adState !== 'undefined' && adState.passive2x) ? 2 : 1;
         const _trVip    = typeof getVipMult === 'function' ? getVipMult() : 1;
         const tickRate = fleet.filter(x => x.renting).reduce((s, it) => s + getTerminalEarnRate(it), 0) * _trAdMult * _trVip;
@@ -17698,11 +17694,10 @@ function startTerminalTick() {
           if (!it.renting) return;
           const el = document.getElementById('tc-earned-' + it.id);
           const sl = document.getElementById('tc-sell-' + it.id);
-          const elapsed   = (now - it.rentStart) / 1000;
-          const earned    = it.earned;
-          const condition = Math.max(0, 100 - Math.min(100, (elapsed / cycSec) * 100));
+          const elapsedV  = (now - it.rentStart) / 1000;
+          const condition = Math.max(0, 100 - Math.min(100, (elapsedV / cycSec) * 100));
           const sellNow   = Math.round(it.value * (condition / 100));
-          if (el) el.textContent = (_currentLang==='en'?'Earned: ':'Зароблено: ') + fmtCapital(Math.round(earned));
+          if (el) el.textContent = (_currentLang==='en'?'Earned: ':'Зароблено: ') + fmtCapital(Math.round(it.earned));
           if (sl) sl.textContent = fmtCapital(sellNow);
         });
       }
@@ -17719,8 +17714,8 @@ function processTerminalOffline() {
   const fleet  = state.terminalFleet || [];
   const cycSec = getTerminalCycleSec();
 
-  const hasRenting = fleet.some(x => x.renting);
-  if (!hasRenting) {
+  // Немає активних оренд — нічого робити
+  if (!fleet.some(x => x.renting)) {
     terminalOfflineModalShownThisSession = true;
     return;
   }
@@ -17731,66 +17726,61 @@ function processTerminalOffline() {
   fleet.forEach(it => {
     if (!it.renting) return;
 
-    const rate          = getTerminalEarnRate(it);
     const maxEarned     = getTerminalMaxEarned(it);
     const alreadyEarned = it.earned || 0;
     const rentEnd_abs   = it.rentEnd || (it.rentStart + cycSec * 1000);
+    const elapsed       = (now - it.rentStart) / 1000;
     const cycleFinished = now >= rentEnd_abs;
 
     if (cycleFinished) {
-      // Цикл завершився поки гравця не було.
-      // Нараховуємо залишок від того місця де зупинився тік.
+      // Цикл завершився — нараховуємо залишок що не встиг тік
       const remaining = Math.max(0, maxEarned - alreadyEarned);
       if (remaining > 0) {
-        it.earned = maxEarned;
         totalEarned += remaining;
-        lines.push('🔴 ' + it.name + ': ' + (_currentLang==='en'?'broken, +':'зламаний, +') + fmtCapital(remaining));
-      } else {
-        // Тік вже нарахував максимум — просто видаляємо
-        lines.push('🔴 ' + it.name + ': ' + (_currentLang==='en'?'broken':'зламаний'));
+        it.earned    = maxEarned;
       }
       it.condition = 0;
+      lines.push('🔴 ' + it.name + ': ' + (_currentLang==='en'?'broken, +':'зламаний, +') + fmtCapital(remaining > 0 ? remaining : alreadyEarned));
       it._removeAfterOffline = true;
+
     } else {
-      // Цикл ще не завершився — нараховуємо тільки те що пропустив тік
-      // Момент де зупинився тік (через вже зароблене)
-      const earnedSec     = rate > 0 ? (alreadyEarned / rate) : 0;
-      const tickStoppedAt = it.rentStart + earnedSec * 1000;
-      const offlineSec    = Math.max(0, (now - tickStoppedAt) / 1000);
+      // Цикл ще йде — нараховуємо за час поки тік не працював
+      const rate       = getTerminalEarnRate(it);
+      // Час який вже "відпрацював" тік (через зароблену суму)
+      const earnedTime = rate > 0 ? alreadyEarned / rate : 0;
+      // Реальний час від старту
+      const realTime   = elapsed;
+      // Різниця — час поки тік не рахував (офлайн)
+      const missedSec  = Math.max(0, realTime - earnedTime);
 
-      if (offlineSec < 30) return;
+      if (missedSec < 30) return;
 
-      const timeLeft  = Math.max(0, (rentEnd_abs - tickStoppedAt) / 1000);
-      const actualSec = Math.min(offlineSec, timeLeft);
-      if (actualSec <= 0) return;
-
-      const rawEarned = Math.round(rate * actualSec);
+      const rawEarned = Math.round(rate * missedSec);
       const earned    = Math.max(0, Math.min(rawEarned, maxEarned - alreadyEarned));
       if (earned <= 0) return;
 
       it.earned = alreadyEarned + earned;
       totalEarned += earned;
 
-      const elapsedTotal = Math.max(0, (now - it.rentStart) / 1000);
-      const cond = Math.max(0, Math.round(100 - Math.min(100, (elapsedTotal / cycSec) * 100)));
+      const cond = Math.max(0, Math.round(100 - Math.min(100, (elapsed / cycSec) * 100)));
       it.condition = cond;
-      lines.push('⏳ ' + it.name + ': +' + fmtCapital(earned) + (_currentLang==='en'?' (cond ':' (міцн. ') + cond + '%)');
+      lines.push('⏳ ' + it.name + ': +' + fmtCapital(earned) +
+        (_currentLang==='en' ? ' (cond ' : ' (міцн. ') + cond + '%)');
     }
   });
 
   terminalOfflineModalShownThisSession = true;
   state.terminalFleet = (state.terminalFleet || []).filter(it => !it._removeAfterOffline);
 
-  // Показуємо модалку навіть якщо є зламані предмети без нового доходу
-  const hasExpired = lines.some(l => l.includes('🔴'));
-  if (totalEarned === 0 && !hasExpired) return;
+  if (lines.length === 0) return;
 
   if (totalEarned > 0) {
     state.terminalPendingOffline = (state.terminalPendingOffline || 0) + totalEarned;
   }
   state._terminalOfflineLines = lines;
 
-  saveState(); updateHUD();
+  saveState();
+  updateHUD();
   showTerminalOfflineModal(totalEarned, lines);
 }
 
