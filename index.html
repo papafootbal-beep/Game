@@ -17116,7 +17116,17 @@ function playHangarStandard(h, item) {
       <div id="sg-btns" style="display:flex;gap:10px;opacity:0;transition:opacity .5s;">
         <button onclick="keepHangarResult()" style="flex:1;padding:12px;border-radius:10px;border:none;
           background:linear-gradient(135deg,${h.accent},#22c55e);color:#000;
-          font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">${state.terminalUnlocked ? (_currentLang==='en'?'🌐 To Terminal':'🌐 В Термінал') : (_currentLang==='en'?'✅ To Storage':'✅ На склад')}</button>
+          font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">${
+            state.terminalUnlocked
+              ? ((() => {
+                  const fs = (state.terminalFleet||[]).length;
+                  const fl = state.terminalFleetLimit || 10;
+                  return fs >= fl
+                    ? (_currentLang==='en' ? '⚠️ Fleet Full' : '⚠️ Флот повний')
+                    : (_currentLang==='en' ? '🌐 To Terminal' : '🌐 В Термінал') + ' (' + fs + '/' + fl + ')';
+                })())
+              : (_currentLang==='en'?'✅ To Storage':'✅ На склад')
+          }</button>
         <button onclick="sellHangarResult()" style="flex:1;padding:12px;border-radius:10px;border:none;
           background:linear-gradient(135deg,#f5c842,#f97316);color:#000;
           font-family:Rajdhani,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">${_currentLang==='en'?'💸 Sell':'💸 Продати'}</button>
@@ -17251,7 +17261,17 @@ function playHangarLegendary(h, item) {
       <div id="lg-btns" style="display:flex;gap:10px;opacity:0;transition:opacity .7s;">
         <button onclick="keepHangarResult()" style="flex:1;padding:13px;border-radius:12px;
           border:2px solid #f5c842;background:linear-gradient(135deg,#f5c842,#b8860b);color:#000;
-          font-family:Rajdhani,sans-serif;font-size:15px;font-weight:800;cursor:pointer;">${state.terminalUnlocked ? (_currentLang==='en'?'🌐 To Terminal':'🌐 В Термінал') : (_currentLang==='en'?'✅ To Storage':'✅ На склад')}</button>
+          font-family:Rajdhani,sans-serif;font-size:15px;font-weight:800;cursor:pointer;">${
+            state.terminalUnlocked
+              ? ((() => {
+                  const fs = (state.terminalFleet||[]).length;
+                  const fl = state.terminalFleetLimit || 10;
+                  return fs >= fl
+                    ? (_currentLang==='en' ? '⚠️ Fleet Full' : '⚠️ Флот повний')
+                    : (_currentLang==='en' ? '🌐 To Terminal' : '🌐 В Термінал') + ' (' + fs + '/' + fl + ')';
+                })())
+              : (_currentLang==='en'?'✅ To Storage':'✅ На склад')
+          }</button>
         <button onclick="sellHangarResult()" style="flex:1;padding:13px;border-radius:12px;border:none;
           background:linear-gradient(135deg,#f97316,#dc2626);color:#fff;
           font-family:Rajdhani,sans-serif;font-size:15px;font-weight:800;cursor:pointer;">${_currentLang==='en'?'💸 Sell':'💸 Продати'}</button>
@@ -17311,9 +17331,15 @@ function keepHangarResult() {
   const { item, hangar } = hangarResult;
   // ── Terminal routing ──
   if (state.terminalUnlocked) {
-    if (state.terminalFleet.length >= state.terminalFleetLimit) {
+    const fleetSize  = (state.terminalFleet || []).length;
+    const fleetLimit = state.terminalFleetLimit || 10;
+    if (fleetSize >= fleetLimit) {
+      // Флот повний — продаємо за ринковою вартістю
       state.balance += item.value; state.totalEarned += item.value; state.stats.itemsSold++;
-      showToast((_currentLang==='en'?'⚠️ Terminal fleet full! ':'⚠️ Ангарний парк повний! ') + getItemName(item) + (_currentLang==='en'?' sold for ':' продано за ') + fmtCapitalV(item));
+      showToast((_currentLang==='en'
+        ? '⚠️ Terminal fleet full (' + fleetSize + '/' + fleetLimit + ')! Sold for '
+        : '⚠️ Ангарний парк повний (' + fleetSize + '/' + fleetLimit + ')! Продано за ')
+        + fmtCapitalV(item));
     } else {
       state.terminalFleet.unshift({
         id: Date.now() + Math.random(),
@@ -17879,6 +17905,40 @@ function renderTerminalMgmt() {
     '</div>';
   el.appendChild(slotsCard);
 
+  // ── Fleet Capacity ──
+  const fleetLim = state.terminalFleetLimit || 10;
+  const FLEET_LEVELS = [10, 15, 20, 30, 50];
+  const FLEET_PRICES = [300_000_000, 2_000_000_000, 15_000_000_000, 100_000_000_000];
+  const fleetLvl = FLEET_LEVELS.indexOf(fleetLim) !== -1 ? FLEET_LEVELS.indexOf(fleetLim) : 0;
+  const nextFleetLvl = fleetLvl < FLEET_LEVELS.length - 1 ? FLEET_PRICES[fleetLvl] : null;
+  const canBuyFleet  = nextFleetLvl && state.balance >= nextFleetLvl;
+
+  const fleetCapCard = document.createElement('div');
+  fleetCapCard.style.cssText = 'background:var(--bg2);border-radius:16px;border:1px solid rgba(34,197,94,.2);padding:16px;margin-bottom:12px;';
+  let fleetDots = '';
+  for (let i = 0; i < 4; i++) fleetDots += '<span style="display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 2px;background:' + (i < fleetLvl ? '#22c55e' : 'rgba(255,255,255,.12)') + ';"></span>';
+
+  fleetCapCard.innerHTML =
+    '<div style="display:flex;align-items:flex-start;gap:12px;">' +
+      '<div style="font-size:30px;flex-shrink:0;">🏭</div>' +
+      '<div style="flex:1;">' +
+        '<div style="font-family:\'Orbitron\',sans-serif;font-size:13px;font-weight:800;color:#22c55e;margin-bottom:4px;">' + (_currentLang==='en'?'Fleet Capacity':'Місткість флоту') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">' + (_currentLang==='en'?'Max items in Terminal fleet':'Максимальна кількість предметів у флоті') + '</div>' +
+        '<div style="font-size:11px;color:#22c55e;margin-bottom:8px;">' + (_currentLang==='en'?'Current: ':'Поточно: ') + fleetLim + (_currentLang==='en'?' items':' предметів') + '</div>' +
+        '<div style="margin-bottom:10px;">' + fleetDots + '</div>' +
+        (fleetLvl >= FLEET_LEVELS.length - 1
+          ? '<div style="padding:10px;border-radius:10px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80;font-weight:800;font-size:13px;text-align:center;">' + (_currentLang==='en'?'✅ Max 50 items!':'✅ Максимум 50 предметів!') + '</div>'
+          : '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border-radius:10px;padding:10px 12px;">' +
+              '<div><div style="font-size:11px;color:var(--muted);">→ ' + FLEET_LEVELS[fleetLvl+1] + (_currentLang==='en'?' items':' предметів') + '</div>' +
+              '<div style="font-size:13px;font-weight:700;color:#4ade80;">+' + (FLEET_LEVELS[fleetLvl+1]-fleetLim) + (_currentLang==='en'?' more slots':' додаткових місць') + '</div></div>' +
+              '<button onclick="buyTerminalFleet()" style="padding:9px 16px;border-radius:10px;border:none;font-family:\'Rajdhani\',sans-serif;font-size:13px;font-weight:800;cursor:' +
+                (canBuyFleet ? 'pointer;background:linear-gradient(135deg,#22c55e,#15803d);color:#fff;' : 'not-allowed;background:rgba(255,255,255,.08);color:var(--muted);') + '">' +
+                fmtCapital(nextFleetLvl) + '</button>' +
+            '</div>') +
+      '</div>' +
+    '</div>';
+  el.appendChild(fleetCapCard);
+
   // ── Speed upgrades ──
   const speedCard = document.createElement('div');
   speedCard.style.cssText = 'background:var(--bg2);border-radius:16px;border:1px solid rgba(249,115,22,.2);padding:16px;margin-bottom:12px;';
@@ -18014,6 +18074,23 @@ function buyTerminalSpeed() {
     : '⚡ Форсаж '+state.terminalSpeedLvl+' активовано! −'+savedH+'год для активних оренд'), 'gold');
   renderTerminalMgmt();
   renderTerminalFleet();
+}
+
+function buyTerminalFleet() {
+  const FLEET_LEVELS = [10, 15, 20, 30, 50];
+  const PRICES = [300_000_000, 2_000_000_000, 15_000_000_000, 100_000_000_000];
+  const lim = state.terminalFleetLimit || 10;
+  const lvl = FLEET_LEVELS.indexOf(lim);
+  if (lvl === -1 || lvl >= FLEET_LEVELS.length - 1) { showToast(_currentLang==='en'?'✅ Max 50 items!':'✅ Максимум 50 предметів!'); return; }
+  const price = PRICES[lvl];
+  if (state.balance < price) { showToast(t('toast_not_enough')); return; }
+  state.balance -= price;
+  state.terminalFleetLimit = FLEET_LEVELS[lvl + 1];
+  updateHUD(); saveState();
+  showToast((_currentLang==='en'
+    ? '🏭 Fleet expanded to ' + state.terminalFleetLimit + ' items!'
+    : '🏭 Флот розширено до ' + state.terminalFleetLimit + ' предметів!'), '#22c55e', 3000);
+  renderTerminalMgmt();
 }
 
 function buyTerminalIncome() {
